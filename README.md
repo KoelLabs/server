@@ -14,7 +14,7 @@ Read about all our repositories [here](https://github.com/KoelLabs).
 
 ### Run with Docker (Easiest Setup)
 
-0. `https://github.com/KoelLabs/server.git`
+0. `git clone https://github.com/KoelLabs/server.git`
 1. Install Docker and Docker Compose
     - [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/install/) or `brew cask install docker` with [Homebrew](https://brew.sh/)
         - If it repeatedly complains about the daemon not running, make sure Docker Desktop is running and add `export DOCKER_HOST=unix:///Users/$USER/Library/Containers/com.docker.docker/Data/docker.raw.sock` to your shell profile (e.g. `~/.zshrc`)
@@ -31,7 +31,7 @@ To add new dependencies, update the `requirements.txt` file and run `. ./scripts
 
 ### Run directly on your machine (Runs Fastest)
 
-0. `https://github.com/KoelLabs/server.git`
+0. `git clone https://github.com/KoelLabs/server.git`
 1. Install Python 3.8.10 or higher
     - [Install pyenv](https://github.com/pyenv/pyenv?tab=readme-ov-file#installation)
     - Run `pyenv install 3.10.12`
