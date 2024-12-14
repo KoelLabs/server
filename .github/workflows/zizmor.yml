@@ -1,4 +1,4 @@
-name: GitHub Actions Security Analysis with zizmor 🌈
+name: Zizmor Actions Security
 
 on: [push, pull_request]
 

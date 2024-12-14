@@ -5,6 +5,9 @@
 ![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)
 
 # Koel Labs - Server
+![Black Formatting](https://github.com/KoelLabs/server/actions/workflows/black.yml/badge.svg)
+![PyTest](https://github.com/KoelLabs/server/actions/workflows/tests.yml/badge.svg)
+![Zizmor](https://github.com/KoelLabs/server/actions/workflows/zizmor.yml/badge.svg)
 
 Contains the Python server that runs our ML inference. It is used by our [webapp](https://github.com/KoelLabs/webapp) repository and can be run directly as part of the webapp following instructions in that repository.
 
