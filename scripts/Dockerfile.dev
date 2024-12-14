@@ -1,0 +1,24 @@
+# Use the official Python image as the base
+FROM python:3.10.12-slim-buster
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the requirements file into the container
+COPY requirements.txt requirements.txt
+
+# Install the required packages
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Below is not needed because we mount the code as a volume instead for hot reloading
+# # Copy the application code into the container
+# COPY . .
+
+# Expose the port that the Flask app will run on
+EXPOSE 8080
+
+# Set an environment variable for Flask
+ENV FLASK_APP=server/server.py
+
+# Define the command to run the Flask app
+CMD ["python", "src/server.py"]
