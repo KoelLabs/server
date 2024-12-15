@@ -14,11 +14,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # # Copy the application code into the container
 # COPY . .
 
+# Set non-secret environment variables
+ENV HF_HUB_CACHE=/app/.cache/huggingface/hub
+
 # Expose the port that the Flask app will run on
 EXPOSE 8080
-
-# Set an environment variable for Flask
-ENV FLASK_APP=server/server.py
 
 # Define the command to run the Flask app
 CMD ["python", "src/server.py"]

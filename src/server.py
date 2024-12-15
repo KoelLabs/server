@@ -159,7 +159,7 @@ def stream(ws):
                     buffer = b""  # Clear the buffer
         except Exception as e:
             print(f"Error: {e}")
-            print(f"Line: {e.__traceback__.tb_lineno}")
+            print(f"Line: {e.__traceback__.tb_lineno if e.__traceback__ else -1}")
             break
 
 
