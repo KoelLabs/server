@@ -1,3 +1,4 @@
+const serverorigin = location.origin;
 const serverhost = location.host;
 
 export class FeedbackGiver {
@@ -28,7 +29,7 @@ export class FeedbackGiver {
 
   async getFeedback() {
     const res = await fetch(
-      `http://${serverhost}/feedback?target=${encodeURIComponent(
+      `${serverorigin}/feedback?target=${encodeURIComponent(
         this.target
       )}&tbw=${encodeURIComponent(
         JSON.stringify(this.target_by_word)
@@ -41,7 +42,7 @@ export class FeedbackGiver {
 
   async getCER() {
     const res = await fetch(
-      `http://${serverhost}/score_words_cer?target=${encodeURIComponent(
+      `${serverorigin}/score_words_cer?target=${encodeURIComponent(
         this.target
       )}&tbw=${encodeURIComponent(
         JSON.stringify(this.target_by_word)
@@ -54,7 +55,7 @@ export class FeedbackGiver {
 
   async getWFED() {
     const res = await fetch(
-      `http://${serverhost}/score_words_wfed?target=${encodeURIComponent(
+      `${serverorigin}/score_words_wfed?target=${encodeURIComponent(
         this.target
       )}&tbw=${encodeURIComponent(
         JSON.stringify(this.target_by_word)
@@ -67,7 +68,7 @@ export class FeedbackGiver {
 
   async getSideBySideDescription() {
     const res = await fetch(
-      `http://${serverhost}/side_by_side_description?target=${encodeURIComponent(`
+      `${serverorigin}/side_by_side_description?target=${encodeURIComponent(`
         ${this.target}
         `)}&tbw=${encodeURIComponent(
         JSON.stringify(this.target_by_word)
