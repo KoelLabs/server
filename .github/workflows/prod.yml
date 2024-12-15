@@ -66,5 +66,5 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'Production'
-          images: "${{ env.REGISTRY }}/${{ github.repository }}:${{ github.sha }}"
+          images: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
           
