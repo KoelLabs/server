@@ -9,6 +9,7 @@
 ![PyTest](https://github.com/KoelLabs/server/actions/workflows/tests.yml/badge.svg)
 ![Zizmor](https://github.com/KoelLabs/server/actions/workflows/zizmor.yml/badge.svg)
 ![Gitleaks Secret Scanning](https://github.com/KoelLabs/server/actions/workflows/gitleaks.yml/badge.svg)
+![Deploy to Production](https://github.com/KoelLabs/server/actions/workflows/prod.yml/badge.svg)
 
 Contains the Python server that runs our ML inference. It is used by our [webapp](https://github.com/KoelLabs/webapp) repository and can be run directly as part of the webapp following instructions in that repository.
 
