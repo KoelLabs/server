@@ -71,6 +71,9 @@ def pair_by_words(target, target_by_words, speech):
 
 
 def score_words_cer(target, target_by_words, speech):
+    if len(speech) == 0:
+        return [[word, seq, "", 0] for word, seq in target_by_words], 0
+
     pbw = pair_by_words(target, target_by_words, speech)
     word_scores = []
     average_score = 0
@@ -84,6 +87,9 @@ def score_words_cer(target, target_by_words, speech):
 
 
 def score_words_wfed(target, target_by_words, speech):
+    if len(speech) == 0:
+        return [[word, seq, "", 0] for word, seq in target_by_words], 0
+
     pbw = pair_by_words(target, target_by_words, speech)
     word_scores = []
     average_score = 0
@@ -99,6 +105,13 @@ def score_words_wfed(target, target_by_words, speech):
 
 
 def feedback(target, target_by_words, speech, good_enough_threshold=0.4):
+    if len(speech) == 0:
+        return (
+            [[word, "", "You didn't say anything!", 0] for word, _ in target_by_words],
+            [],
+            0,
+        )
+
     pbw = pair_by_words(target, target_by_words, speech)
     word_feedbacks = []
     for word, pairs in pbw:
@@ -140,6 +153,18 @@ def feedback(target, target_by_words, speech, good_enough_threshold=0.4):
 
 
 def side_by_side_description(target, target_by_words, speech):
+    if len(speech) == 0:
+        return [
+            [
+                word,
+                [
+                    (sound_descriptions[t], sound_descriptions["silence"])
+                    for t in phonemes
+                ],
+            ]
+            for word, phonemes in target_by_words
+        ]
+
     pbw = pair_by_words(target, target_by_words, speech)
     vis = []
     prevt, prevs = target[1], speech[1]
@@ -186,6 +211,13 @@ def side_by_side_description(target, target_by_words, speech):
 
 
 sound_descriptions = {
+    "silence": {
+        "phonemicSpelling": "silence",
+        "description": "Mouth closed.",
+        "exampleWord": "",
+        "viseme_id": [0],
+        "example_words": ["silence"],
+    },
     "a": {
         "phonemicSpelling": "ah",
         "description": "An open front unrounded vowel. Open your mouth wide, position the tongue low and towards the front, and vibrate the vocal cords.",

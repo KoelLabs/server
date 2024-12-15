@@ -82,7 +82,9 @@ export class FeedbackGiver {
     this.#setTranscription("");
 
     // Open WebSocket connection
-    this.socket = new WebSocket(`ws://${serverhost}/stream`);
+    this.socket = new WebSocket(
+      `${location.protocol === "https:" ? "wss:" : "ws:"}//${serverhost}/stream`
+    );
 
     // Handle incoming transcriptions
     this.socket.onmessage = async (event) => {
@@ -101,7 +103,9 @@ export class FeedbackGiver {
     });
 
     // Load the AudioWorkletProcessor (which handles audio processing)
-    await this.audioContext.audioWorklet.addModule("WavWorklet.js");
+    await this.audioContext.audioWorklet.addModule(
+      `${serverorigin}/WavWorklet.js`
+    );
 
     // Create the AudioWorkletNode
     this.audioWorkletNode = new AudioWorkletNode(

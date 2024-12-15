@@ -24,4 +24,4 @@ COPY . .
 EXPOSE 8080
 
 # Define the command to run the Flask app
-CMD ["gunicorn", "--bind=0.0.0.0:8080", "--timeout", "600", "--chdir", "src", "server:app"]
+CMD gunicorn --workers=$((2 * $(python -c 'import os; print(os.cpu_count())') + 1)) --threads=1 --bind=0.0.0.0:8080 --timeout 600 --chdir src server:app
