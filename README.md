@@ -32,6 +32,8 @@ See the [DEVELOPMENT.md](DEVELOPMENT.md) file for instructions on how to set up 
 
 Check out the [CONTRIBUTING.md](CONTRIBUTING.md) file for specific guidelines on contributing to this repository.
 
+We are grateful for all of [our contributors](ACKNOWLEDGEMENTS.md). If you contribute to this repository and wish to be acknowledged, please add your name to the list in your pull request.
+
 ## License
 
 The code in this repository is licensed under the [GNU Affero General Public License](https://www.gnu.org/licenses/agpl-3.0.en.html).

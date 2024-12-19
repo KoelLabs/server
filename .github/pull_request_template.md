@@ -8,6 +8,7 @@
 ### Q/A checklist
 
 - [ ] If you added new dependencies, did you update the requirements.txt file? `pip freeze > requirements.txt`
+- [ ] For new dependencies, also make sure to run `python scripts/license-report.py` to check for incompatible licenses and update the `Third-Party Software` section in [ACKNOWLEDGEMENTS.md](../ACKNOWLEDGEMENTS.md).
 - [ ] Run formatting, linting, tests, and security checks `. scripts/alltests.sh` 
 - [ ] Do a self code review of the changes - Read the diff at least twice.
 - [ ] I have written tests for any new features and regression tests for any bug fixes.
