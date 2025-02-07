@@ -5,8 +5,9 @@
 ### With Docker (easiest)
 
 0. `git clone https://github.com/KoelLabs/server.git`
+    - On Windows, install [Git](https://git-scm.com/downloads/win) first. Recommended: use the included git-bash to run the commands in the rest of the instructions.
 1. Install Docker and Docker Compose
-    - [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/install/) or `brew cask install docker` with [Homebrew](https://brew.sh/)
+    - [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/install/) or `brew install --cask docker` with [Homebrew](https://brew.sh/)
         - If it repeatedly complains about the daemon not running, make sure Docker Desktop is running and add `export DOCKER_HOST=unix:///Users/$USER/Library/Containers/com.docker.docker/Data/docker.raw.sock` to your shell profile (e.g. `~/.zshrc`)
     - [Docker Desktop for Windows](https://docs.docker.com/docker-for-windows/install/) or `choco install docker-desktop` with [Chocolatey](https://chocolatey.org/)
     - [Docker Engine for Linux](https://docs.docker.com/engine/install/) or `sudo apt install docker.io` with APT on Ubuntu
@@ -22,6 +23,7 @@ To add new dependencies, update the `requirements.txt` file and run `. ./scripts
 ### Directly on your machine (runs fastest)
 
 0. `git clone https://github.com/KoelLabs/server.git`
+    - On Windows, install [Git](https://git-scm.com/downloads/win) first. Recommended: use the included git-bash to run the commands in the rest of the instructions.
 1. Install Python 3.8.10 or higher
     - [Install pyenv](https://github.com/pyenv/pyenv?tab=readme-ov-file#installation)
     - Run `pyenv install 3.10.12`
