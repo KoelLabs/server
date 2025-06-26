@@ -27,7 +27,7 @@ app.config["CORS_HEADERS"] = "Content-Type"
 sock = Sock(app)
 
 # Load Wav2Vec2 model
-model_id = "KoelLabs/xlsr-timit-b0"
+model_id = "KoelLabs/xlsr-english-01"
 # model_id = "speech31/wav2vec2-large-english-TIMIT-phoneme_v3"
 # model_id = "ginic/hyperparam_tuning_1_wav2vec2-large-xlsr-buckeye-ipa"
 processor = AutoProcessor.from_pretrained(model_id)
