@@ -15,6 +15,7 @@ h11==0.14.0
 huggingface-hub==0.26.5
 idna==3.10
 iniconfig==2.0.0
+ipapy==0.0.9
 itsdangerous==2.2.0
 Jinja2==3.1.4
 MarkupSafe==3.0.2
