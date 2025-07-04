@@ -34,7 +34,14 @@ processor = AutoProcessor.from_pretrained(model_id)
 model = AutoModelForCTC.from_pretrained(model_id)
 
 
-def transcribe_audio(audio: np.ndarray) -> str:
+def transcribe_audio(audio: np.ndarray, include_timestamps: bool = False) -> "tuple[str, list]":
+    """
+    Transcribe audio and return both transcription and timestamp information.
+    
+    Returns:
+        tuple: (transcription_string, timestamps_list)
+        timestamps_list contains (start_time, end_time, token) for each token
+    """
     inputs = processor(
         audio,
         sampling_rate=SAMPLE_RATE,
@@ -45,7 +52,56 @@ def transcribe_audio(audio: np.ndarray) -> str:
         logits = model(inputs.input_values).logits
     predicted_ids = torch.argmax(logits, dim=-1)
     transcription = processor.batch_decode(predicted_ids)[0]
-    return transcription
+    transcription_batch, phonemes_with_time_batch = transcribe_batch_timestamped([(None, audio)] , model, processor)
+    if include_timestamps:
+        return transcription, phonemes_with_time_batch[0]
+    else:
+        return transcription
+
+
+def transcribe_batch_timestamped(batch, model, processor):
+    input_values = (
+        processor(
+            [x[1] for x in batch],
+            sampling_rate=processor.feature_extractor.sampling_rate,
+            return_tensors="pt",
+            padding=True,
+        )
+        .input_values.type(torch.float32)
+        .to(model.device)
+    )
+    with torch.no_grad():
+        logits = model(input_values).logits
+
+    predicted_ids_batch = torch.argmax(logits, dim=-1)
+    transcription_batch = [processor.decode(ids) for ids in predicted_ids_batch]
+
+    # get the start and end timestamp for each phoneme
+    phonemes_with_time_batch = []
+    for predicted_ids in predicted_ids_batch:
+        predicted_ids = predicted_ids.tolist()
+        duration_sec = input_values.shape[1] / processor.feature_extractor.sampling_rate
+
+        ids_w_time = [
+            (i / len(predicted_ids) * duration_sec, _id)
+            for i, _id in enumerate(predicted_ids)
+        ]
+
+        current_phoneme_id = processor.tokenizer.pad_token_id
+        current_start_time = 0
+        phonemes_with_time = []
+        for time, _id in ids_w_time:
+            if current_phoneme_id != _id:
+                if current_phoneme_id != processor.tokenizer.pad_token_id:
+                    phonemes_with_time.append(
+                        (processor.decode(current_phoneme_id), current_start_time, time)
+                    )
+                current_start_time = time
+                current_phoneme_id = _id
+
+        phonemes_with_time_batch.append(phonemes_with_time)
+
+    return transcription_batch, phonemes_with_time_batch
 
 
 def confidence_score(logits, predicted_ids) -> "tuple[np.ndarray, float]":
