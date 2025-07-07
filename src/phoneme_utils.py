@@ -43,31 +43,111 @@ def weighted_deletion_cost(x):
     return -abs(panphon_dist.weighted_deletion_cost(x))
 
 
-def fastdtw_phoneme_alignment(seq1, seq2):
-    # Group IPA characters into proper phoneme units
-    seq1_phonemes = group_phonemes(seq1)
-    seq2_phonemes = group_phonemes(seq2)
+def group_phonemes(phoneme_string):
+    """
+    Groups IPA characters into proper phoneme units.
 
-    # Convert phoneme sequences to feature vector sequences
-    seq1_vectors = sequence_to_vectors(seq1_phonemes)
-    seq2_vectors = sequence_to_vectors(seq2_phonemes)
+    Args:
+        phoneme_string (str): A string of IPA characters
 
-    if not seq1_vectors or not seq2_vectors:
-        raise ValueError(
-            "One or both sequences could not be converted to feature vectors."
+    Returns:
+        list: A list of grouped phonemes
+
+    Example:
+        group_phonemes("kʰɔlɪŋkʰɑɹdzɔɹðəweɪvʌvðəfjutʃɝ")
+        # Returns: ['kʰ', 'ɔ', 'l', 'ɪ', 'ŋ', 'kʰ', 'ɑ', 'ɹ', 'd͡z', 'ɔ', 'ɹ', 'ð', 'ə', 'w', 'e', 'ɪ', 'v', 'ʌ', 'v', 'ð', 'ə', 'f', 'j', 'u', 't͡ʃ', 'ɝ']
+    """
+    if not is_valid_ipa(phoneme_string):
+        print(
+            f"Warning: removing invalid ipa characters from {phoneme_string}.",
+            file=sys.stderr,
         )
+    return string2symbols(canonize(phoneme_string, ignore=True), IPA_SYMBOLS)[0]
 
-    # Use FastDTW with Euclidean distance on the vectors
-    distance, path = fastdtw(seq1_vectors, seq2_vectors, dist=euclidean)
 
-    # Align the original phoneme sequences based on the path
-    aligned_seq1 = []
-    aligned_seq2 = []
+def is_valid_ipa(ipa_string):
+    """Check if the given Unicode string is a valid IPA string"""
+    for c in ipa_string:
+        if not ipapy.is_valid_ipa(c):
+            print(f"Invalid IPA character: {c}")
+    return ipapy.is_valid_ipa(ipa_string)
+
+
+def string2symbols(string, symbols):
+    """
+    Converts a string of symbols into a list of symbols, minimizing the number of untranslatable symbols,
+    then minimizing the number of translated symbols.
+    """
+    N = len(string)
+    symcost = 1  # path cost per translated symbol
+    oovcost = len(string)  # path cost per untranslatable symbol
+    maxsym = max(len(k) for k in symbols)  # max input symbol length
+    # (pathcost to s[(n-m):n], n-m, translation[s[(n-m):m]], True/False)
+    lattice = [(0, 0, "", True)]
+    for n in range(1, N + 1):
+        # Initialize on the assumption that s[n-1] is untranslatable
+        lattice.append((oovcost + lattice[n - 1][0], n - 1, string[(n - 1) : n], False))
+        # Search for translatable sequences s[(n-m):n], and keep the best
+        for m in range(1, min(n + 1, maxsym + 1)):
+            if (
+                string[(n - m) : n] in symbols
+                and symcost + lattice[n - m][0] < lattice[n][0]
+            ):
+                lattice[n] = (
+                    symcost + lattice[n - m][0],
+                    n - m,
+                    string[(n - m) : n],
+                    True,
+                )
+    # Back-trace
+    tl = []
+    translated = []
+    n = N
+    while n > 0:
+        tl.append(lattice[n][2])
+        translated.append(lattice[n][3])
+        n = lattice[n][1]
+    return (tl[::-1], translated[::-1])
+
+
+def canonize(ipa_string, ignore=False):
+    """canonize the Unicode representation of the IPA string"""
+    return str(
+        IPAString(unicode_string=ipa_string, ignore=ignore).canonical_representation
+    )
+
+
+# ---- alignment functions ----
+
+
+def get_fastdtw_aligned_phoneme_lists(target, speech):
+    """Get aligned phoneme lists for target and speech phonemes (even for grouped phones like kʰ)
+    example:
+    target = "loooonger"
+    speech = "short"
+    returns:
+    aligned_targets = (['l', 'o', 'o', 'o', 'o', 'o', 'n', 'g', 'e', 'e'], ['s', 'h', 'o', 'o', 'o', 'o', 'r', 'r', 'r', 't'])
+    """
+    target_phonemes = group_phonemes(target)
+    speech_phonemes = group_phonemes(speech)
+
+    # Use FastDTW to get the alignment path
+    target_vectors = sequence_to_vectors(target_phonemes)
+    speech_vectors = sequence_to_vectors(speech_phonemes)
+
+    if not target_vectors or not speech_vectors:
+        return [], []
+
+    distance, path = fastdtw(target_vectors, speech_vectors, dist=euclidean)
+
+    # Create aligned sequences based on the path
+    aligned_target = []
+    aligned_speech = []
     for i, j in path:
-        aligned_seq1.append(seq1_phonemes[i] if i < len(seq1_phonemes) else "-")
-        aligned_seq2.append(seq2_phonemes[j] if j < len(seq2_phonemes) else "-")
+        aligned_target.append(target_phonemes[i] if i < len(target_phonemes) else "-")
+        aligned_speech.append(speech_phonemes[j] if j < len(speech_phonemes) else "-")
 
-    return "".join(aligned_seq1), "".join(aligned_seq2)
+    return aligned_target, aligned_speech
 
 
 def needleman_wunsch(
@@ -135,77 +215,6 @@ def weighted_needleman_wunsch(seq1, seq2):
     return [s if s == "-" else s[0] for s in aligned_seq1], [
         s if s == "-" else s[0] for s in aligned_seq2
     ]
-
-
-def group_phonemes(phoneme_string):
-    """
-    Groups IPA characters into proper phoneme units.
-
-    Args:
-        phoneme_string (str): A string of IPA characters
-
-    Returns:
-        list: A list of grouped phonemes
-
-    Example:
-        group_phonemes("kʰɔlɪŋkʰɑɹdzɔɹðəweɪvʌvðəfjutʃɝ")
-        # Returns: ['kʰ', 'ɔ', 'l', 'ɪ', 'ŋ', 'kʰ', 'ɑ', 'ɹ', 'd͡z', 'ɔ', 'ɹ', 'ð', 'ə', 'w', 'e', 'ɪ', 'v', 'ʌ', 'v', 'ð', 'ə', 'f', 'j', 'u', 't͡ʃ', 'ɝ']
-    """
-    if not is_valid_ipa(phoneme_string):
-        print(
-            f"Warning: removing invalid ipa characters from {phoneme_string}.",
-            file=sys.stderr,
-        )
-    return string2symbols(canonize(phoneme_string, ignore=True), IPA_SYMBOLS)[0]
-
-
-def is_valid_ipa(ipa_string):
-    """Check if the given Unicode string is a valid IPA string"""
-    return ipapy.is_valid_ipa(ipa_string)
-
-
-def string2symbols(string, symbols):
-    """
-    Converts a string of symbols into a list of symbols, minimizing the number of untranslatable symbols,
-    then minimizing the number of translated symbols.
-    """
-    N = len(string)
-    symcost = 1  # path cost per translated symbol
-    oovcost = len(string)  # path cost per untranslatable symbol
-    maxsym = max(len(k) for k in symbols)  # max input symbol length
-    # (pathcost to s[(n-m):n], n-m, translation[s[(n-m):m]], True/False)
-    lattice = [(0, 0, "", True)]
-    for n in range(1, N + 1):
-        # Initialize on the assumption that s[n-1] is untranslatable
-        lattice.append((oovcost + lattice[n - 1][0], n - 1, string[(n - 1) : n], False))
-        # Search for translatable sequences s[(n-m):n], and keep the best
-        for m in range(1, min(n + 1, maxsym + 1)):
-            if (
-                string[(n - m) : n] in symbols
-                and symcost + lattice[n - m][0] < lattice[n][0]
-            ):
-                lattice[n] = (
-                    symcost + lattice[n - m][0],
-                    n - m,
-                    string[(n - m) : n],
-                    True,
-                )
-    # Back-trace
-    tl = []
-    translated = []
-    n = N
-    while n > 0:
-        tl.append(lattice[n][2])
-        translated.append(lattice[n][3])
-        n = lattice[n][1]
-    return (tl[::-1], translated[::-1])
-
-
-def canonize(ipa_string, ignore=False):
-    """Canonize the Unicode representation of the IPA string"""
-    # For now, just return the string as-is since we're not using ipapy
-    # This can be enhanced later if needed
-    return ipa_string
 
 
 def main(args):
