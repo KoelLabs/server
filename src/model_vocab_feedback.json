@@ -16,7 +16,7 @@
         ],
         "explanation": "Try smiling but with your mouth wide open! Your mouth should be wide enough to fit more than two fingers between your teeth! It feels weird but your lips should be tense (think of when you are apply chapstick!) and your tongue is flat on the floor of your mouth with the very tip of your tongue at the front of your mouth",
         "confused phone": "ɑ",
-        "peet-suh": ["apple:0", "last: 1"],
+        "example": ["apple:0", "last: 1"],
         "phonetic-spelling": "AH!"
     },
     {
@@ -97,7 +97,8 @@
         ],
         "explanation": "Start just like saying the 'ee' in 'see', but now try to hum through your nose at the same time! It should feel like the sound is coming from both your mouth and nose. Plugging your nose should change the pitch of the sound.",
         "confused phone": "i",
-        "example": ["mean: 1"]
+        "example": ["mean: 1"],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "ɨ",
@@ -106,7 +107,8 @@
         ],
         "explanation": "Make the 'ee' sound in 'see', but pull your tongue slightly back so it's not touching the roof of your mouth and not fully front. Keep your lips relaxed and not smiling. It's like a mix between 'ee' and 'uh'.",
         "confused phone": "i",
-        "example": []
+        "example": [],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "ɪ",
@@ -124,7 +126,8 @@
             "close-mid front unrounded vowel"
         ],
         "explanation": "Smile lightly and raise the middle of your tongue toward the roof of your mouth but without touching it. Your tongue should be closest to the roof it can be without touching to produce a higher sounding 'eh' sound. This sound is like the 'e' in Spanish 'bebé' or the first vowel in French 'été'.",
-        "example": []
+        "example": [],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "eɪ",
@@ -142,8 +145,9 @@
             "back close-mid rounded vowel"
         ],
         "explanation": "Round your lips and blow warm air from your mouth instead. Now with your tongue flat and lips rounded, say 'oh' as if you are surprised. ",
-        "example": []
-    },
+        "example": [],
+        "phonetic-spelling": "IDK"
+        },
     {
         "phoneme": "oʊ",
         "description": [
@@ -162,7 +166,8 @@
             "nasalized"
         ],
         "explanation": "Round your lips and blow warm air from your mouth instead. Start with saying 'oh' but quickly make the hole your mouth forms slightly smaller, almost like a wolf howling! Now make this nasalized by pushing the back of your tongue towards the back of your throat. This sound is used by southern American speakers for 'o' in 'Don' be talkin' like that!'",
-        "example": []
+        "example": [],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "u",
@@ -189,7 +194,8 @@
             "near-back near-close rounded vowel"
         ],
         "explanation": "Start like the relaxed 'uh' then  quickly make the hole your mouth forms slightly smaller, almost like a wolf howling! Common in British English for words like 'go'.",
-        "example": []
+        "example": [],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "ə̃",
@@ -198,7 +204,8 @@
             "nasalized"
         ],
         "explanation": "Like you are feeling unsure, say the 'UH' in 'ummm'. Your lips should be relaxed and your jaw is dropped slightly, mouth open. BUT you must make the 'eee' sound nasalized. This means your tongue moves further back in your mouth to stop airflow from going to your nose. If done correctly, plugging versus unplugging your nose changes the pitch!",
-        "example": []
+        "example": [],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "ə̥",
@@ -207,7 +214,8 @@
             "voiceless"
         ],
         "explanation": "As if you took a drink of soda and say 'ah' after. It has no vocal cord vibration—just airflow. Imagine sighing the 'uh' sound softly without voice.",
-        "example": []
+        "example": [],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "ʊ",
@@ -226,7 +234,9 @@
             "nasalized"
         ],
         "explanation": "Say the 'oo' in 'good', but let some air out through your nose at the same time. You should feel a nasal buzz along with the vowel.",
-        "example": []
+        "example": [], 
+        "phonetic-spelling": "IDK"
+
     },
     {
         "phoneme": "ʌ",
@@ -263,7 +273,9 @@
             "nasalized"
         ],
         "explanation": "Say the vowel in 'bed' but with nasal airflow—like you're slightly congested or speaking through your nose. You should feel vibration in your nose.",
-        "example": []
+        "example": [], 
+        "phonetic-spelling": "IDK"
+
     },
     {
         "phoneme": "ɜ",
@@ -308,7 +320,9 @@
             " nasalized"
         ],
         "explanation": "Place the tip of your tongue against the gums just behind your upper front teeth and quickly tap it once while using your vocal cords to create a sound. It's like a quick 'd' sound but softer, like in 'butter' in American English. Now make this nasalized by pushing the back of your tongue towards the back of your throat. This sound can stand alone as a syllable.",
-        "example": []
+        "example": [], 
+        "phonetic-spelling": "IDK"
+
     },
     {
         "phoneme": "d",
@@ -344,7 +358,9 @@
             "central close rounded vowel"
         ],
         "explanation": "as if you spitting out something with force, make the 'puh!' sound. the 'ooh' sound is formed with rounded lips and the back of your tongue raised high.",
-        "example": []
+        "example": [], 
+        "phonetic-spelling": "IDK"
+
     },
     
     {
@@ -436,7 +452,8 @@
             " syllabic"
         ],
         "explanation": "Place the tip of your tongue against the gums just behind your upper front teeth, allowing air to flow around the sides of your tongue while using your vocal cords to create a sound. This sound can stand alone as a syllable, like in 'bottle'.",
-        "example": ["bottle: 0", "little: 1"]
+        "example": ["bottle: 0", "little: 1"],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "m",
@@ -453,8 +470,9 @@
             "bilabial consonant nasal voiced",
             " syllabic"
         ],
-        "explanation": "Press your lips together and hum, allowing the sound to come through your nose. Your vocal cords should vibrate, creating a soft buzzing sound. This sound can stand alone as a syllable, like in 'rhythm'.",
-        "example": ["rhythm: 0", "system: 1"]
+        "explanation": "Press your lips together and hum, allowing the sound to come through your nose. Your vocal cords should vibrate, creating a soft buzzing sound. This sound can stand alone as a syllable, like in 'rhythm'. This means that the vowel before this sound is merged into this 'm' sound rather than the vowel sound being pronounced alone.",
+        "example": ["rhythm: 0", "system: 1"], 
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "n",
@@ -472,8 +490,9 @@
             "alveolar consonant nasal voiced",
             " syllabic"
         ],
-        "explanation": "Place the tip of your tongue against the gums just behind your upper front teeth and hum, allowing the sound to come through your nose. Your vocal cords should vibrate, creating a soft buzzing sound. This sound can stand alone as a syllable, like in 'button'.",  
-        "example": ["button: 0", "sudden: 1"]
+        "explanation": "Place the tip of your tongue against the gums just behind your upper front teeth and hum, allowing the sound to come through your nose. Your vocal cords should vibrate, creating a soft buzzing sound. This sound can stand alone as a syllable, like in 'button'. This means that the vowel before this sound is merged into this 'n' sound rather than the vowel sound being pronounced alone.",  
+        "example": ["sudden: 1"], 
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "p",
@@ -500,7 +519,8 @@
             "alveolar consonant trill voiced"
         ], 
         "explanation": "Place the tip of your tongue against the gums just behind your upper front teeth and let it vibrate quickly as you use your vocal cords to create a sound. Your vocal cords should vibrate like you are gargling water or trying to growl from your throat. It's like a rapid 'd' sound but with a rolling effect.",
-        "example": []
+        "example": [],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "s",
@@ -518,7 +538,8 @@
             "aspirated "
         ],
         "explanation": "Put your teeth together but create a small gap to push air between. Place the tip of your tongue close to the roof of your mouth, just behind your upper front teeth, and blow air out without using your vocal cords. Now add a puff of air after the 's' sound, like a small burst of breath.",
-        "example": []
+        "example": [], 
+        "phonetic-spelling": "IDK"
     },
    
     {
@@ -545,7 +566,8 @@
             "consonant non-sibilant-fricative velar voiceless"
         ],
         "explanation": "Raise the back of your tongue to the soft part of the roof of your mouth (as if you may swallow your tongue) and blow air out without using your vocal cords. It's like a soft 'h' sound from the back of your mouth.",
-        "example": ["loch: 0", "Bach: 1"]
+        "example": ["loch: 0", "Bach: 1"],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "z",
@@ -591,8 +613,9 @@
         "description": [
             "consonant nasal velar voiced"
         ],
-        "explanation": "Raise the back of your tongue to the soft part of the roof of your mouth (as if you may swallow your tongue) and hum, allowing the sound to come through your nose. Your vocal cords should vibrate, creating a soft buzzing sound. Now, try to make this nasalized by pushing the back of your tongue towards the back of your throat. This sound can stand alone as a syllable. ",
-        "example": []
+        "explanation": "Raise the back of your tongue to the soft part of the roof of your mouth (as if you may swallow your tongue) and hum, allowing the sound to come through your nose. Your vocal cords should vibrate, creating a soft buzzing sound. This sound can stand alone as a syllable. This means that the vowel before this sound is merged into this 'n' sound rather than the vowel sound being pronounced alone. ",
+        "example": [], 
+        "phonetic-spelling": "IDK"
     },
    
      
@@ -612,7 +635,8 @@
             "consonant non-sibilant-fricative velar voiced"
         ],
         "explanation": "Raise the back of your tongue to the soft part of the roof of your mouth (as if you may swallow your tongue) and blow air out while using your vocal cords to create a sound. Now, in addition to vibrating your vocal chords it should feel like you are gargling water. It's like a soft 'h' sound from the back of your mouth but with buzzing.",
-        "example": []
+        "example": [], 
+        "phonetic-spelling": "IDK"
 
     },
     {
@@ -621,7 +645,8 @@
             "consonant glottal non-sibilant-fricative voiced"
         ],
         "explanation": "Open your mouth slightly and exhale gently, like a soft sigh. Now, use your vocal cords to create a sound while exhaling. It's like a breathy 'h' sound but with buzzing from your vocal cords.",
-        "example": []
+        "example": [], 
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "ʃ",
@@ -629,7 +654,8 @@
             "consonant palato-alveolar sibilant-fricative voiceless"
         ],
         "explanation": "Put your teeth together but create a small gap to push air between. Place the tip of your tongue close to the roof of your mouth, just behind your upper front teeth, and blow air out without using your vocal cords. Now add a puff of air after the 's' sound, like a small burst of breath.",
-        "example": ["she: 0", "shoes: 1"]
+        "example": ["she: 0", "shoes: 1"], 
+        "phonetic-spelling": "SH"
     },
     
     {
@@ -638,9 +664,8 @@
             "consonant glottal plosive voiceless"
         ],
         "explanation": "Close your vocal cords tightly and then release them suddenly to create a sharp sound, like a small explosion from your throat. It's like the sound you make when you say 'uh-oh' or 'button' in American English.",
-        "example": ["uh-oh: 0"],
+        "example": ["uh-oh: 0"], 
         "phonetic-spelling": "UH"
-
     },
     {
         "phoneme": "β",
@@ -648,7 +673,8 @@
             "bilabial consonant non-sibilant-fricative voiced"
         ],
         "explanation": "Press your lips together and blow air out while using your vocal cords to create a sound. Your vocal cords should vibrate, creating a buzzing sound. It's like a soft 'b' sound but with continuous airflow.",
-        "example": []
+        "example": [],
+        "phonetic-spelling": "IDK"
 
     },
     {
@@ -658,7 +684,8 @@
             "aspirated "
         ],
         "explanation": "Place your tongue between your teeth and blow air out without using your vocal cords. Your tongue should be relaxed and not tense, allowing the air to flow freely around it. Now add a puff of air after the 'th' sound, like a small burst of breath.",
-        "example": []
+        "example": [],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "ĩ",
@@ -668,7 +695,8 @@
         ],
         "explanation": "Start just like saying the 'ee' in 'see', but now try to hum through your nose at the same time! It should feel like the sound is coming from both your mouth and nose. Plugging versus unplugging your nose should change the pitch! ",
         "confused phone": "i",
-        "example": []
+        "example": [],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "ɑ̃",
@@ -677,7 +705,8 @@
             " nasalized"
         ],
         "Explanation": "As if you realized something say the 'ah' in 'ah ha!'. relax your mouth! Drop your jaw enough to place an index finger of space between your teeth. Your lips should be relaxed so that your lips form a round oval. Almost like you are about to yawn. Your tongue should be to the floor of your mouth. Now make this nasalized by pushing the back of your tongue towards the back of your throat. This sound can stand alone as a syllable.",
-        "example": []
+        "example": [],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "aɪ̃",
@@ -687,7 +716,8 @@
             " nasalized"
         ],
         "explanation": "Say the 'I' in 'I am happy!'. You start with the 'AH' sound and move to an 'eee' sound. BUT you must make the 'eee' sound nasalized. This means your tongue moves further back in your mouth to stop airflow from going to your nose. If done correctly, plugging versus unplugging your nose changes the pitch! Start with your jaw dropped with your tongue at the floor of your mouth with the tip of your tongue behind your bottom teeth  to get the 'AH' sound. Then, close your mouth while bringing your tongue to the BACK roof of your mouth to get the nasalized 'eee' sound. ",
-        "example": []
+        "example": [],
+        "phonetic-spelling": "IDK"
     },
     {
         "phoneme": "æ̃",
@@ -696,7 +726,8 @@
             " nasalized"
         ],
         "explanation": "Try smiling but with your mouth wide open! Your mouth should be wide enough to fit more than two fingers between your teeth! It feels weird but your lips should be tense (think of when you are apply chapstick!) and your tongue is flat on the floor of your mouth with the very tip of your tongue at the front of your mouth. Now make this nasalized by pushing the back of your tongue towards the back of your throat. This sound is used by southern American speakers for 'a' in 'Don' be talkin' like that!'",
-        "example": []
+        "example": [],
+        "phonetic-spelling": "IDK"
     }
 
 ]
