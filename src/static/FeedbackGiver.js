@@ -77,6 +77,23 @@ export class FeedbackGiver {
     return await res.json();
   }
 
+  async getPhonemeNaturalLanguageFeedback() {
+    const res = await fetch(
+      `${serverorigin}/phoneme_written_feedback?target=${encodeURIComponent(this.target)}&speech=${encodeURIComponent(this.transcription)}`
+    );
+    return await res.json();
+  }
+
+  async getUserPhoneticErrors() {
+    console.log("getUserPhoneticErrors called with transcription:", this.transcription);
+    const res = await fetch(
+      `${serverorigin}/user_phonetic_errors?target=${encodeURIComponent(this.target)}&tbw=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(this.transcription)}`
+    );
+    console.log("res", res);
+    return await res.json();
+      
+  }
+
   async start() {
     // Clear previous transcription
     this.#setTranscription("");

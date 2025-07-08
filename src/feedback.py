@@ -1,112 +1,98 @@
 import panphon
 import panphon.distance
-from fastdtw import fastdtw
+from panphon.distance import Distance
 import numpy as np
-from scipy.spatial.distance import euclidean
 import json
 import os
+from phoneme_utils import group_phonemes, get_fastdtw_aligned_phoneme_lists
 
 # Create a panphon feature table
 ft = panphon.FeatureTable()
+# Create a distance object for reuse
+dist = Distance()
+
+model_vocab_json = os.path.join(os.path.dirname(__file__), "model_vocab_feedback.json")
 
 
-def load_sound_descriptions():
-    """Load sound descriptions from the JSON file."""
-    json_path = os.path.join(os.path.dirname(__file__), "model_vocab_feedback.json")
+def get_all_phoneme_pairs(target, target_by_words, speech):
+    """
+    Get all phoneme pairs from the alignment for building frequency dictionaries.
+    Returns a dictionary of word: (target_phoneme, speech_phoneme) tuples.
+    example: {'calling': [('ɔ', 'o'), ('l', 'i'), ('i', 'i'), ('ŋ', 'ŋ')], ...}
+    """
+    if len(speech) == 0:
+        return {}
     
-    # Add a silence entry for special cases
-    sound_descriptions = {
-        "silence": {
-            "phonemicSpelling": "silence",
-            "description": "Mouth closed.",
-            "exampleWord": "",
-            "example_words": ["silence"],
-        }
-    }
+    pbw = pair_by_words(target, target_by_words, speech)
+    all_pairs = {}
     
-    try:
-        with open(json_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        
-        for item in data:
-            phoneme = item.get("phoneme", "")
-            if phoneme:
-                # Convert JSON format to the expected format
-                sound_descriptions[phoneme] = {
-                    "phonemicSpelling": item.get("phonetic-spelling", ""),
-                    "description": item.get("explanation", ""),
-                    "exampleWord": item.get("example", []),
-                    "example_words": item.get("example", [])
-                }
-    except Exception as e:
-        print(f"Warning: Could not load sound descriptions from {json_path}: {e}")
+    for word, pairs in pbw:
+        all_pairs[word] = pairs
     
-    return sound_descriptions
+    return all_pairs
 
 
-# Load sound descriptions
-sound_descriptions = load_sound_descriptions()
+def user_phonetic_errors(target, target_by_words, speech):
+    """
+    Build a frequency dictionary of phoneme mistakes.
+    Returns {target_phoneme: (mistake_frequency, words_with_mistake, mistake_severities, phoneme_spoken_as)}
+    example: {'k': (3, {'calling', 'crack'}, [2.3, .6], {'l', 'i'}), 'o': (1, {'cooler'}, [.3, .4], {'i', 'e'})}
+    """
+    if len(speech) == 0:
+        return {}
+    
+    word_phone_pairings = get_all_phoneme_pairs(target, target_by_words, speech)
+    phoneme_mistake_freq = {}
+    print("word_phone_pairings", word_phone_pairings)
+    for word, pairs in word_phone_pairings.items():
+        for target_phoneme, speech_phoneme in pairs:
+            if target_phoneme != speech_phoneme: 
 
+                if target_phoneme not in phoneme_mistake_freq:
+                    phoneme_mistake_freq[target_phoneme] = (0, set(), [], set())
 
-# Convert a phoneme to a numerical feature vector
-def phoneme_to_vector(phoneme):
-    vectors = ft.word_to_vector_list(phoneme, numeric=True)
-    if vectors:
-        return np.array(vectors[0])  # Take the first vector if multiple exist
-    else:
-        return None  # Invalid phoneme
+                # update mistake count and word set and mistake severity and phoneme spoken as
+                mistake_count, word_set, mistake_severities, phoneme_spoken_as = phoneme_mistake_freq[target_phoneme]
+                word_set.add(word)
+                mistake_severities.append(dist.feature_error_rate(target_phoneme, speech_phoneme))
+                phoneme_spoken_as.add(speech_phoneme)
+                phoneme_mistake_freq[target_phoneme] = (mistake_count + 1, word_set, mistake_severities, phoneme_spoken_as)
 
+    return phoneme_mistake_freq
 
-# Convert sequences of phonemes to sequences of vectors
-def sequence_to_vectors(seq):
-    return [phoneme_to_vector(p) for p in seq if phoneme_to_vector(p) is not None]
-
-
-def fastdtw_phoneme_alignment(seq1, seq2):
-    # Convert phoneme sequences to feature vector sequences
-    seq1_vectors = sequence_to_vectors(seq1)
-    seq2_vectors = sequence_to_vectors(seq2)
-
-    if not seq1_vectors or not seq2_vectors:
-        raise ValueError(
-            "One or both sequences could not be converted to feature vectors."
-        )
-
-    # Use FastDTW with Euclidean distance on the vectors
-    distance, path = fastdtw(seq1_vectors, seq2_vectors, dist=euclidean)
-
-    # Align the original phoneme sequences based on the path
-    aligned_seq1 = []
-    aligned_seq2 = []
-    for i, j in path:
-        aligned_seq1.append(seq1[i] if i < len(seq1) else "-")
-        aligned_seq2.append(seq2[j] if j < len(seq2) else "-")
-
-    return "".join(aligned_seq1), "".join(aligned_seq2)
 
 
 def pair_by_words(target, target_by_words, speech):
-    paired = zip(*fastdtw_phoneme_alignment(target, speech))
-
+    ''' this function pairs the target and speech by words 
+    example: [('calling', [('k', 'k'), ('ɔ', 'o'), ('l', 'l'), ('ɪ', 'i'), ('ŋ', 'ŋ')]), ...]'''
+    # Get aligned phoneme lists with needleman wunsch
+    aligned_target, aligned_speech = get_fastdtw_aligned_phoneme_lists(target, speech)
+    
+    if not aligned_target or not aligned_speech:
+        return []
+    
+    # Now pair by words
     pair_by_words = []
-    pairs = iter(paired)
-    cur_pair = next(pairs)
-    start = []
+    target_idx = 0
+    
     for word, phons in target_by_words:
-        phons = list(phons)
-        ps = start
-        while len(phons) > 0:
-            t, s = cur_pair
-            if t != phons[0]:
-                phons.pop(0)
-            ps.append(cur_pair)
-            try:
-                cur_pair = next(pairs)
-            except StopIteration:
-                break
-        pair_by_words.append((word, ps[:-1]))
-        start = [ps[-1]]
-
+        # Group the phonemes for this word
+        word_phonemes = group_phonemes(phons)
+        word_pairs = []
+        
+        # Find pairs for this word
+        for i in range(len(aligned_target)):
+            if target_idx < len(aligned_target):
+                t, s = aligned_target[target_idx], aligned_speech[target_idx]
+                word_pairs.append((t, s))
+                target_idx += 1
+                
+                # Check if we've processed all phonemes for this word
+                if len(word_pairs) >= len(word_phonemes):
+                    break
+        
+        pair_by_words.append((word, word_pairs))
+    
     return pair_by_words
 
 
@@ -136,12 +122,33 @@ def score_words_wfed(target, target_by_words, speech):
     for word, pairs in pbw:
         seq1, seq2 = map(lambda x: "".join(x), zip(*pairs))
         norm_score = (
-            22 - panphon.distance.Distance().weighted_feature_edit_distance(seq1, seq2)
+            22 - dist.weighted_feature_edit_distance(seq1, seq2)
         ) / 22
         word_scores.append((word, seq1, seq2, norm_score**2))
         average_score += norm_score**2
     average_score /= len(pbw)
     return word_scores, average_score
+
+def phoneme_written_feedback(target, speech):
+    ''' This function takes in the target and speech and returns a dictionary 
+    of phoneme: {explanation, phonetic-spelling} for all phonemes in the target
+    and speech. 
+    '''
+    all_phoneme_feedback = {}
+    target_user_speech = group_phonemes(target + speech)
+    with open(model_vocab_json, "r", encoding="utf-8") as f:
+        content = json.load(f)
+    for phoneme in target_user_speech: 
+        phoneme_feedback = next((item for item in content if item["phoneme"] == phoneme), None)
+        if phoneme_feedback:
+            all_phoneme_feedback[phoneme] = {
+                "explanation": phoneme_feedback["explanation"],
+                "phonetic-spelling": phoneme_feedback["phonetic-spelling"],
+            }
+        else:
+            print(f"Phoneme {phoneme} not found in model vocabulary")
+    
+    return all_phoneme_feedback
 
 
 def feedback(target, target_by_words, speech, good_enough_threshold=0.4):
@@ -151,16 +158,15 @@ def feedback(target, target_by_words, speech, good_enough_threshold=0.4):
             [],
             0,
         )
-
     pbw = pair_by_words(target, target_by_words, speech)
     word_feedbacks = []
     for word, pairs in pbw:
         wrongest_pair = pairs[0]
-        wrongest_pair_dist = panphon.distance.Distance().weighted_feature_edit_distance(
+        wrongest_pair_dist = dist.weighted_feature_edit_distance(
             wrongest_pair[0], wrongest_pair[1]
         )
         for p in pairs:
-            dist = panphon.distance.Distance().weighted_feature_edit_distance(
+            dist = dist.weighted_feature_edit_distance(
                 p[0], p[1]
             )
             if dist > wrongest_pair_dist:
@@ -189,52 +195,7 @@ def feedback(target, target_by_words, speech, good_enough_threshold=0.4):
                 )
             )
     top3 = sorted(word_feedbacks, key=lambda x: x[2], reverse=True)[:3]
+    
     return word_feedbacks, top3
 
 
-def side_by_side_description(target, target_by_words, speech):
-    if len(speech) == 0:
-        return [
-            [
-                word,
-                [
-                    (sound_descriptions[t], sound_descriptions["silence"])
-                    for t in phonemes
-                ],
-            ]
-            for word, phonemes in target_by_words
-        ]
-
-    pbw = pair_by_words(target, target_by_words, speech)
-    vis = []
-    for word, pairs in pbw:
-        st = []
-        for t, s in pairs:
-            st.append(
-                (
-                    sound_descriptions[t],
-                    sound_descriptions[s],
-                )
-            )
-        vis.append((word, st))
-    vis[0] = (
-        vis[0][0],
-        [
-            (
-                {
-                    "phonemicSpelling": "silence",
-                    "description": "Mouth closed.",
-                    "exampleWord": "",
-                    "example_words": ["silence"],
-                },
-                {
-                    "phonemicSpelling": "silence",
-                    "description": "Mouth closed.",
-                    "exampleWord": "",
-                    "example_words": ["silence"],
-                },
-            ),
-            *vis[0][1],
-        ],
-    )
-    return vis

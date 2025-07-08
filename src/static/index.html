@@ -7,33 +7,44 @@
   </head>
   <body>
     <h1>Real-Time Transcription</h1>
-    <button id="start">Start</button>
-    <button id="stop" disabled>Stop</button>
-    <button id="analyze">Analyze</button>
-    <p>Transcription: <span id="transcription"></span></p>
-    <p>Accent Similarity: <span id="score"></span>%</p>
-    <p id="scored_words"></p>
-    <p id="feedback"></p>
     <div>
       <h2>Word by Word</h2>
+      <div id="scored_words"></div>
       <span id="word"></span>
-      <button id="prev_word">Previous Word</button>
-      <button id="next_word">Next Word</button><br><br>
-      <img id="target_image" src="" alt="Target Image" style="width: 200px; height: 200px;" />
-      <img id="transcription_image" src="" alt="Transcription Image" style="width: 200px; height: 200px;"/>
-      <button id="play_word">Play</button>
-      <input type="range" id="phoneme_pair" min="0" max="0" step="1" />
+      <!-- <button id="play_word">Play</button>
+      <input type="range" id="phoneme_pair" min="0" max="0" step="1" /> -->
       <p id="target_phoneme_discription"></p>
       <p id="transcription_phoneme_discription"></p>
     </div>
 
+    <button id="start">Start</button>
+    <button id="stop" disabled>Stop</button>
+    <button id="analyze_phonetics">Analyze Phonetics</button>
+    <p>Transcription: <span id="transcription"></span></p>
+    <p>Accent Similarity: <span id="score"></span>%</p>
+    <p id="missed_phonemes"></p>
+    <p id="feedback"></p>
+    
     <script type="module">
       import { FeedbackGiver } from './FeedbackGiver.js';
+      const target = "kʰɔlɪŋkʰɑɹdzɑɹðəweɪvəvðəfjutʃɝ"
+      const target_by_words = [
+        ['calling', 'kʰɔlɪŋ'],
+        ['cards', 'kʰɑɹdz'],
+        ['are', 'ɑɹ'],
+        ['the', 'ðʌ'],
+        ['wave', 'weɪv'],
+        ['of', 'əv'],
+        ['the', 'ðʌ'],
+        ['future', 'fjutʃɝ']
+      ]
+    
 
       const transcriptionElement = document.getElementById("transcription");
-      const scoredWordsElement = document.getElementById("scored_words");
+      const missedPhonemesElement = document.getElementById("missed_phonemes");
       const feedbackElement = document.getElementById("feedback");
       const scoreElement = document.getElementById("score");
+      const scoredWordsElement = document.getElementById("scored_words");
 
       function color_word(el) {
         const score = parseFloat(el.dataset.pscore);
@@ -50,7 +61,7 @@
         const [scoredWords, overall] = await feedbackGiver.getCER();
         console.log('Phoneme Score:', overall);
         const wordElements = document.querySelectorAll("#scored_words span");
-        for (let i = 0; i < scoredWords.length; i++) {
+        for (let i = 0; i < scoredWords.length; i++) { 
           const wordscore = scoredWords[i];
           const score = wordscore.at(-1);
           wordElements[i].dataset.pscore = score;
@@ -76,25 +87,20 @@
             initWordDiagramExplorer();
             document.getElementById("start").disabled = false;
             document.getElementById("stop").disabled = true;
-          }, 1000);
+          }, 3000);
         } else {
           const el = wordElements[next_word_ix];
           el.style.border = "3px solid red";
         }
       }
 
-      const target = 'ɔliŋkɑɹdsʔɑɹðəweɪvəvðifjutʃɹ';
-      const target_by_word = [
-        ['Calling', 'ɔliŋ'],
-        ['cards', 'kɑɹdsʔ'],
-        ['are', 'ɑɹ'],
-        ['the', 'ðə'],
-        ['wave', 'weɪv'],
-        ['of', 'əv'],
-        ['the', 'ði'],
-        ['future', 'fjutʃɹ'],
-      ];
-      const feedbackGiver = new FeedbackGiver(target, target_by_word, on_transcription, on_word_spoken);
+      
+    
+      
+      
+      
+      const feedbackGiver = new FeedbackGiver(target, target_by_words, on_transcription, on_word_spoken);
+      
       for (const word of feedbackGiver.words) {
         scoredWordsElement.innerHTML += `<span data-pscore="0" data-word-correct="false">${word}</span> `;
       }
@@ -149,18 +155,45 @@
         });
         updatePhonemePair();
       }
-
-      document.getElementById("analyze").addEventListener("click", async () => {
-        const [perWordFeedback, top3feedback] = await feedbackGiver.getFeedback();
-        feedbackElement.innerHTML = "";
-        for (const [word, feedback] of perWordFeedback) {
-          feedbackElement.innerHTML += `<p>${word}: ${feedback}</p>`;
-        }
-        feedbackElement.innerHTML += `<h2>Top 3 feedback</h2>`;
-        for (const [word, feedback] of top3feedback) {
-          feedbackElement.innerHTML += `<p>${word}: ${feedback}</p>`;
+      document.getElementById("analyze_phonetics").addEventListener("click", async () => {
+        console.log("Analyze phonetics button clicked");
+        console.log("Current transcription:", feedbackGiver.transcription);
+        try {
+          const missed_phonemes = await feedbackGiver.getUserPhoneticErrors();
+          const natural_language_feedback = await feedbackGiver.getPhonemeNaturalLanguageFeedback();
+          console.log("natural_language_feedback", natural_language_feedback);
+          console.log("Got phonetic errors:", missed_phonemes);
+          
+          // Convert dictionary to array and sort by frequency
+          const phoneme_errors = Object.entries(missed_phonemes).map(([phoneme, data]) => {
+            const [frequency, words, severities, spoken_as] = data;
+            return {
+              phoneme,
+              frequency,
+              words: words,
+              severities,
+              spoken_as: spoken_as
+            };
+          }).sort((a, b) => b.frequency - a.frequency);
+          
+          
+          missedPhonemesElement.innerHTML = ""; // Clear previous content
+          console.log("phoneme_errors", phoneme_errors);
+          for (const errors of phoneme_errors) {
+            const natural_phonetic_spelling = natural_language_feedback[errors.phoneme]["phonetic-spelling"]
+            const natural_explanation = natural_language_feedback[errors.phoneme]["explanation"]
+            missedPhonemesElement.innerHTML += `<p><strong>You struggle with the: ${natural_phonetic_spelling}</strong> sound <br>
+            Which occurred in the words: ${errors.words.join(', ')}<br>
+            It sounded like: ${errors.spoken_as.join(', ')}<br>
+            ${natural_explanation}</p>`;
+          }
+        } catch (error) {
+          console.error("Error in analyze_phonetics:", error);
+          missedPhonemesElement.innerHTML = `<p>Error: ${error.message}</p>`;
         }
       });
+
+
 
       document.getElementById("start").addEventListener("click", () => {
         const wordElements = document.querySelectorAll("#scored_words span");

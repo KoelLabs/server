@@ -1,16 +1,17 @@
-from flask import Flask, send_from_directory, request
+from flask import Flask, send_from_directory, request, jsonify
 from flask_cors import CORS, cross_origin
 from flask_sock import Sock
 import torch
 from transformers import AutoProcessor, AutoModelForCTC
 import numpy as np
-import scipy.io.wavfile as wavfile
+import os
 
 from feedback import (
     score_words_cer,
     score_words_wfed,
     feedback,
-    side_by_side_description,
+    phoneme_written_feedback,
+    user_phonetic_errors
 )
 import json
 
@@ -18,7 +19,6 @@ import json
 SAMPLE_RATE = 16000
 NUM_SECONDS_PER_CHUNK = 2
 NUM_CHUNKS_ACCUMULATED = 5
-DEBUG = False
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -33,6 +33,7 @@ model_id = "KoelLabs/xlsr-english-01"
 processor = AutoProcessor.from_pretrained(model_id)
 model = AutoModelForCTC.from_pretrained(model_id)
 
+model_vocab_json = os.path.join(os.path.dirname(__file__), "model_vocab_feedback.json")
 
 def transcribe_audio(audio: np.ndarray, include_timestamps: bool = False) -> "tuple[str, list]":
     """
@@ -52,8 +53,8 @@ def transcribe_audio(audio: np.ndarray, include_timestamps: bool = False) -> "tu
         logits = model(inputs.input_values).logits
     predicted_ids = torch.argmax(logits, dim=-1)
     transcription = processor.batch_decode(predicted_ids)[0]
-    transcription_batch, phonemes_with_time_batch = transcribe_batch_timestamped([(None, audio)] , model, processor)
     if include_timestamps:
+        transcription_batch, phonemes_with_time_batch = transcribe_batch_timestamped([(None, audio)] , model, processor)
         return transcription, phonemes_with_time_batch[0]
     else:
         return transcription
@@ -130,6 +131,39 @@ def index():
 def send_static(path):
     return send_from_directory("static", path)
 
+@app.route("/phoneme_written_feedback", methods=["GET"])
+@cross_origin()
+def get_phoneme_feedback():
+    try:
+        target = request.args.get("target", "").strip()
+        speech = request.args.get("speech", "").strip()
+        
+        result = phoneme_written_feedback(target, speech)
+
+
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/user_phonetic_errors", methods=["GET"])
+@cross_origin()
+def get_user_phonetic_errors():
+    try:
+        target = request.args.get("target", "").strip()
+        target_by_word = json.loads(request.args.get("tbw") or "null")
+        speech = request.args.get("speech", "").strip()
+        
+        result = user_phonetic_errors(target, target_by_word, speech)
+        
+        result_sorted_freq = sorted(result.items(), key=lambda x: x[1][0], reverse=True)
+        # Convert sets to lists for JSON serialization
+        serializable_result = {}
+        for phoneme, (count, words, severities, spoken_as) in result_sorted_freq:
+            serializable_result[phoneme] = [count, list(words), severities, list(spoken_as)]
+        
+        return jsonify(serializable_result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # REST endpoint
 @app.route("/score_words_cer", methods=["GET"])
@@ -139,9 +173,9 @@ def get_score_words_cer():
     target_by_word = json.loads(request.args.get("tbw") or "null")
     speech = request.args.get("speech", "").strip()
     if not speech:
-        return json.dumps([[[word, seq, "", 0] for word, seq in target_by_word], 0])
+        return jsonify([[[word, seq, "", 0] for word, seq in target_by_word], 0])
     word_scores = score_words_cer(target, target_by_word, speech)
-    return json.dumps(word_scores)
+    return jsonify(word_scores)
 
 
 @app.route("/score_words_wfed", methods=["GET"])
@@ -151,9 +185,9 @@ def get_score_words_wfed():
     target_by_word = json.loads(request.args.get("tbw") or "null")
     speech = request.args.get("speech", "").strip()
     if not speech:
-        return json.dumps([[[word, seq, "", 0] for word, seq in target_by_word], 0])
+        return jsonify([[[word, seq, "", 0] for word, seq in target_by_word], 0])
     word_scores = score_words_wfed(target, target_by_word, speech)
-    return json.dumps(word_scores)
+    return jsonify(word_scores)
 
 
 @app.route("/feedback", methods=["GET"])
@@ -162,16 +196,8 @@ def get_feedback():
     target = request.args.get("target", "").strip()
     target_by_word = json.loads(request.args.get("tbw") or "null")
     speech = request.args.get("speech", "").strip()
-    return json.dumps(feedback(target, target_by_word, speech))
+    return jsonify(feedback(target, target_by_word, speech))
 
-
-@app.route("/side_by_side_description", methods=["GET"])
-@cross_origin()
-def get_side_by_side_description():
-    target = request.args.get("target", "").strip()
-    target_by_word = json.loads(request.args.get("tbw") or "null")
-    speech = request.args.get("speech", "").strip()
-    return json.dumps(side_by_side_description(target, target_by_word, speech))
 
 
 # WebSocket endpoint for transcription
@@ -208,16 +234,10 @@ def stream(ws):
                         num_chunks_accumulated = 0
                         transcription = ""
 
-                    if DEBUG:
-                        wavfile.write("audio.wav", SAMPLE_RATE, audio)
-                        wavfile.write("combined.wav", SAMPLE_RATE, combined)
-
                     buffer = b""  # Clear the buffer
         except Exception as e:
-            print(f"Error: {e}")
-            print(f"Line: {e.__traceback__.tb_lineno if e.__traceback__ else -1}")
             break
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=8080)
+    app.run(debug=False, host="0.0.0.0", port=8080)
