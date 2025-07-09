@@ -56,7 +56,11 @@ def transcribe_audio(
     with torch.no_grad():
         logits = model(inputs.input_values).logits
     predicted_ids = torch.argmax(logits, dim=-1)
-    transcription = processor.batch_decode(predicted_ids)[0]
+    tokens = processor.tokenizer.convert_ids_to_tokens(predicted_ids[0])
+    transcription = [
+        t for t in tokens if t not in processor.tokenizer.all_special_tokens
+    ]
+
     if include_timestamps:
         transcription_batch, phonemes_with_time_batch = transcribe_batch_timestamped(
             [(None, audio)], model, processor
@@ -87,7 +91,7 @@ def transcribe_batch_timestamped(batch, model, processor):
     phonemes_with_time_batch = []
     for predicted_ids in predicted_ids_batch:
         predicted_ids = predicted_ids.tolist()
-        duration_sec = input_values.shape[1]
+        duration_sec = input_values.shape[1] / processor.feature_extractor.sampling_rate
 
         ids_w_time = [
             (i / len(predicted_ids) * duration_sec, _id)
@@ -96,12 +100,13 @@ def transcribe_batch_timestamped(batch, model, processor):
 
         current_phoneme_id = processor.tokenizer.pad_token_id
         current_start_time = 0
-        phonemes_with_time = []
+        phonemes_with_time = {}
         for time, _id in ids_w_time:
             if current_phoneme_id != _id:
                 if current_phoneme_id != processor.tokenizer.pad_token_id:
-                    phonemes_with_time.append(
-                        (processor.decode(current_phoneme_id), current_start_time, time)
+                    phonemes_with_time[processor.decode(current_phoneme_id)] = (
+                        current_start_time,
+                        time,
                     )
                 current_start_time = time
                 current_phoneme_id = _id
@@ -124,24 +129,18 @@ def confidence_score(logits, predicted_ids) -> "tuple[np.ndarray, float]":
     return character_scores.numpy(), total_average.float().item()
 
 
-def get_user_word_audio_sample(
-    speech_word, full_transcript, timestamps, speech, sample_rate
-):
-    grouped_speech_word = group_phonemes(speech_word)
-    grouped_full_transcript = group_phonemes(full_transcript)
-    start_phoneme = grouped_speech_word[0]
-    print("start_phoneme", start_phoneme)
-    end_phoneme = grouped_speech_word[-1]
-    print("end_phoneme", end_phoneme)
-    word_start_index = grouped_full_transcript.index(start_phoneme)
-    print("word_start_index", word_start_index)
-    word_end_index = grouped_full_transcript.index(end_phoneme)
-    print("word_end_index", word_end_index)
-    start_timestamp = timestamps[word_start_index][1]
-    print("start_timestamp", start_timestamp)
-    end_timestamp = timestamps[word_end_index][2]
+def get_user_word_audio_clip(speech_word, timestamps, speech_audio):
 
-    return speech[start_timestamp:end_timestamp]
+    first_phoneme = speech_word[0]
+    last_phoneme = speech_word[-1]
+    print(timestamps)
+
+    print(timestamps[first_phoneme], timestamps[last_phoneme])
+
+    word_start_time = int(float(timestamps[first_phoneme][0]) * SAMPLE_RATE)
+    word_end_time = int(float(timestamps[last_phoneme][1]) * SAMPLE_RATE)
+
+    return speech_audio[word_start_time:word_end_time]
 
 
 # server /
