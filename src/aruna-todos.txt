@@ -1,0 +1,10 @@
+fixing the bugs Cannot read properties of undefined (reading 'phonetic-spelling'). i think if you canonize the input every time, you should be getting things aligned the way u expect since parsing string = parsing list 
+
+
+The explanations of phones should be based on the target phone not the one that you said instead. 
+fill in all the IDK parts 
+omitting feedback: run fast fer calulcation of the top 3 and if the  similarity score is high then remove it from feedback. 
+create things that seem confident to say "you are nailing these sounds!" 
+
+then in the
+
