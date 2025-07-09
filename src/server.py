@@ -11,7 +11,8 @@ from feedback import (
     score_words_wfed,
     feedback,
     phoneme_written_feedback,
-    user_phonetic_errors
+    user_phonetic_errors,
+    group_phonemes,
 )
 import json
 
@@ -35,10 +36,13 @@ model = AutoModelForCTC.from_pretrained(model_id)
 
 model_vocab_json = os.path.join(os.path.dirname(__file__), "model_vocab_feedback.json")
 
-def transcribe_audio(audio: np.ndarray, include_timestamps: bool = False) -> "tuple[str, list]":
+
+def transcribe_audio(
+    audio: np.ndarray, include_timestamps: bool = False
+) -> "tuple[str, list]":
     """
     Transcribe audio and return both transcription and timestamp information.
-    
+
     Returns:
         tuple: (transcription_string, timestamps_list)
         timestamps_list contains (start_time, end_time, token) for each token
@@ -54,7 +58,9 @@ def transcribe_audio(audio: np.ndarray, include_timestamps: bool = False) -> "tu
     predicted_ids = torch.argmax(logits, dim=-1)
     transcription = processor.batch_decode(predicted_ids)[0]
     if include_timestamps:
-        transcription_batch, phonemes_with_time_batch = transcribe_batch_timestamped([(None, audio)] , model, processor)
+        transcription_batch, phonemes_with_time_batch = transcribe_batch_timestamped(
+            [(None, audio)], model, processor
+        )
         return transcription, phonemes_with_time_batch[0]
     else:
         return transcription
@@ -81,7 +87,7 @@ def transcribe_batch_timestamped(batch, model, processor):
     phonemes_with_time_batch = []
     for predicted_ids in predicted_ids_batch:
         predicted_ids = predicted_ids.tolist()
-        duration_sec = input_values.shape[1] / processor.feature_extractor.sampling_rate
+        duration_sec = input_values.shape[1]
 
         ids_w_time = [
             (i / len(predicted_ids) * duration_sec, _id)
@@ -118,6 +124,26 @@ def confidence_score(logits, predicted_ids) -> "tuple[np.ndarray, float]":
     return character_scores.numpy(), total_average.float().item()
 
 
+def get_user_word_audio_sample(
+    speech_word, full_transcript, timestamps, speech, sample_rate
+):
+    grouped_speech_word = group_phonemes(speech_word)
+    grouped_full_transcript = group_phonemes(full_transcript)
+    start_phoneme = grouped_speech_word[0]
+    print("start_phoneme", start_phoneme)
+    end_phoneme = grouped_speech_word[-1]
+    print("end_phoneme", end_phoneme)
+    word_start_index = grouped_full_transcript.index(start_phoneme)
+    print("word_start_index", word_start_index)
+    word_end_index = grouped_full_transcript.index(end_phoneme)
+    print("word_end_index", word_end_index)
+    start_timestamp = timestamps[word_start_index][1]
+    print("start_timestamp", start_timestamp)
+    end_timestamp = timestamps[word_end_index][2]
+
+    return speech[start_timestamp:end_timestamp]
+
+
 # server /
 @app.route("/")
 @cross_origin()
@@ -131,19 +157,20 @@ def index():
 def send_static(path):
     return send_from_directory("static", path)
 
+
 @app.route("/phoneme_written_feedback", methods=["GET"])
 @cross_origin()
 def get_phoneme_feedback():
     try:
         target = request.args.get("target", "").strip()
         speech = request.args.get("speech", "").strip()
-        
-        result = phoneme_written_feedback(target, speech)
 
+        result = phoneme_written_feedback(target, speech)
 
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/user_phonetic_errors", methods=["GET"])
 @cross_origin()
@@ -152,18 +179,24 @@ def get_user_phonetic_errors():
         target = request.args.get("target", "").strip()
         target_by_word = json.loads(request.args.get("tbw") or "null")
         speech = request.args.get("speech", "").strip()
-        
+
         result = user_phonetic_errors(target, target_by_word, speech)
-        
+
         result_sorted_freq = sorted(result.items(), key=lambda x: x[1][0], reverse=True)
         # Convert sets to lists for JSON serialization
         serializable_result = {}
         for phoneme, (count, words, severities, spoken_as) in result_sorted_freq:
-            serializable_result[phoneme] = [count, list(words), severities, list(spoken_as)]
-        
+            serializable_result[phoneme] = [
+                count,
+                list(words),
+                severities,
+                list(spoken_as),
+            ]
+
         return jsonify(serializable_result)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 # REST endpoint
 @app.route("/score_words_cer", methods=["GET"])
@@ -197,7 +230,6 @@ def get_feedback():
     target_by_word = json.loads(request.args.get("tbw") or "null")
     speech = request.args.get("speech", "").strip()
     return jsonify(feedback(target, target_by_word, speech))
-
 
 
 # WebSocket endpoint for transcription
