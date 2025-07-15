@@ -5,16 +5,20 @@ import torch
 from transformers import AutoProcessor, AutoModelForCTC
 import numpy as np
 import os
+import io, base64
 
 from feedback import (
     score_words_cer,
     score_words_wfed,
-    feedback,
     phoneme_written_feedback,
     user_phonetic_errors,
-    group_phonemes,
 )
 import json
+
+# Note: map_phoneme_for_panphon_ipapy is used within feedback(), keep import
+from phoneme_utils import phrase_bounds, map_phoneme_for_panphon_ipapy
+import soundfile as sf
+from scipy.io import wavfile
 
 # Constants
 SAMPLE_RATE = 16000
@@ -60,6 +64,7 @@ def transcribe_audio(
     transcription = [
         t for t in tokens if t not in processor.tokenizer.all_special_tokens
     ]
+    print("ARUNA transcription", transcription)
 
     if include_timestamps:
         transcription_batch, phonemes_with_time_batch = transcribe_batch_timestamped(
@@ -100,13 +105,16 @@ def transcribe_batch_timestamped(batch, model, processor):
 
         current_phoneme_id = processor.tokenizer.pad_token_id
         current_start_time = 0
-        phonemes_with_time = {}
+        phonemes_with_time = []
         for time, _id in ids_w_time:
             if current_phoneme_id != _id:
                 if current_phoneme_id != processor.tokenizer.pad_token_id:
-                    phonemes_with_time[processor.decode(current_phoneme_id)] = (
-                        current_start_time,
-                        time,
+                    phonemes_with_time.append(
+                        (
+                            processor.decode(current_phoneme_id),
+                            current_start_time,
+                            time,
+                        )
                     )
                 current_start_time = time
                 current_phoneme_id = _id
@@ -127,6 +135,55 @@ def confidence_score(logits, predicted_ids) -> "tuple[np.ndarray, float]":
     character_scores = pred_scores.masked_select(mask)
     total_average = torch.sum(character_scores) / len(character_scores)
     return character_scores.numpy(), total_average.float().item()
+
+
+def get_error_audio_clip(word_phone_pairings, timestamps, speech_audio, word_idx):
+
+    start, end = phrase_bounds(word_phone_pairings, timestamps, word_idx)
+    clip = speech_audio[int(start * SAMPLE_RATE) : int(end * SAMPLE_RATE)]
+
+    # Encode the clip as a WAV file in-memory and then base64 so it can be JSON-serialised.
+    buf = io.BytesIO()
+    wavfile.write(buf, SAMPLE_RATE, clip)
+    audio_b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+    return audio_b64
+
+
+def feedback(target, target_by_words, speech_audio, speech_phones, timestamps):
+    if len(speech_phones) == 0:
+        return []
+    # retrieve main info
+    user_phonetic_errors_dict = user_phonetic_errors(
+        target, target_by_words, speech_phones, topk=3
+    )
+
+    feedback_items = []
+    for phoneme, error_info in user_phonetic_errors_dict.items():
+        num_mistakes, which_words, mistake_severities, phoneme_spoken_as, score = (
+            error_info
+        )
+        target_phoneme_spelling = get_phoneme_feedback(phoneme)["phonetic-spelling"]
+        target_phoneme_explanation = get_phoneme_feedback(phoneme)["explanation"]
+        target_phoneme_video = get_phoneme_feedback(phoneme)["video"]
+        # target_phoneme_audio = get_phoneme_feedback(phoneme)["audio"] # NOTE: this can be added once we create a page of all audio trancripts for videos
+        speech_phoneme_words = target_by_words[which_words]
+        speech_phoneme_spelling = get_phoneme_feedback(phoneme)["phonetic-spelling"]
+        speech_phoneme_audio = get_error_audio_clip(
+            target_by_words, timestamps, speech_audio, which_words
+        )
+
+        feedback_item = [
+            target_phoneme_spelling,
+            target_phoneme_explanation,
+            target_phoneme_video,
+            # target_phoneme_audio = None,
+            speech_phoneme_words,
+            speech_phoneme_spelling,
+            speech_phoneme_audio,
+        ]
+        feedback_items.append(feedback_item)
+
+    return feedback_items
 
 
 def get_user_word_audio_clip(speech_word, timestamps, speech_audio):
@@ -222,13 +279,38 @@ def get_score_words_wfed():
     return jsonify(word_scores)
 
 
-@app.route("/feedback", methods=["GET"])
+@app.route("/feedback", methods=["POST"])
 @cross_origin()
 def get_feedback():
-    target = request.args.get("target", "").strip()
-    target_by_word = json.loads(request.args.get("tbw") or "null")
-    speech = request.args.get("speech", "").strip()
-    return jsonify(feedback(target, target_by_word, speech))
+    # 1. pull the inputs out of the request
+    target = request.form["target"].strip()
+    target_by_words = json.loads(request.form["tbw"])
+    audio_bytes = request.files["audio"].read()
+    speech_audio = np.frombuffer(audio_bytes, dtype=np.float32)
+
+    print(
+        f"Feedback endpoint: audio length = {len(speech_audio)} samples ({len(speech_audio)/SAMPLE_RATE:.2f} seconds)"
+    )
+
+    # Check if audio is too short (less than 0.1 seconds)
+    if len(speech_audio) < SAMPLE_RATE * 0.1:
+        print(f"Audio too short: {len(speech_audio)} samples")
+        return jsonify({"error": "Audio too short to process"}), 400
+
+    # 2. ONE call to the model
+    speech_phones, timestamps = transcribe_audio(
+        speech_audio, include_timestamps=True
+    )  # speech_phones is already a LIST of phoneme strings
+    speech_phones = map_phoneme_for_panphon_ipapy(speech_phones)
+    # 3. continue the pipeline without ever calling transcribe_audio again
+    out = feedback(
+        target,
+        target_by_words,
+        speech_audio,  # raw audio (for clipping)
+        speech_phones,
+        timestamps,  # per-phoneme timing info
+    )
+    return jsonify(out)
 
 
 # WebSocket endpoint for transcription
