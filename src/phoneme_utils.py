@@ -16,19 +16,61 @@ panphon_dist = panphon.distance.Distance()
 
 IPA_SYMBOLS = [ipa for ipa, *_ in ft.segments]
 
+# Phoneme mapping for panphon compatibility
+# Some IPA phonemes have multiple Unicode representations. This maps them to
+# the specific forms that panphon recognizes for proper feature vector generation.
+PHONEME_MAPPINGS = {
+    "ɝ": "ɜ˞",  # r-colored schwa (U+025D) -> schwa + r-coloring diacritic (U+025C + U+02DE)
+    "ɚ": "ə˞",
+    "ŋ̍": "ŋ̩",  # ipapy comptability
+    "ĩ": "ɪ̰",  # ipapy comptability
+}
+
+
+def map_phoneme_for_panphon_ipapy(phoneme_string):
+    """Map phonemes (or lists of phonemes) to their panphon-compatible forms.
+
+    The original implementation returned a *list* of characters for an input
+    string.  That made downstream code think a *single* phoneme was a list and
+    therefore unhashable (e.g. when used as dict keys).  We now:
+
+    1. If the input is a *string* representing one phoneme, replace any
+       characters using `PHONEME_MAPPINGS` and return the *string*.
+    2. If the input is a *list* (e.g. an existing list of phoneme strings), we
+       map each element individually and return a *list* of strings – keeping
+       the original container type intact.
+    """
+
+    # Handle the common case where we already have a list of phoneme strings
+    # (like the transcription list returned by the ASR model).
+    if isinstance(phoneme_string, list):
+        return [map_phoneme_for_panphon_ipapy(p) for p in phoneme_string]
+
+    # Otherwise, we expect a *single* phoneme encoded as a string.  Replace any
+    # characters that need to be normalised for panphon/IPAPy compatibility and
+    # return the joined string.
+    return "".join(PHONEME_MAPPINGS.get(ch, ch) for ch in phoneme_string)
+
 
 # Convert a phoneme to a numerical feature vector
 def phoneme_to_vector(phoneme):
-    vectors = ft.word_to_vector_list(phoneme, numeric=True)
+    # Map to panphon-compatible version first
+    mapped_phoneme = map_phoneme_for_panphon_ipapy(phoneme)
+    vectors = ft.word_to_vector_list(mapped_phoneme, numeric=True)
     if vectors:
         return np.array(vectors[0])  # Take the first vector if multiple exist
     else:
+        raise ValueError(f"Invalid phoneme: {phoneme}")
         return None  # Invalid phoneme
 
 
 # Convert sequences of phonemes to sequences of vectors
 def sequence_to_vectors(seq):
-    return [phoneme_to_vector(p) for p in seq if phoneme_to_vector(p) is not None]
+    vectors = []
+    for p in seq:
+        vec = phoneme_to_vector(p)
+        vectors.append(vec)
+    return vectors
 
 
 def weighted_substitution_cost(x, y):
@@ -57,6 +99,7 @@ def group_phonemes(phoneme_string):
         group_phonemes("kʰɔlɪŋkʰɑɹdzɔɹðəweɪvʌvðəfjutʃɝ")
         # Returns: ['kʰ', 'ɔ', 'l', 'ɪ', 'ŋ', 'kʰ', 'ɑ', 'ɹ', 'd͡z', 'ɔ', 'ɹ', 'ð', 'ə', 'w', 'e', 'ɪ', 'v', 'ʌ', 'v', 'ð', 'ə', 'f', 'j', 'u', 't͡ʃ', 'ɝ']
     """
+    phoneme_string = map_phoneme_for_panphon_ipapy(phoneme_string)
     if not is_valid_ipa(phoneme_string):
         print(
             f"Warning: removing invalid ipa characters from {phoneme_string}.",
@@ -120,34 +163,56 @@ def canonize(ipa_string, ignore=False):
 # ---- alignment functions ----
 
 
+def phrase_bounds(word_phone_pairings, timestamps, word_idx):
+    """Return (start_time, end_time) for the three-word window around idx_word."""
+    left_pairs = word_phone_pairings[max(0, word_idx - 1)][1]
+    right_pairs = word_phone_pairings[min(len(word_phone_pairings) - 1, word_idx + 1)][
+        1
+    ]
+
+    first_idx = left_pairs[0][2]  # speech index of first phoneme
+    last_idx = right_pairs[-1][2]  # speech index of last phoneme
+    start_time = timestamps[first_idx][1]  # timestamps = (phoneme, start, end)
+    end_time = timestamps[last_idx][2]
+    return start_time, end_time
+
+
 def get_fastdtw_aligned_phoneme_lists(target, speech):
     """Get aligned phoneme lists for target and speech phonemes (even for grouped phones like kʰ)
     example:
     target = "loooonger"
     speech = "short"
-    returns:
-    aligned_targets = (['l', 'o', 'o', 'o', 'o', 'o', 'n', 'g', 'e', 'e'], ['s', 'h', 'o', 'o', 'o', 'o', 'r', 'r', 'r', 't'])
+    returns 3 parallel lists of equal length:
+        aligned_target   – phonemes from the target
+        aligned_speech   – phonemes from the speech sequence (with "-" for gaps)
+        aligned_s_idx    – original index of the speech phoneme in the un-aligned sequence (None for gaps)
+    Example:
+        aligned_targets = (
+            ['l', 'o', 'o', 'o', 'o', 'o', 'n', 'g', 'e', 'e'],
+            ['s', 'h', 'o', 'o', 'o', 'o', 'r', 'r', 'r', 't'],
+            [ 0 ,  1 ,  2 ,  3 ,  4 ,  5 ,  6 ,  7 ,  8 ,  9 ]
+        )
     """
-    target_phonemes = group_phonemes(target)
-    speech_phonemes = group_phonemes(speech)
 
     # Use FastDTW to get the alignment path
-    target_vectors = sequence_to_vectors(target_phonemes)
-    speech_vectors = sequence_to_vectors(speech_phonemes)
+    target_vectors = sequence_to_vectors(target)
+    speech_vectors = sequence_to_vectors(speech)
 
     if not target_vectors or not speech_vectors:
-        return [], []
+        # When either list is empty, return three empty lists so caller logic remains consistent
+        return [], [], []
 
     distance, path = fastdtw(target_vectors, speech_vectors, dist=euclidean)
 
     # Create aligned sequences based on the path
     aligned_target = []
     aligned_speech = []
+    aligned_s_idx = []
     for i, j in path:
-        aligned_target.append(target_phonemes[i] if i < len(target_phonemes) else "-")
-        aligned_speech.append(speech_phonemes[j] if j < len(speech_phonemes) else "-")
-
-    return aligned_target, aligned_speech
+        aligned_target.append(target[i] if i < len(target) else "-")
+        aligned_speech.append(speech[j] if j < len(speech) else "-")
+        aligned_s_idx.append(j if j < len(speech) else None)
+    return aligned_target, aligned_speech, aligned_s_idx
 
 
 def needleman_wunsch(
