@@ -13,6 +13,7 @@ from scipy.spatial.distance import euclidean
 # Create a panphon feature table
 ft = panphon.FeatureTable()
 panphon_dist = panphon.distance.Distance()
+inverse_double_weight_sum = 1 / (sum(ft.weights) * 2)
 
 IPA_SYMBOLS = [ipa for ipa, *_ in ft.segments]
 
@@ -25,6 +26,17 @@ PHONEME_MAPPINGS = {
     "ŋ̍": "ŋ̩",  # ipapy comptability
     "ĩ": "ɪ̰",  # ipapy comptability
 }
+
+
+def fer(prediction, ground_truth):
+    """
+    Feature Error Rate: the edits weighted by their acoustic features summed up and divided by the length of the ground truth.
+    """
+    return (
+        inverse_double_weight_sum
+        * panphon_dist.weighted_feature_edit_distance(ground_truth, prediction)
+        / len(ground_truth)
+    )
 
 
 def map_phoneme_for_panphon_ipapy(phoneme_string):
@@ -212,6 +224,9 @@ def get_fastdtw_aligned_phoneme_lists(target, speech):
         aligned_target.append(target[i] if i < len(target) else "-")
         aligned_speech.append(speech[j] if j < len(speech) else "-")
         aligned_s_idx.append(j if j < len(speech) else None)
+    print(aligned_target)
+    print(aligned_speech)
+    print(aligned_s_idx)
     return aligned_target, aligned_speech, aligned_s_idx
 
 
