@@ -17,11 +17,11 @@ inverse_double_weight_sum = 1 / (sum(ft.weights) * 2)
 IPA_SYMBOLS = [ipa for ipa, *_ in ft.segments]
 
 # Phoneme mapping for panphon compatibility
-# Some IPA phonemes have multiple Unicode representations. This maps them to
-# the specific forms that panphon recognizes for proper feature vector generation.
+# Some IPA phonemes have multiple Unicode representations.
 PHONEME_MAPPINGS = {
     "ɝ": "ɜ˞",  # r-colored schwa (U+025D) -> schwa + r-coloring diacritic (U+025C + U+02DE)
     "ɚ": "ə˞",
+    "g": "ɡ",  # model vocab has correct ɡ but we add this since its hard to distinguish
 }
 
 
@@ -58,7 +58,8 @@ def phoneme_to_vector(phoneme):
     vectors = ft.word_to_vector_list(phoneme, numeric=True)
     if vectors:
         return np.array(vectors[0])  # Take the first vector if multiple exist
-    return None  # Invalid phoneme
+    else:
+        raise ValueError(f"vector not found for phoneme: {phoneme}")
 
 
 # Convert sequences of phonemes to sequences of vectors
@@ -102,42 +103,32 @@ def phrase_bounds(word_phone_pairings, timestamps, word_idx):
 def get_fastdtw_aligned_phoneme_lists(target, speech):
     """Get aligned phoneme lists for target and speech phonemes (even for grouped phones like kʰ)
     example:
-    target = "loooonger"
-    speech = "short"
-    returns 3 parallel lists of equal length:
-        aligned_target   – phonemes from the target
-        aligned_speech   – phonemes from the speech sequence (with "-" for gaps)
-        aligned_s_idx    – original index of the speech phoneme in the un-aligned sequence (None for gaps)
+        target = ['l', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r']
+        speech = ['s', 'h', 'o', 'r', 'r', 't']
     Example:
-        aligned_targets = (
-            ['l', 'o', 'o', 'o', 'o', 'o', 'n', 'g', 'e', 'e'],
-            ['s', 'h', 'o', 'o', 'o', 'o', 'r', 'r', 'r', 't'],
-            [ 0 ,  1 ,  2 ,  3 ,  4 ,  5 ,  6 ,  7 ,  8 ,  9 ]
-        )
+        target ['l', 'o', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r', 'r', 'r']
+        speech ['s', 'h', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'r', 'r', 't']
     """
 
-    # Use FastDTW to get the alignment path
-    target_vectors = sequence_to_vectors(target)
-    speech_vectors = sequence_to_vectors(speech)
+    seq1_vectors = sequence_to_vectors(target)
+    seq2_vectors = sequence_to_vectors(speech)
 
-    if not target_vectors or not speech_vectors:
-        # When either list is empty, return three empty lists so caller logic remains consistent
-        return [], [], []
+    if not seq1_vectors or not seq2_vectors:
+        raise ValueError(
+            "One or both sequences could not be converted to feature vectors."
+        )
 
-    distance, path = fastdtw(target_vectors, speech_vectors, dist=euclidean)
+    # Use FastDTW with Euclidean distance on the vectors
+    distance, path = fastdtw(seq1_vectors, seq2_vectors, dist=euclidean)
 
-    # Create aligned sequences based on the path
-    aligned_target = []
-    aligned_speech = []
-    aligned_s_idx = []
+    # Align the original phoneme sequences based on the path
+    aligned_seq1 = []
+    aligned_seq2 = []
     for i, j in path:
-        aligned_target.append(target[i] if i < len(target) else "-")
-        aligned_speech.append(speech[j] if j < len(speech) else "-")
-        aligned_s_idx.append(j if j < len(speech) else None)
-    print(aligned_target)
-    print(aligned_speech)
-    print(aligned_s_idx)
-    return aligned_target, aligned_speech, aligned_s_idx
+        aligned_seq1.append(target[i] if i < len(target) else "-")
+        aligned_seq2.append(speech[j] if j < len(speech) else "-")
+
+    return aligned_seq1, aligned_seq2
 
 
 def needleman_wunsch(
