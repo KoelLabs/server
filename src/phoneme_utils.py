@@ -1,12 +1,8 @@
 # Conversion between different phonetic codes
 # Modified from https://github.com/jhasegaw/phonecodes/blob/master/src/phonecodes.py
 
-# Import monkey patch first to fix ipapy collections import issue
-import ipapy_monkey_patch
-
 import sys
-import ipapy
-from ipapy.ipastring import IPAString
+
 import panphon
 import panphon.distance
 import numpy as np
@@ -26,8 +22,6 @@ IPA_SYMBOLS = [ipa for ipa, *_ in ft.segments]
 PHONEME_MAPPINGS = {
     "ɝ": "ɜ˞",  # r-colored schwa (U+025D) -> schwa + r-coloring diacritic (U+025C + U+02DE)
     "ɚ": "ə˞",
-    "ŋ̍": "ŋ̩",  # ipapy comptability
-    "ĩ": "ɪ̰",  # ipapy comptability
 }
 
 
@@ -42,7 +36,7 @@ def fer(prediction, ground_truth):
     )
 
 
-def map_phoneme_for_panphon_ipapy(phoneme_string):
+def map_phoneme_for_panphon(phoneme_string):
     """Map phonemes (or lists of phonemes) to their panphon-compatible forms.
 
     The original implementation returned a *list* of characters for an input
@@ -56,27 +50,15 @@ def map_phoneme_for_panphon_ipapy(phoneme_string):
        the original container type intact.
     """
 
-    # Handle the common case where we already have a list of phoneme strings
-    # (like the transcription list returned by the ASR model).
-    if isinstance(phoneme_string, list):
-        return [map_phoneme_for_panphon_ipapy(p) for p in phoneme_string]
-
-    # Otherwise, we expect a *single* phoneme encoded as a string.  Replace any
-    # characters that need to be normalised for panphon/IPAPy compatibility and
-    # return the joined string.
-    return "".join(PHONEME_MAPPINGS.get(ch, ch) for ch in phoneme_string)
+    return [PHONEME_MAPPINGS.get(ch, ch) for ch in phoneme_string]
 
 
 # Convert a phoneme to a numerical feature vector
 def phoneme_to_vector(phoneme):
-    # Map to panphon-compatible version first
-    mapped_phoneme = map_phoneme_for_panphon_ipapy(phoneme)
-    vectors = ft.word_to_vector_list(mapped_phoneme, numeric=True)
+    vectors = ft.word_to_vector_list(phoneme, numeric=True)
     if vectors:
         return np.array(vectors[0])  # Take the first vector if multiple exist
-    else:
-        raise ValueError(f"Invalid phoneme: {phoneme}")
-        return None  # Invalid phoneme
+    return None  # Invalid phoneme
 
 
 # Convert sequences of phonemes to sequences of vectors
@@ -98,37 +80,6 @@ def weighted_insertion_cost(x):
 
 def weighted_deletion_cost(x):
     return -abs(panphon_dist.weighted_deletion_cost(x))
-
-
-def group_phonemes(phoneme_string):
-    """
-    Groups IPA characters into proper phoneme units.
-
-    Args:
-        phoneme_string (str): A string of IPA characters
-
-    Returns:
-        list: A list of grouped phonemes
-
-    Example:
-        group_phonemes("kʰɔlɪŋkʰɑɹdzɔɹðəweɪvʌvðəfjutʃɝ")
-        # Returns: ['kʰ', 'ɔ', 'l', 'ɪ', 'ŋ', 'kʰ', 'ɑ', 'ɹ', 'd͡z', 'ɔ', 'ɹ', 'ð', 'ə', 'w', 'e', 'ɪ', 'v', 'ʌ', 'v', 'ð', 'ə', 'f', 'j', 'u', 't͡ʃ', 'ɝ']
-    """
-    phoneme_string = map_phoneme_for_panphon_ipapy(phoneme_string)
-    if not is_valid_ipa(phoneme_string):
-        print(
-            f"Warning: removing invalid ipa characters from {phoneme_string}.",
-            file=sys.stderr,
-        )
-    return string2symbols(canonize(phoneme_string, ignore=True), IPA_SYMBOLS)[0]
-
-
-def is_valid_ipa(ipa_string):
-    """Check if the given Unicode string is a valid IPA string"""
-    for c in ipa_string:
-        if not ipapy.is_valid_ipa(c):
-            print(f"Invalid IPA character: {c}")
-    return ipapy.is_valid_ipa(ipa_string)
 
 
 # ---- alignment functions ----
