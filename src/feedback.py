@@ -4,7 +4,7 @@ from panphon.distance import Distance
 import numpy as np
 import json
 import os
-from phoneme_utils import group_phonemes, get_fastdtw_aligned_phoneme_lists
+from phoneme_utils import group_phonemes, get_fastdtw_aligned_phoneme_lists, fer
 
 # Create a panphon feature table
 ft = panphon.FeatureTable()
@@ -135,7 +135,7 @@ def score_words_wfed(target, target_by_words, speech):
     for word, pairs in pbw:
         seq1 = "".join([t for t, _, _ in pairs])
         seq2 = "".join([s for _, s, _ in pairs])
-        norm_score = (22 - dist.weighted_feature_edit_distance(seq1, seq2)) / 22
+        norm_score = (22 - fer(seq1, seq2)) / 22
         word_scores.append((word, seq1, seq2, norm_score**2))
         average_score += norm_score**2
     average_score /= len(pbw)
