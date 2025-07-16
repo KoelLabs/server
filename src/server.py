@@ -15,10 +15,11 @@ from feedback import (
 )
 import json
 
-# Note: map_phoneme_for_panphon_ipapy is used within feedback(), keep import
-from phoneme_utils import phrase_bounds, map_phoneme_for_panphon_ipapy
+from phoneme_utils import phrase_bounds, PHONEME_MAPPINGS
 import soundfile as sf
 from scipy.io import wavfile
+
+DEBUG = True
 
 # Constants
 SAMPLE_RATE = 16000
@@ -41,44 +42,45 @@ model = AutoModelForCTC.from_pretrained(model_id)
 model_vocab_json = os.path.join(os.path.dirname(__file__), "model_vocab_feedback.json")
 
 
-def transcribe_audio(
-    audio: np.ndarray, include_timestamps: bool = False
-) -> "tuple[str, list]":
+def transcribe_audio(audio: np.ndarray) -> str:
     """
     Transcribe audio and return both transcription and timestamp information.
-
-    Returns:
-        tuple: (transcription_string, timestamps_list)
-        timestamps_list contains (start_time, end_time, token) for each token
     """
-    inputs = processor(
-        audio,
-        sampling_rate=SAMPLE_RATE,
-        return_tensors="pt",
-        padding=True,
-    )
-    with torch.no_grad():
-        logits = model(inputs.input_values).logits
-    predicted_ids = torch.argmax(logits, dim=-1)
-    tokens = processor.tokenizer.convert_ids_to_tokens(predicted_ids[0])
-    transcription = [
-        t for t in tokens if t not in processor.tokenizer.all_special_tokens
+    transcription, _, _ = _run_inference(audio, model, processor)
+    return transcription
+
+
+def transcribe_timestamped(audio):
+    transcription, duration_sec, predicted_ids = _run_inference(audio, model, processor)
+
+    ids_w_time = [
+        (i / len(predicted_ids) * duration_sec, _id)
+        for i, _id in enumerate(predicted_ids)
     ]
-    print("ARUNA transcription", transcription)
 
-    if include_timestamps:
-        transcription_batch, phonemes_with_time_batch = transcribe_batch_timestamped(
-            [(None, audio)], model, processor
-        )
-        return transcription, phonemes_with_time_batch[0]
-    else:
-        return transcription
+    current_phoneme_id = processor.tokenizer.pad_token_id
+    current_start_time = 0
+    phonemes_with_time = []
+    for time, _id in ids_w_time:
+        if current_phoneme_id != _id:
+            if current_phoneme_id != processor.tokenizer.pad_token_id:
+                phonemes_with_time.append(
+                    (
+                        processor.decode(current_phoneme_id),
+                        current_start_time,
+                        time,
+                    )
+                )
+            current_start_time = time
+            current_phoneme_id = _id
+
+    return transcription, phonemes_with_time
 
 
-def transcribe_batch_timestamped(batch, model, processor):
+def _run_inference(audio, model, processor):
     input_values = (
         processor(
-            [x[1] for x in batch],
+            audio,
             sampling_rate=processor.feature_extractor.sampling_rate,
             return_tensors="pt",
             padding=True,
@@ -89,42 +91,18 @@ def transcribe_batch_timestamped(batch, model, processor):
     with torch.no_grad():
         logits = model(input_values).logits
 
-    predicted_ids_batch = torch.argmax(logits, dim=-1)
-    transcription_batch = [processor.decode(ids) for ids in predicted_ids_batch]
-
-    # get the start and end timestamp for each phoneme
-    phonemes_with_time_batch = []
-    for predicted_ids in predicted_ids_batch:
-        predicted_ids = predicted_ids.tolist()
-        duration_sec = input_values.shape[1] / processor.feature_extractor.sampling_rate
-
-        ids_w_time = [
-            (i / len(predicted_ids) * duration_sec, _id)
-            for i, _id in enumerate(predicted_ids)
-        ]
-
-        current_phoneme_id = processor.tokenizer.pad_token_id
-        current_start_time = 0
-        phonemes_with_time = []
-        for time, _id in ids_w_time:
-            if current_phoneme_id != _id:
-                if current_phoneme_id != processor.tokenizer.pad_token_id:
-                    phonemes_with_time.append(
-                        (
-                            processor.decode(current_phoneme_id),
-                            current_start_time,
-                            time,
-                        )
-                    )
-                current_start_time = time
-                current_phoneme_id = _id
-
-        phonemes_with_time_batch.append(phonemes_with_time)
-
-    return transcription_batch, phonemes_with_time_batch
+    predicted_ids = torch.argmax(logits, dim=-1)[0].tolist()
+    tokens = processor.tokenizer.convert_ids_to_tokens(predicted_ids)
+    transcription = [
+        PHONEME_MAPPINGS.get(t, t)
+        for t in tokens
+        if t not in processor.tokenizer.all_special_tokens
+    ]
+    duration_sec = input_values.shape[1] / processor.feature_extractor.sampling_rate
+    return transcription, duration_sec, predicted_ids
 
 
-def confidence_score(logits, predicted_ids) -> "tuple[np.ndarray, float]":
+def confidence_score(logits, predicted_ids) -> tuple[np.ndarray, float]:
     scores = torch.nn.functional.softmax(logits, dim=-1)
     pred_scores = scores.gather(-1, predicted_ids.unsqueeze(-1))[:, :, 0]
     mask = torch.logical_and(
@@ -190,9 +168,6 @@ def get_user_word_audio_clip(speech_word, timestamps, speech_audio):
 
     first_phoneme = speech_word[0]
     last_phoneme = speech_word[-1]
-    print(timestamps)
-
-    print(timestamps[first_phoneme], timestamps[last_phoneme])
 
     word_start_time = int(float(timestamps[first_phoneme][0]) * SAMPLE_RATE)
     word_end_time = int(float(timestamps[last_phoneme][1]) * SAMPLE_RATE)
@@ -279,29 +254,19 @@ def get_score_words_wfed():
     return jsonify(word_scores)
 
 
-@app.route("/feedback", methods=["POST"])
+@app.route("/feedback", methods=["GET"])
 @cross_origin()
 def get_feedback():
-    # 1. pull the inputs out of the request
     target = request.form["target"].strip()
     target_by_words = json.loads(request.form["tbw"])
     audio_bytes = request.files["audio"].read()
     speech_audio = np.frombuffer(audio_bytes, dtype=np.float32)
 
-    print(
-        f"Feedback endpoint: audio length = {len(speech_audio)} samples ({len(speech_audio)/SAMPLE_RATE:.2f} seconds)"
-    )
-
     # Check if audio is too short (less than 0.1 seconds)
     if len(speech_audio) < SAMPLE_RATE * 0.1:
-        print(f"Audio too short: {len(speech_audio)} samples")
-        return jsonify({"error": "Audio too short to process"}), 400
+        raise ValueError(f"Audio too short: {len(speech_audio)} samples")
 
-    # 2. ONE call to the model
-    speech_phones, timestamps = transcribe_audio(
-        speech_audio, include_timestamps=True
-    )  # speech_phones is already a LIST of phoneme strings
-    speech_phones = map_phoneme_for_panphon_ipapy(speech_phones)
+    speech_phones, timestamps = transcribe_timestamped(speech_audio)
     # 3. continue the pipeline without ever calling transcribe_audio again
     out = feedback(
         target,
@@ -313,7 +278,6 @@ def get_feedback():
     return jsonify(out)
 
 
-# WebSocket endpoint for transcription
 @sock.route("/stream")
 def stream(ws):
     buffer = b""  # Buffer to hold audio chunks
@@ -338,17 +302,25 @@ def stream(ws):
                     combined = np.concatenate([combined, audio])
 
                     if num_chunks_accumulated < NUM_CHUNKS_ACCUMULATED:
-                        transcription += transcribe_audio(audio)
+                        speech, timestamps = transcribe_timestamped(audio)
+                        transcription += speech
                         ws.send(full_transcription + transcription)
                     else:
-                        full_transcription += transcribe_audio(combined)
+                        speech, timestamps = transcribe_timestamped(combined)
+                        full_transcription += speech
                         ws.send(full_transcription)
                         combined = np.array([], dtype=np.float32)
                         num_chunks_accumulated = 0
                         transcription = ""
 
+                    if DEBUG:
+                        wavfile.write("audio.wav", SAMPLE_RATE, audio)
+                        wavfile.write("combined.wav", SAMPLE_RATE, combined)
+
                     buffer = b""  # Clear the buffer
         except Exception as e:
+            print(f"Error: {e}")
+            print(f"Line: {e.__traceback__.tb_lineno if e.__traceback__ else -1}")
             break
 
 
