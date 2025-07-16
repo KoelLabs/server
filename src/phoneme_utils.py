@@ -1,3 +1,6 @@
+# Conversion between different phonetic codes
+# Modified from https://github.com/jhasegaw/phonecodes/blob/master/src/phonecodes.py
+
 # Import monkey patch first to fix ipapy collections import issue
 import ipapy_monkey_patch
 
