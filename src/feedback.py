@@ -4,7 +4,7 @@ from panphon.distance import Distance
 import numpy as np
 import json
 import os
-from phoneme_utils import group_phonemes, get_fastdtw_aligned_phoneme_lists, fer
+from phoneme_utils import get_fastdtw_aligned_phoneme_lists, fer
 
 # Create a panphon feature table
 ft = panphon.FeatureTable()
@@ -69,11 +69,9 @@ def pair_by_words(target, target_by_words, speech):
     """
     # Retrieve aligned sequences along with the speech-side indices so that we can
     # later map any phoneme back to its timestamp without extra scans.
-    aligned_target, aligned_speech, aligned_idx = get_fastdtw_aligned_phoneme_lists(
-        target, speech
-    )
+    aligned_target, aligned_speech = get_fastdtw_aligned_phoneme_lists(target, speech)
 
-    paired = zip(aligned_target, aligned_speech, aligned_idx)
+    paired = zip(aligned_target, aligned_speech)
 
     pair_by_words = []
     pairs = iter(paired)
@@ -93,19 +91,8 @@ def pair_by_words(target, target_by_words, speech):
                 break
         pair_by_words.append((word, ps[:-1]))
         start = [ps[-1]]
-    # pair_by_words.append(start)
 
     return pair_by_words
-
-
-def pairs_to_phonetic_phrases(pairs):
-    """this function takes in a list of pairs and returns a list of phonetic phrases
-    example: [('ɔ', 'o'), ('l', 'i'), ('i', 'i'), ('ŋ', 'ŋ')] -> ['ɔlilŋ', 'olilŋ', 'ɔlilŋ', 'olilŋ']
-    """
-    phonetic_phrases = []
-    for pair in pairs:
-        phonetic_phrases.append(pair[0] + pair[1])
-    return phonetic_phrases
 
 
 def score_words_cer(target, target_by_words, speech):
