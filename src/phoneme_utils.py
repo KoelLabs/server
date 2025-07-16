@@ -131,50 +131,6 @@ def is_valid_ipa(ipa_string):
     return ipapy.is_valid_ipa(ipa_string)
 
 
-def string2symbols(string, symbols):
-    """
-    Converts a string of symbols into a list of symbols, minimizing the number of untranslatable symbols,
-    then minimizing the number of translated symbols.
-    """
-    N = len(string)
-    symcost = 1  # path cost per translated symbol
-    oovcost = len(string)  # path cost per untranslatable symbol
-    maxsym = max(len(k) for k in symbols)  # max input symbol length
-    # (pathcost to s[(n-m):n], n-m, translation[s[(n-m):m]], True/False)
-    lattice = [(0, 0, "", True)]
-    for n in range(1, N + 1):
-        # Initialize on the assumption that s[n-1] is untranslatable
-        lattice.append((oovcost + lattice[n - 1][0], n - 1, string[(n - 1) : n], False))
-        # Search for translatable sequences s[(n-m):n], and keep the best
-        for m in range(1, min(n + 1, maxsym + 1)):
-            if (
-                string[(n - m) : n] in symbols
-                and symcost + lattice[n - m][0] < lattice[n][0]
-            ):
-                lattice[n] = (
-                    symcost + lattice[n - m][0],
-                    n - m,
-                    string[(n - m) : n],
-                    True,
-                )
-    # Back-trace
-    tl = []
-    translated = []
-    n = N
-    while n > 0:
-        tl.append(lattice[n][2])
-        translated.append(lattice[n][3])
-        n = lattice[n][1]
-    return (tl[::-1], translated[::-1])
-
-
-def canonize(ipa_string, ignore=False):
-    """canonize the Unicode representation of the IPA string"""
-    return str(
-        IPAString(unicode_string=ipa_string, ignore=ignore).canonical_representation
-    )
-
-
 # ---- alignment functions ----
 
 
