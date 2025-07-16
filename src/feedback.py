@@ -173,6 +173,5 @@ def phoneme_written_feedback(target, speech):
                 "example": phoneme_feedback["example"],
             }
         else:
-            print(f"Phoneme {phoneme} not found in model vocabulary")
-
+            raise ValueError(f"Phoneme {phoneme} not found in model vocabulary")
     return all_phoneme_feedback
