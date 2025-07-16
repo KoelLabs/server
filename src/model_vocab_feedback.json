@@ -49,7 +49,7 @@
     {
         "phoneme": "ɒ",
         "description": ["back open rounded vowel"],
-        "explanation": "The birtish AH! Round your lips to form a circle like you're about to say 'awe' BUT now relax your lips a bit to form an oval shape.",
+        "explanation": "The birtish AW! Round your lips to form a circle like you're about to say 'awe' BUT now relax your lips a bit to form an oval shape.",
         "confused phone": "ɔ",
         "example": ["lot: 1", "cloth: 2"],
         "phonetic-spelling": "AW",
@@ -169,6 +169,14 @@
         "video": "https://www.youtube.com/watch?v=AzNRoSGBh44"
     },
     {
+        "phoneme": "ə˞",
+        "description": ["central mid rhotacized unrounded vowel"],
+        "explanation": "Say the 'er' in 'butter' in American English. Start with a relaxed 'uh' and then curl the tip of your tongue slightly back toward the roof of your mouth to get that 'r' coloring.",
+        "example": ["butter: 5", "sister: 5"],
+        "phonetic-spelling": "ER",
+        "video": "https://www.youtube.com/watch?v=AzNRoSGBh44"
+    },
+    {
         "phoneme": "ɛ",
         "description": ["front open-mid unrounded vowel"],
         "explanation": "Drop your jaw slightly and smile gently. Your tongue should sit in the front-middle of your mouth. This is the vowel in 'bed'.",
@@ -177,6 +185,14 @@
     },
     {
         "phoneme": "ɝ",
+        "description": ["central open-mid rhotacized unrounded vowel"],
+        "explanation": "First try to say 'eee' in peas! Your teeth should be less than a finger space apart. Now without changing anything else, can you slide your tongue back, as if you are about the swallow your tongue, and curl the tip just slightly up without touching any part of the mouth? If this is difficult, try using a finger or spoon to gently push up the tip of your tongue back and up. This sound generally appears in the middle or at the end of words",
+        "example": ["her: 2", "word: 2"],
+        "phonetic-spelling": "ERR",
+        "video": "https://www.youtube.com/watch?app=desktop&v=6ppOrwjvslc&t=269s"
+    },
+    {
+        "phoneme": "ɜ˞",
         "description": ["central open-mid rhotacized unrounded vowel"],
         "explanation": "First try to say 'eee' in peas! Your teeth should be less than a finger space apart. Now without changing anything else, can you slide your tongue back, as if you are about the swallow your tongue, and curl the tip just slightly up without touching any part of the mouth? If this is difficult, try using a finger or spoon to gently push up the tip of your tongue back and up. This sound generally appears in the middle or at the end of words",
         "example": ["her: 2", "word: 2"],
@@ -468,6 +484,14 @@
         "video": "https://www.youtube.com/watch?v=SqKXiVHPgDE"
     },
     {
+        "phoneme": "ŋ̩",
+        "description": ["consonant nasal velar voiced"],
+        "explanation": "NG sound but treated as a short vowel and consonant together! Raise the back of your tongue to the soft part of the roof of your mouth (as if you may swallow your tongue) and hum, allowing the sound to come through your nose. Your vocal cords should vibrate, creating a soft buzzing sound. This sound can stand alone as a syllable. This means that the vowel before this sound is merged into this 'n' sound rather than the vowel sound being pronounced alone. ",
+        "example": [],
+        "phonetic-spelling": "IN",
+        "video": "https://www.youtube.com/watch?v=SqKXiVHPgDE"
+    },
+    {
         "phoneme": "ɡ",
         "description": ["consonant plosive velar voiced"],
         "explanation": "Raise the back of your tongue to the soft part of the roof of your mouth (as if you may swallow your tongue) and then release it suddenly with a puff of air. It's like a small explosion of sound from the back of your mouth. Now, place your hand on your throat and create the puff of air while vibrating your vocal cords (you should feel this on your throat).",
@@ -520,6 +544,15 @@
     },
     {
         "phoneme": "ĩ",
+        "description": ["close front unrounded vowel", "nasalized"],
+        "explanation": "Start just like saying the 'ee' in 'see', but now try to hum through your nose at the same time! It should feel like the sound is coming from both your mouth and nose. Plugging versus unplugging your nose should change the pitch! ",
+        "confused phone": "i",
+        "example": [],
+        "phonetic-spelling": "IHN",
+        "video": "https://www.youtube.com/watch?v=fp3koTl84_M&t=314s"
+    },
+    {
+        "phoneme": "ɪ̰",
         "description": ["close front unrounded vowel", "nasalized"],
         "explanation": "Start just like saying the 'ee' in 'see', but now try to hum through your nose at the same time! It should feel like the sound is coming from both your mouth and nose. Plugging versus unplugging your nose should change the pitch! ",
         "confused phone": "i",
