@@ -1,7 +1,7 @@
 import json
 import subprocess
 
-CMD = "pipx run licensecheck --using requirements:./requirements.txt --format json --only-licenses 'PUBLIC DOMAIN' UNLICENSE BOOST MIT BSD ISC NCSA PYTHON APACHE ECLIPSE LGPL AGPL GPL MPL EUPL"
+CMD = "pipx run licensecheck --requirements-paths ./requirements.txt --format json --only-licenses 'PUBLIC DOMAIN' UNLICENSE BOOST MIT BSD ISC NCSA PYTHON APACHE ECLIPSE LGPL AGPL GPL MPL EUPL"
 result = subprocess.run(CMD, shell=True, check=True, stdout=subprocess.PIPE)
 licenses: list[dict] = json.loads(result.stdout)["packages"]
 
