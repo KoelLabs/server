@@ -6,6 +6,7 @@ from transformers import AutoProcessor, AutoModelForCTC
 import numpy as np
 import os
 import io, base64
+import json
 
 from feedback import (
     score_words_cer,
@@ -40,7 +41,7 @@ model = AutoModelForCTC.from_pretrained(model_id)
 model_vocab_json = os.path.join(os.path.dirname(__file__), "model_vocab_feedback.json")
 
 
-def transcribe_audio(audio: np.ndarray) -> str:
+def transcribe_audio(audio: np.ndarray) -> list[str]:
     """
     Transcribe audio and return both transcription and timestamp information.
     """
@@ -189,7 +190,6 @@ def send_static(path):
     return send_from_directory("static", path)
 
 
-
 @app.route("/user_phonetic_errors", methods=["GET"])
 @cross_origin()
 def get_user_phonetic_errors():
@@ -218,13 +218,14 @@ def get_user_phonetic_errors():
     except Exception as e:
         return jsonify({"server error from get_user_phonetic_errors": str(e)}), 500
 
+
 @app.route("/phoneme_written_feedback", methods=["GET"])
 @cross_origin()
 def get_phoneme_written_feedback():
     try:
         target = json.loads(request.args.get("target", "[]"))
         speech = json.loads(request.args.get("speech", "[]"))
-        
+
         result = phoneme_written_feedback(target, speech)
         return jsonify(result)
     except Exception as e:
@@ -245,7 +246,6 @@ def get_score_words_cer():
         return jsonify(word_scores)
     except Exception as e:
         return jsonify({"server error from get_score_words_cer": str(e)}), 500
-
 
 
 @app.route("/score_words_wfed", methods=["GET"])
@@ -278,20 +278,22 @@ def get_feedback():
     out = feedback(
         target,
         target_by_words,
-        speech_audio,  
+        speech_audio,
         speech_phones,
         timestamps,  # per-phoneme timing info
     )
     return jsonify(out)
 
+
 @sock.route("/stream")
 def stream(ws):
     buffer = b""  # Buffer to hold audio chunks
 
-    full_transcription = ""
+    full_transcription = []
     combined = np.array([], dtype=np.float32)
     num_chunks_accumulated = 0
-    transcription = ""
+    transcription = []
+
     while True:
         try:
             # Receive audio data from the client
@@ -308,14 +310,17 @@ def stream(ws):
                     combined = np.concatenate([combined, audio])
 
                     if num_chunks_accumulated < NUM_CHUNKS_ACCUMULATED:
-                        transcription += transcribe_audio(audio)
-                        ws.send(full_transcription + transcription)
+                        # transcribe_audio returns a list, so extend directly
+                        new_transcription = transcribe_audio(audio)
+                        transcription.extend(new_transcription)
+                        ws.send(json.dumps(full_transcription + transcription))
                     else:
-                        full_transcription += transcribe_audio(combined)
-                        ws.send(full_transcription)
+                        new_transcription = transcribe_audio(combined)
+                        full_transcription.extend(new_transcription)
+                        ws.send(json.dumps(full_transcription))
                         combined = np.array([], dtype=np.float32)
                         num_chunks_accumulated = 0
-                        transcription = ""
+                        transcription = []
 
                     if DEBUG:
                         wavfile.write("audio.wav", SAMPLE_RATE, audio)
@@ -326,7 +331,6 @@ def stream(ws):
             print(f"Error: {e}")
             print(f"Line: {e.__traceback__.tb_lineno if e.__traceback__ else -1}")
             break
-
 
 
 if __name__ == "__main__":
