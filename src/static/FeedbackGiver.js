@@ -5,7 +5,7 @@ export class FeedbackGiver {
   constructor(target, target_by_word, on_transcription, on_word_spoken) {
     this.target = target;
     this.target_by_word = target_by_word;
-    this.transcription = []; 
+    this.transcription = [];
     this.on_transcription = on_transcription;
     this.socket = null;
     this.audioContext = null;
@@ -23,19 +23,20 @@ export class FeedbackGiver {
   }
 
   #setTranscription(transcription) {
-    if (typeof transcription === 'string') {
-      throw new Error("Transcription must be an array of characters");
+    // Server should send JSON arrays directly
+    try {
+      this.transcription = JSON.parse(transcription);
+    } catch (error) {
+      console.error("Failed to parse transcription JSON:", error);
+      this.transcription = [];  // Fallback to empty array
     }
-
-    this.transcription = transcription;
     this.on_transcription(this.transcription);
   }
-
 
   async getCER() {
     const res = await fetch(
       `${serverorigin}/score_words_cer?target=${encodeURIComponent(
-        this.target
+        JSON.stringify(this.target)
       )}&tbw=${encodeURIComponent(
         JSON.stringify(this.target_by_word)
       )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
@@ -48,10 +49,10 @@ export class FeedbackGiver {
   async getWFED() {
     const res = await fetch(
       `${serverorigin}/score_words_wfed?target=${encodeURIComponent(
-        this.target
+        JSON.stringify(this.target)
       )}&tbw=${encodeURIComponent(
         JSON.stringify(this.target_by_word)
-      )}&speech=${encodeURIComponent(this.transcription)}`
+      )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
     );
     const data = await res.json();
     const [scoredWords, overall] = data;
@@ -59,7 +60,7 @@ export class FeedbackGiver {
   }
   async getPhonemeNaturalLanguageFeedback() {
     const res = await fetch(
-      `${serverorigin}/phoneme_written_feedback?target=${encodeURIComponent(this.target)}&speech=${encodeURIComponent(this.transcription)}`
+      `${serverorigin}/phoneme_written_feedback?target=${encodeURIComponent(JSON.stringify(this.target))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
     );
     return await res.json();
   }
@@ -67,7 +68,7 @@ export class FeedbackGiver {
   async getUserPhoneticErrors() {
     console.log("getUserPhoneticErrors called with transcription:", this.transcription);
     const res = await fetch(
-      `${serverorigin}/user_phonetic_errors?target=${encodeURIComponent(this.target)}&tbw=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(this.transcription)}`
+      `${serverorigin}/user_phonetic_errors?target=${encodeURIComponent(JSON.stringify(this.target))}&tbw=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
     );
     console.log("res", res);
     return await res.json();
@@ -75,7 +76,7 @@ export class FeedbackGiver {
 
   async start() {
     // Clear previous transcription
-    this.#setTranscription([]);
+    this.#setTranscription("");
 
     // Open WebSocket connection
     this.socket = new WebSocket(
@@ -120,6 +121,8 @@ export class FeedbackGiver {
     this.audioWorkletNode.port.onmessage = (event) => {
       if (this.socket.readyState === WebSocket.OPEN) {
         this.socket.send(event.data);
+      } else {
+        console.error("WebSocket not open, cannot send audio data");
       }
     };
 
@@ -174,7 +177,7 @@ export class FeedbackGiver {
       const allWords = finalWords.concat(wordlist);
       if (
         allWords[0].toLowerCase().replace(/[^a-z]/g, "") !=
-          this.words[0].toLowerCase().replace(/[^a-z]/g, "") &&
+        this.words[0].toLowerCase().replace(/[^a-z]/g, "") &&
         allWords.length > 0
       ) {
         allWords.shift();
