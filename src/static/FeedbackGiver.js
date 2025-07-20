@@ -5,7 +5,7 @@ export class FeedbackGiver {
   constructor(target, target_by_word, on_transcription, on_word_spoken) {
     this.target = target;
     this.target_by_word = target_by_word;
-    this.transcription = "";
+    this.transcription = []; 
     this.on_transcription = on_transcription;
     this.socket = null;
     this.audioContext = null;
@@ -20,14 +20,13 @@ export class FeedbackGiver {
     }
     this.next_word_ix = 0;
     this.recognition = null;
-
-    // Collect Float32Array chunks coming from the AudioWorklet so that we can
-    // send the full utterance to the backend /feedback endpoint after the
-    // recording is finished.
-    this._audioChunks = [];
   }
 
   #setTranscription(transcription) {
+    if (typeof transcription === 'string') {
+      throw new Error("Transcription must be an array of characters");
+    }
+
     this.transcription = transcription;
     this.on_transcription(this.transcription);
   }
@@ -39,7 +38,7 @@ export class FeedbackGiver {
         this.target
       )}&tbw=${encodeURIComponent(
         JSON.stringify(this.target_by_word)
-      )}&speech=${encodeURIComponent(this.transcription)}`
+      )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
     );
     const data = await res.json();
     const [scoredWords, overall] = data;
@@ -58,7 +57,6 @@ export class FeedbackGiver {
     const [scoredWords, overall] = data;
     return [scoredWords, overall];
   }
-
   async getPhonemeNaturalLanguageFeedback() {
     const res = await fetch(
       `${serverorigin}/phoneme_written_feedback?target=${encodeURIComponent(this.target)}&speech=${encodeURIComponent(this.transcription)}`
@@ -73,12 +71,11 @@ export class FeedbackGiver {
     );
     console.log("res", res);
     return await res.json();
-      
   }
 
   async start() {
     // Clear previous transcription
-    this.#setTranscription("");
+    this.#setTranscription([]);
 
     // Open WebSocket connection
     this.socket = new WebSocket(
@@ -115,11 +112,9 @@ export class FeedbackGiver {
     // Connect the audio input to the AudioWorkletNode
     const audioInput = this.audioContext.createMediaStreamSource(stream);
     audioInput.connect(this.audioWorkletNode);
-    console.log("Audio input connected to AudioWorkletNode");
 
     // Connect the AudioWorkletNode to the audio context destination
     this.audioWorkletNode.connect(this.audioContext.destination);
-    console.log("AudioWorkletNode connected to destination");
 
     // Connect AudioWorkletNode to process audio and send to WebSocket
     this.audioWorkletNode.port.onmessage = (event) => {
@@ -146,46 +141,6 @@ export class FeedbackGiver {
       await this.audioContext.close();
       this.audioContext = null;
     }
-
-    // Optionally, you can await this.feedback() here or call it externally.
-  }
-
-  // Concatenate the recorded Float32Array chunks into a single Float32Array
-  _getFullAudio() {
-    const totalLength = this._audioChunks.reduce((sum, c) => sum + c.length, 0);
-    const merged = new Float32Array(totalLength);
-    let offset = 0;
-    for (const chunk of this._audioChunks) {
-      merged.set(chunk, offset);
-      offset += chunk.length;
-    }
-    return merged;
-  }
-
-  /**
-   * Upload the full recording to `/feedback` and return the JSON response.
-   * Call this after `stop()` finishes so that recording is complete.
-   */
-  async feedback() {
-    // Assemble audio
-    const audioFloat32 = this._getFullAudio();
-
-    // Prepare multipart/form-data payload
-    const formData = new FormData();
-    formData.append("target", this.target.join(""));
-    formData.append("tbw", JSON.stringify(this.target_by_word));
-    formData.append(
-      "audio",
-      new Blob([audioFloat32.buffer], { type: "application/octet-stream" }),
-      "audio.raw"
-    );
-
-    const res = await fetch(`${serverorigin}/feedback`, {
-      method: "POST",
-      body: formData,
-    });
-
-    return await res.json();
   }
 
   #startWordTranscription() {
