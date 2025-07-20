@@ -34,8 +34,6 @@ sock = Sock(app)
 
 # Load Wav2Vec2 model
 model_id = "KoelLabs/xlsr-english-01"
-# model_id = "speech31/wav2vec2-large-english-TIMIT-phoneme_v3"
-# model_id = "ginic/hyperparam_tuning_1_wav2vec2-large-xlsr-buckeye-ipa"
 processor = AutoProcessor.from_pretrained(model_id)
 model = AutoModelForCTC.from_pretrained(model_id)
 
@@ -134,18 +132,20 @@ def feedback(target, target_by_words, speech_audio, speech_phones, timestamps):
     user_phonetic_errors_dict = user_phonetic_errors(
         target, target_by_words, speech_phones, topk=3
     )
-
+    # load all phoneme feedback
+    all_phoneme_feedback = phoneme_written_feedback(target, speech_phones)
     feedback_items = []
     for phoneme, error_info in user_phonetic_errors_dict.items():
         num_mistakes, which_words, mistake_severities, phoneme_spoken_as, score = (
             error_info
         )
-        target_phoneme_spelling = get_phoneme_feedback(phoneme)["phonetic-spelling"]
-        target_phoneme_explanation = get_phoneme_feedback(phoneme)["explanation"]
-        target_phoneme_video = get_phoneme_feedback(phoneme)["video"]
-        # target_phoneme_audio = get_phoneme_feedback(phoneme)["audio"] # NOTE: this can be added once we create a page of all audio trancripts for videos
+        phoneme_feedback = all_phoneme_feedback.get(phoneme)
+        target_phoneme_spelling = phoneme_feedback["phonetic-spelling"]
+        target_phoneme_explanation = phoneme_feedback["explanation"]
+        target_phoneme_video = phoneme_feedback["video"]
+        # target_phoneme_audio = phoneme_feedback["audio"] # NOTE: this can be added once we create a page of all audio trancripts for videos
         speech_phoneme_words = target_by_words[which_words]
-        speech_phoneme_spelling = get_phoneme_feedback(phoneme)["phonetic-spelling"]
+        speech_phoneme_spelling = phoneme_feedback["phonetic-spelling"]
         speech_phoneme_audio = get_error_audio_clip(
             target_by_words, timestamps, speech_audio, which_words
         )
@@ -189,27 +189,17 @@ def send_static(path):
     return send_from_directory("static", path)
 
 
-@app.route("/phoneme_written_feedback", methods=["GET"])
-@cross_origin()
-def get_phoneme_feedback():
-    try:
-        target = request.args.get("target", "").strip()
-        speech = request.args.get("speech", "").strip()
-
-        result = phoneme_written_feedback(target, speech)
-
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
 
 @app.route("/user_phonetic_errors", methods=["GET"])
 @cross_origin()
 def get_user_phonetic_errors():
     try:
-        target = request.args.get("target", "").strip()
-        target_by_word = json.loads(request.args.get("tbw") or "null")
-        speech = request.args.get("speech", "").strip()
+        # target = request.args.get("target", "").strip()
+        # target_by_word = json.loads(request.args.get("tbw") or "null")
+        # speech = request.args.get("speech", "").strip()
+        target = json.loads(request.args.get("target", "[]"))
+        target_by_word = json.loads(request.args.get("tbw", "[]"))
+        speech = json.loads(request.args.get("speech", "[]"))
 
         result = user_phonetic_errors(target, target_by_word, speech)
 
@@ -226,32 +216,51 @@ def get_user_phonetic_errors():
 
         return jsonify(serializable_result)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"server error from get_user_phonetic_errors": str(e)}), 500
+
+@app.route("/phoneme_written_feedback", methods=["GET"])
+@cross_origin()
+def get_phoneme_written_feedback():
+    try:
+        target = json.loads(request.args.get("target", "[]"))
+        speech = json.loads(request.args.get("speech", "[]"))
+        
+        result = phoneme_written_feedback(target, speech)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"server error from get_phoneme_written_feedback": str(e)}), 500
 
 
 # REST endpoint
 @app.route("/score_words_cer", methods=["GET"])
 @cross_origin()
 def get_score_words_cer():
-    target = request.args.get("target", "").strip()
-    target_by_word = json.loads(request.args.get("tbw") or "null")
-    speech = request.args.get("speech", "").strip()
-    if not speech:
-        return jsonify([[[word, seq, "", 0] for word, seq in target_by_word], 0])
-    word_scores = score_words_cer(target, target_by_word, speech)
-    return jsonify(word_scores)
+    try:
+        target = json.loads(request.args.get("target", "[]"))
+        target_by_word = json.loads(request.args.get("tbw") or "null")
+        speech = json.loads(request.args.get("speech", "[]"))
+        if not speech:
+            return jsonify([[[word, seq, "", 0] for word, seq in target_by_word], 0])
+        word_scores = score_words_cer(target, target_by_word, speech)
+        return jsonify(word_scores)
+    except Exception as e:
+        return jsonify({"server error from get_score_words_cer": str(e)}), 500
+
 
 
 @app.route("/score_words_wfed", methods=["GET"])
 @cross_origin()
 def get_score_words_wfed():
-    target = request.args.get("target", "").strip()
-    target_by_word = json.loads(request.args.get("tbw") or "null")
-    speech = request.args.get("speech", "").strip()
-    if not speech:
-        return jsonify([[[word, seq, "", 0] for word, seq in target_by_word], 0])
-    word_scores = score_words_wfed(target, target_by_word, speech)
-    return jsonify(word_scores)
+    try:
+        target = json.loads(request.args.get("target", "[]"))
+        target_by_word = json.loads(request.args.get("tbw") or "null")
+        speech = json.loads(request.args.get("speech", "[]"))
+        if not speech:
+            return jsonify([[[word, seq, "", 0] for word, seq in target_by_word], 0])
+        word_scores = score_words_cer(target, target_by_word, speech)
+        return jsonify(word_scores)
+    except Exception as e:
+        return jsonify({"server error from get_score_words_wfed": str(e)}), 500
 
 
 @app.route("/feedback", methods=["GET"])
@@ -262,21 +271,18 @@ def get_feedback():
     audio_bytes = request.files["audio"].read()
     speech_audio = np.frombuffer(audio_bytes, dtype=np.float32)
 
-    # Check if audio is too short (less than 0.1 seconds)
     if len(speech_audio) < SAMPLE_RATE * 0.1:
         raise ValueError(f"Audio too short: {len(speech_audio)} samples")
 
     speech_phones, timestamps = transcribe_timestamped(speech_audio)
-    # 3. continue the pipeline without ever calling transcribe_audio again
     out = feedback(
         target,
         target_by_words,
-        speech_audio,  # raw audio (for clipping)
+        speech_audio,  
         speech_phones,
         timestamps,  # per-phoneme timing info
     )
     return jsonify(out)
-
 
 @sock.route("/stream")
 def stream(ws):
@@ -302,12 +308,10 @@ def stream(ws):
                     combined = np.concatenate([combined, audio])
 
                     if num_chunks_accumulated < NUM_CHUNKS_ACCUMULATED:
-                        speech, timestamps = transcribe_timestamped(audio)
-                        transcription += speech
+                        transcription += transcribe_audio(audio)
                         ws.send(full_transcription + transcription)
                     else:
-                        speech, timestamps = transcribe_timestamped(combined)
-                        full_transcription += speech
+                        full_transcription += transcribe_audio(combined)
                         ws.send(full_transcription)
                         combined = np.array([], dtype=np.float32)
                         num_chunks_accumulated = 0
@@ -322,6 +326,7 @@ def stream(ws):
             print(f"Error: {e}")
             print(f"Line: {e.__traceback__.tb_lineno if e.__traceback__ else -1}")
             break
+
 
 
 if __name__ == "__main__":
