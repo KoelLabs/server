@@ -81,7 +81,7 @@ def pair_by_words(target, target_by_words, speech):
         phons = list(phons)
         ps = start
         while len(phons) > 0:
-            t, s, _ = cur_pair
+            t, s = cur_pair
             if t != phons[0]:
                 phons.pop(0)
             ps.append(cur_pair)
@@ -103,9 +103,9 @@ def score_words_cer(target, target_by_words, speech):
     word_scores = []
     average_score = 0
     for word, pairs in pbw:
-        cer = sum(1 for t, s, _ in pairs if t != s) / len(pairs)
-        seq1 = "".join([t for t, _, _ in pairs])
-        seq2 = "".join([s for _, s, _ in pairs])
+        cer = sum(1 for t, s in pairs if t != s) / len(pairs)
+        seq1 = "".join([t for t, _ in pairs])
+        seq2 = "".join([s for _, s in pairs])
         word_scores.append((word, seq1, seq2, (1 - cer / 2)))
         average_score += 1 - cer / 2
     average_score /= len(pbw)
@@ -120,22 +120,13 @@ def score_words_wfed(target, target_by_words, speech):
     word_scores = []
     average_score = 0
     for word, pairs in pbw:
-        seq1 = "".join([t for t, _, _ in pairs])
-        seq2 = "".join([s for _, s, _ in pairs])
+        seq1 = "".join([t for t, _ in pairs])
+        seq2 = "".join([s for _, s in pairs])
         norm_score = (22 - fer(seq1, seq2)) / 22
         word_scores.append((word, seq1, seq2, norm_score**2))
         average_score += norm_score**2
     average_score /= len(pbw)
     return word_scores, average_score
-
-
-def get_phoneme_feedback(phoneme):
-    with open(model_vocab_json, "r", encoding="utf-8") as f:
-        content = json.load(f)
-    phoneme_feedback = next(
-        (item for item in content if item["phoneme"] == phoneme), None
-    )
-    return phoneme_feedback
 
 
 def phoneme_written_feedback(target, speech):
@@ -144,7 +135,7 @@ def phoneme_written_feedback(target, speech):
     and speech.
     """
     all_phoneme_feedback = {}
-    all_speech_phonemes = list(set(target + speech))
+    all_speech_phonemes = set(target + speech)
     with open(model_vocab_json, "r", encoding="utf-8") as f:
         content = json.load(f)
     for phoneme in all_speech_phonemes:
