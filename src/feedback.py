@@ -132,7 +132,7 @@ def score_words_wfed(target, target_by_words, speech):
 
 def phoneme_written_feedback(target, speech):
     """This function takes in the target and speech and returns a dictionary
-    of phoneme: {explanation, phonetic-spelling} for ALL phonemes in the target
+    of phoneme: {explanation, phonetic spelling} for ALL phonemes in the target
     and speech.
     """
     all_phoneme_feedback = {}
@@ -146,7 +146,7 @@ def phoneme_written_feedback(target, speech):
         if phoneme_feedback:
             all_phoneme_feedback[phoneme] = {
                 "explanation": phoneme_feedback["explanation"],
-                "phonetic-spelling": phoneme_feedback["phonetic spelling"],
+                "phonetic spelling": phoneme_feedback["phonetic spelling"],
                 "video": phoneme_feedback["video"],
                 "description": phoneme_feedback["description"],
                 "examples": phoneme_feedback["examples"],

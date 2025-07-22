@@ -122,7 +122,7 @@
           const phoneme_spoken_as_spelling = phoneme_spoken_as.map(phoneme => all_phoneme_feedback[phoneme]["phonetic spelling"]);
           const all_target_phoneme_feedback = all_phoneme_feedback[target_phoneme];
           const target_phoneme_explanation = all_target_phoneme_feedback["explanation"];
-          const target_phoneme_spelling = all_target_phoneme_feedback["phonetic-spelling"]; 
+          const target_phoneme_spelling = all_target_phoneme_feedback["phonetic spelling"]; 
 
           missedPhonemesElement.innerHTML += `<p><strong>You struggle with the <em>${target_phoneme_spelling}</em></strong> sound.<br>
               Words affected: ${all_words}<br>
