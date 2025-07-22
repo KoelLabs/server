@@ -74,7 +74,7 @@
           color_word(wordElements[i]);
         }
       }
-      scoreElement.textContent = Math.round(1000 * overall) / 10;
+      scoreElement.textContent = Math.min(Math.round(100 * overall + 5), 100);
     }
 
     function on_word_spoken(words, are_words_correct, next_word_ix, percentage_correct, is_done) {
