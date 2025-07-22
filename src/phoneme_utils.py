@@ -18,11 +18,20 @@ IPA_SYMBOLS = [ipa for ipa, *_ in ft.segments]
 
 # Phoneme mapping for panphon compatibility
 # Some IPA phonemes have multiple Unicode representations.
-PHONEME_MAPPINGS = {
+PANPHONE_MAPPINGS = {
     "ɝ": "ɜ˞",  # r-colored schwa (U+025D) -> schwa + r-coloring diacritic (U+025C + U+02DE)
     "ɚ": "ə˞",
     "g": "ɡ",  # model vocab has correct ɡ but we add this since its hard to distinguish
 }
+# just a few phonemes that are hard to distinguish, we mask them to the closest phoneme to improve scores and omitt unecessary feedback
+PHONEMES_TO_MASK = {
+    "ʌ": "ə",
+    "ɔ": "ɑ",
+    "kʰ": "k",
+    "sʰ": "s",
+}
+
+ALL_MAPPINGS = {**PANPHONE_MAPPINGS, **PHONEMES_TO_MASK}
 
 
 def fer(prediction, ground_truth):
@@ -50,7 +59,7 @@ def map_phoneme_for_panphon(phoneme_string):
        the original container type intact.
     """
 
-    return [PHONEME_MAPPINGS.get(ch, ch) for ch in phoneme_string]
+    return [PANPHONE_MAPPINGS.get(ch, ch) for ch in phoneme_string]
 
 
 # Convert a phoneme to a numerical feature vector

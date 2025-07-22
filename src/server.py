@@ -16,7 +16,7 @@ from feedback import (
 )
 import json
 
-from phoneme_utils import phrase_bounds, PHONEME_MAPPINGS
+from phoneme_utils import phrase_bounds, ALL_MAPPINGS
 import soundfile as sf
 from scipy.io import wavfile
 
@@ -93,7 +93,7 @@ def _run_inference(audio, model, processor):
     predicted_ids = torch.argmax(logits, dim=-1)[0].tolist()
     tokens = processor.tokenizer.convert_ids_to_tokens(predicted_ids)
     transcription = [
-        PHONEME_MAPPINGS.get(t, t)
+        ALL_MAPPINGS.get(t, t)
         for t in tokens
         if t not in processor.tokenizer.all_special_tokens
     ]
@@ -199,7 +199,7 @@ def get_user_phonetic_errors():
     speech = json.loads(request.args.get("speech", "[]"))
 
     result = user_phonetic_errors(target, target_by_word, speech)
-    
+
     result_sorted_freq = sorted(result.items(), key=lambda x: x[1][0], reverse=True)
     # Convert sets to lists for JSON serialization
     serializable_result = {}
@@ -213,7 +213,7 @@ def get_user_phonetic_errors():
         ]
 
     return jsonify(serializable_result)
-   
+
 
 @app.route("/phoneme_written_feedback", methods=["GET"])
 @cross_origin()
