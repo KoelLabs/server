@@ -141,12 +141,12 @@ def feedback(target, target_by_words, speech_audio, speech_phones, timestamps):
             error_info
         )
         phoneme_feedback = all_phoneme_feedback.get(phoneme)
-        target_phoneme_spelling = phoneme_feedback["phonetic-spelling"]
+        target_phoneme_spelling = phoneme_feedback["phonetic spelling"]
         target_phoneme_explanation = phoneme_feedback["explanation"]
-        target_phoneme_video = phoneme_feedback["video"]
+        # target_phoneme_video = phoneme_feedback["video"] # NOTE: this can be added once we create a page of all audio trancripts for videos
         # target_phoneme_audio = phoneme_feedback["audio"] # NOTE: this can be added once we create a page of all audio trancripts for videos
         speech_phoneme_words = target_by_words[which_words]
-        speech_phoneme_spelling = phoneme_feedback["phonetic-spelling"]
+        speech_phoneme_spelling = phoneme_feedback["phonetic spelling"]
         speech_phoneme_audio = get_error_audio_clip(
             target_by_words, timestamps, speech_audio, which_words
         )
@@ -154,7 +154,7 @@ def feedback(target, target_by_words, speech_audio, speech_phones, timestamps):
         feedback_item = [
             target_phoneme_spelling,
             target_phoneme_explanation,
-            target_phoneme_video,
+            # target_phoneme_video,
             # target_phoneme_audio = None,
             speech_phoneme_words,
             speech_phoneme_spelling,
@@ -193,34 +193,33 @@ def send_static(path):
 @app.route("/user_phonetic_errors", methods=["GET"])
 @cross_origin()
 def get_user_phonetic_errors():
-    try:
-        # target = request.args.get("target", "").strip()
-        # target_by_word = json.loads(request.args.get("tbw") or "null")
-        # speech = request.args.get("speech", "").strip()
-        target = json.loads(request.args.get("target", "[]"))
-        target_by_word = json.loads(request.args.get("tbw", "[]"))
-        speech = json.loads(request.args.get("speech", "[]"))
 
-        result = user_phonetic_errors(target, target_by_word, speech)
+    target = json.loads(request.args.get("target", "[]"))
+    target_by_word = json.loads(request.args.get("tbw", "[]"))
+    speech = json.loads(request.args.get("speech", "[]"))
 
-        result_sorted_freq = sorted(result.items(), key=lambda x: x[1][0], reverse=True)
-        # Convert sets to lists for JSON serialization
-        serializable_result = {}
-        for phoneme, (count, words, severities, spoken_as) in result_sorted_freq:
-            serializable_result[phoneme] = [
-                count,
-                list(words),
-                severities,
-                list(spoken_as),
-            ]
+    result = user_phonetic_errors(target, target_by_word, speech)
+    
+    result_sorted_freq = sorted(result.items(), key=lambda x: x[1][0], reverse=True)
+    # Convert sets to lists for JSON serialization
+    serializable_result = {}
+    for phoneme, (count, words, severities, spoken_as, score) in result_sorted_freq:
+        serializable_result[phoneme] = [
+            count,
+            list(words),
+            severities,
+            list(spoken_as),
+            score,
+        ]
 
-        return jsonify(serializable_result)
-    except Exception as e:
-        return jsonify({"server error from get_user_phonetic_errors": str(e)}), 500
-
+    return jsonify(serializable_result)
+   
 
 @app.route("/phoneme_written_feedback", methods=["GET"])
 @cross_origin()
+# This function takes in the target and speech and returns a dictionary
+# of phoneme: {explanation, phonetic-spelling} for ALL phonemes in the target
+# and speech.
 def get_phoneme_written_feedback():
     try:
         target = json.loads(request.args.get("target", "[]"))
