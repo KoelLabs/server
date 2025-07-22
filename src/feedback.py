@@ -16,7 +16,7 @@ model_vocab_json = os.path.join(os.path.dirname(__file__), "model_vocab_feedback
 
 def user_phonetic_errors(target, target_by_words, speech, topk=3):
     """
-    Build a frequency dictionary of phoneme mistakes.
+    Build a frequency dictionary of phoneme mistakes AND sorts by score
     Returns {target_phoneme: (mistake_frequency, words_with_mistake, mistake_severities, phoneme_spoken_as)}
     example: {'k': (3, {1, 2}, 4.8, {'l', 'i'}, 8.4), 'o': (1, {5}, .9, {'i', 'e'})}
     """
@@ -27,7 +27,7 @@ def user_phonetic_errors(target, target_by_words, speech, topk=3):
     phoneme_mistake_freq = {}
 
     for word_idx, (word, pairs) in enumerate(word_phone_pairings):
-        for target_phoneme, speech_phoneme, _ in pairs:
+        for target_phoneme, speech_phoneme in pairs:
             if target_phoneme != speech_phoneme:
                 if target_phoneme not in phoneme_mistake_freq:
                     phoneme_mistake_freq[target_phoneme] = (0, set(), 0.0, set(), 0.0)
@@ -55,6 +55,7 @@ def user_phonetic_errors(target, target_by_words, speech, topk=3):
                     phoneme_spoken_as,
                     score,
                 )
+
     sorted_phoneme_mistake_freq = sorted(
         phoneme_mistake_freq.items(), key=lambda x: x[1][4], reverse=True
     )
@@ -145,10 +146,10 @@ def phoneme_written_feedback(target, speech):
         if phoneme_feedback:
             all_phoneme_feedback[phoneme] = {
                 "explanation": phoneme_feedback["explanation"],
-                "phonetic-spelling": phoneme_feedback["phonetic-spelling"],
+                "phonetic-spelling": phoneme_feedback["phonetic spelling"],
                 "video": phoneme_feedback["video"],
                 "description": phoneme_feedback["description"],
-                "example": phoneme_feedback["example"],
+                "examples": phoneme_feedback["examples"],
             }
         else:
             raise ValueError(f"Phoneme {phoneme} not found in model vocabulary")
