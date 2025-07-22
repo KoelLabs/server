@@ -74,7 +74,7 @@
           color_word(wordElements[i]);
         }
       }
-      scoreElement.textContent = Math.min(Math.round(100 * overall + 5), 100);
+      scoreElement.textContent = Math.min(Math.round(100 * overall + 3), 100);
     }
 
     function on_word_spoken(words, are_words_correct, next_word_ix, percentage_correct, is_done) {
@@ -119,7 +119,7 @@
           const [mistake_count, word_set, mistake_severities, phoneme_spoken_as, score] = error_data;  
           console.log("final scoring of phones", score, "for the phoneme", target_phoneme, "which sounded like", phoneme_spoken_as);
           const all_words = word_set.map(idx => target_by_words[idx][0]);
-          const phoneme_spoken_as_spelling = phoneme_spoken_as.map(phoneme => all_phoneme_feedback[phoneme]["phonetic-spelling"]);
+          const phoneme_spoken_as_spelling = phoneme_spoken_as.map(phoneme => all_phoneme_feedback[phoneme]["phonetic spelling"]);
           const all_target_phoneme_feedback = all_phoneme_feedback[target_phoneme];
           const target_phoneme_explanation = all_target_phoneme_feedback["explanation"];
           const target_phoneme_spelling = all_target_phoneme_feedback["phonetic-spelling"]; 
