@@ -1,203 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Real-Time Transcription</title>
-  </head>
-  <body>
-    <h1>Real-Time Transcription</h1>
-    <div>
-      <h2>Word by Word</h2>
-      <div id="scored_words"></div>
-      <span id="word"></span>
-      <!-- <button id="play_word">Play</button>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Real-Time Transcription</title>
+</head>
+
+<body>
+  <h1>Real-Time Transcription</h1>
+  <div>
+    <h2>Word by Word</h2>
+    <div id="scored_words"></div>
+    <span id="word"></span>
+    <!-- <button id="play_word">Play</button>
       <input type="range" id="phoneme_pair" min="0" max="0" step="1" /> -->
-      <p id="target_phoneme_discription"></p>
-      <p id="transcription_phoneme_discription"></p>
-    </div>
+    <p id="target_phoneme_discription"></p>
+    <p id="transcription_phoneme_discription"></p>
+  </div>
 
-    <button id="start">Start</button>
-    <button id="stop" disabled>Stop</button>
-    <button id="analyze_phonetics">Analyze Phonetics</button>
-    <p>Transcription: <span id="transcription"></span></p>
-    <p>Accent Similarity: <span id="score"></span>%</p>
-    <p id="missed_phonemes"></p>
-    <!-- container for richer per-phoneme feedback -->
-    <div id="phoneme_feedback"></div>
-    
-    <script type="module">
-      import { FeedbackGiver } from './FeedbackGiver.js';
+  <button id="start">Start</button>
+  <button id="stop" disabled>Stop</button>
+  <button id="analyze_phonetics">Analyze Phonetics</button>
+  <p>Transcription: <span id="transcription"></span></p>
+  <p>Accent Similarity: <span id="score"></span>%</p>
+  <p id="missed_phonemes"></p>
+  <!-- container for richer per-phoneme feedback -->
+  <div id="phoneme_feedback"></div>
+
+  <script type="module">
+    import { FeedbackGiver } from './FeedbackGiver.js';
 
 
-      
-      const target = ['kʰ', 'ɔ', 'l', 'ɪ', 'ŋ', 'kʰ', 'ɑ', 'ɹ', 'd', 'z', 'ɑ', 'ɹ', 'ð', 'ə', 'w', 'eɪ', 'v', 'ə', 'v', 'ð', 'ə', 'f', 'j', 'u', 'tʃ', 'ɝ']
-      const target_by_words = [
-          ["calling", ["kʰ", "ɔ", "l", "ɪ", "ŋ"]],
-          ["cards", ["kʰ", "ɑ", "ɹ", "d", "z"]],
-          ["are", ["ɑ", "ɹ"]],
-          ["the", ["ð", "ə"]],
-          ['wave', ["w", "eɪ", "v"]],
-          ["of", ["ə", "v"]],
-          ["the", ["ð", "ə"]],
-          ["future", ["f", "j", "u", "tʃ", "ɜ˞"]],
-      ]
 
-      const transcriptionElement = document.getElementById("transcription");
-      const missedPhonemesElement = document.getElementById("missed_phonemes");
-      const feedbackElement = document.getElementById("feedback");
-      const scoreElement = document.getElementById("score");
-      const scoredWordsElement = document.getElementById("scored_words");
+    const target = ['kʰ', 'ɔ', 'l', 'ɪ', 'ŋ', 'kʰ', 'ɑ', 'ɹ', 'd', 'z', 'ɑ', 'ɹ', 'ð', 'ə', 'w', 'eɪ', 'v', 'ə', 'v', 'ð', 'ə', 'f', 'j', 'u', 'tʃ', 'ɜ˞']
+    const target_by_words = [
+      ["calling", ["kʰ", "ɔ", "l", "ɪ", "ŋ"]],
+      ["cards", ["kʰ", "ɑ", "ɹ", "d", "z"]],
+      ["are", ["ɑ", "ɹ"]],
+      ["the", ["ð", "ə"]],
+      ['wave', ["w", "eɪ", "v"]],
+      ["of", ["ə", "v"]],
+      ["the", ["ð", "ə"]],
+      ["future", ["f", "j", "u", "tʃ", "ɜ˞"]],
+    ]
 
-      function color_word(el) {
-        const score = parseFloat(el.dataset.pscore);
-        const isCorrect = el.dataset.wordCorrect === "true";
-        if (isCorrect || score > 0.8) {
-          el.style.backgroundColor = `hsl(${score * 120}, 100%, 50%)`;
-        } else {
-          el.style.backgroundColor = `red`;
+    const transcriptionElement = document.getElementById("transcription");
+    const missedPhonemesElement = document.getElementById("missed_phonemes");
+    const feedbackElement = document.getElementById("feedback");
+    const scoreElement = document.getElementById("score");
+    const scoredWordsElement = document.getElementById("scored_words");
+
+    function color_word(el) {
+      const score = parseFloat(el.dataset.pscore);
+      const isCorrect = el.dataset.wordCorrect === "true";
+      if (isCorrect || score > 0.8) {
+        el.style.backgroundColor = `hsl(${score * 120}, 100%, 50%)`;
+      } else {
+        el.style.backgroundColor = `red`;
+      }
+    }
+
+    async function on_transcription(transcription) {
+      transcriptionElement.textContent = transcription;
+      const [scoredWords, overall] = await feedbackGiver.getCER();
+      console.log('Phoneme Score:', overall);
+      const wordElements = document.querySelectorAll("#scored_words span");
+      for (let i = 0; i < scoredWords.length; i++) {
+        const wordscore = scoredWords[i];
+        const score = wordscore.at(-1);
+        wordElements[i].dataset.pscore = score;
+        if (i < feedbackGiver.next_word_ix) {
+          color_word(wordElements[i]);
         }
       }
+      scoreElement.textContent = Math.round(1000 * overall) / 10;
+    }
 
-      async function on_transcription(transcription) {
-        transcriptionElement.textContent = transcription;
-        const [scoredWords, overall] = await feedbackGiver.getCER();
-        console.log('Phoneme Score:', overall);
-        const wordElements = document.querySelectorAll("#scored_words span");
-        for (let i = 0; i < scoredWords.length; i++) { 
-          const wordscore = scoredWords[i];
-          const score = wordscore.at(-1);
-          wordElements[i].dataset.pscore = score;
-          if (i < feedbackGiver.next_word_ix) {
-            color_word(wordElements[i]);
-          }
-        }
-        scoreElement.textContent = Math.round(1000 * overall) / 10;
+    function on_word_spoken(words, are_words_correct, next_word_ix, percentage_correct, is_done) {
+      console.log('Percentage Words Correct:', percentage_correct);
+      const wordElements = document.querySelectorAll("#scored_words span");
+      for (let i = 0; i < next_word_ix; i++) {
+        const el = wordElements[i];
+        el.dataset.wordCorrect = are_words_correct[i];
+        el.style.border = "none";
+        color_word(el);
       }
-
-      function on_word_spoken(words, are_words_correct, next_word_ix, percentage_correct, is_done) {
-        console.log('Percentage Words Correct:', percentage_correct);
-        const wordElements = document.querySelectorAll("#scored_words span");
-        for (let i = 0; i < next_word_ix; i++) {
-          const el = wordElements[i];
-          el.dataset.wordCorrect = are_words_correct[i];
-          el.style.border = "none";
-          color_word(el);
-        }
-        if (is_done) {
-          setTimeout(() => {
-            feedbackGiver.stop();
-            document.getElementById("start").disabled = false;
-            document.getElementById("stop").disabled = true;
-          }, 3000);
-        } else {
-          const el = wordElements[next_word_ix];
-          el.style.border = "3px solid red";
-        }
+      if (is_done) {
+        setTimeout(() => {
+          feedbackGiver.stop();
+          document.getElementById("start").disabled = false;
+          document.getElementById("stop").disabled = true;
+        }, 3000);
+      } else {
+        const el = wordElements[next_word_ix];
+        el.style.border = "3px solid red";
       }
+    }
 
-      
-    
-      
-      
-      
-      const feedbackGiver = new FeedbackGiver(target, target_by_words, on_transcription, on_word_spoken);
-      
+
+    const feedbackGiver = new FeedbackGiver(target, target_by_words, on_transcription, on_word_spoken);
+
       for (const word of feedbackGiver.words) {
         scoredWordsElement.innerHTML += `<span data-pscore="0" data-word-correct="false">${word}</span> `;
       }
 
-      const wordElement = document.getElementById("word");
-      const phonemePairElement = document.getElementById("phoneme_pair");
-      const targetImageElement = document.getElementById("target_image");
-      const transcriptionImageElement = document.getElementById("transcription_image");
-      const targetPhonemeDescriptionElement = document.getElementById("target_phoneme_discription");
-      const transcriptionPhonemeDescriptionElement = document.getElementById("transcription_phoneme_discription");
-      let activeWordIX, activePhonemIX;
-      
-      document.getElementById("analyze_phonetics").addEventListener("click", async () => {
-        console.log("Analyze phonetics button clicked");
-        console.log("Current transcription:", feedbackGiver.transcription);
+    document.getElementById("analyze_phonetics").addEventListener("click", async () => {
+      try {
+        const missed_phonemes = await feedbackGiver.getUserPhoneticErrors();
+        const all_phoneme_feedback = await feedbackGiver.getAllPhonemeWrittenFeedback();
+        
 
-        try {
-          // 1. High-level stats
-          const missed_phonemes = await feedbackGiver.getUserPhoneticErrors();
-          const natural_language_feedback = await feedbackGiver.getPhonemeNaturalLanguageFeedback();
+        missedPhonemesElement.innerHTML = "";
+        const phonemeFeedbackContainer = document.getElementById("phoneme_feedback");
+        phonemeFeedbackContainer.innerHTML = "";
 
-          // 2. Detailed per-phoneme feedback (includes audio) – requires full recording
-          const feedback = await feedbackGiver.feedback();
+        for (const [target_phoneme, error_data] of Object.entries(missed_phonemes)) {
+          const [mistake_count, word_set, mistake_severities, phoneme_spoken_as, score] = error_data;  
+          console.log("final scoring of phones", score, "for the phoneme", target_phoneme, "which sounded like", phoneme_spoken_as);
+          const all_words = word_set.map(idx => target_by_words[idx][0]);
+          const phoneme_spoken_as_spelling = phoneme_spoken_as.map(phoneme => all_phoneme_feedback[phoneme]["phonetic-spelling"]);
+          const all_target_phoneme_feedback = all_phoneme_feedback[target_phoneme];
+          const target_phoneme_explanation = all_target_phoneme_feedback["explanation"];
+          const target_phoneme_spelling = all_target_phoneme_feedback["phonetic-spelling"]; 
 
-          // Sort errors by frequency
-          const phoneme_errors = Object.entries(missed_phonemes)
-            .map(([phoneme, data]) => {
-              const [frequency, words, severities, spoken_as] = data;
-              return { phoneme, frequency, words, severities, spoken_as };
-            })
-            .sort((a, b) => b.frequency - a.frequency);
-
-          missedPhonemesElement.innerHTML = "";
-          const phonemeFeedbackContainer = document.getElementById("phoneme_feedback");
-          phonemeFeedbackContainer.innerHTML = "";
-
-          for (const errors of phoneme_errors) {
-            const info = natural_language_feedback[errors.phoneme] || {};
-            const spelling = info["phonetic-spelling"] || errors.phoneme;
-            const explanation = info["explanation"] || "";
-
-            missedPhonemesElement.innerHTML += `<p><strong>You struggle with the <em>${spelling}</em></strong> sound.<br>
-              Words affected: ${errors.words.join(', ')}<br>
-              It sounded like: ${errors.spoken_as.join(', ')}<br>
-              ${explanation}</p>`;
-          }
-
-          // The backend /feedback endpoint returns an array. For robustness assume
-          // either array of arrays (one per phoneme) or single object map.
-          const items = Array.isArray(feedback[0]) ? feedback : [feedback];
-          items.forEach((item) => {
-            const [targetSpelling, targetExplanation, targetVideo, speechWords, speechSpelling, audioBase64] = item;
-
-            const card = document.createElement("div");
-            card.style.border = "1px solid #ccc";
-            card.style.padding = "0.5rem";
-            card.style.margin = "0.5rem 0";
-
-            card.innerHTML = `
-              <h3>Sound: <em>${targetSpelling}</em></h3>
-              <p>${targetExplanation}</p>
-              <p>Affected words: ${speechWords.join ? speechWords.join(', ') : speechWords}</p>
-              <p>You pronounced it like: ${speechSpelling}</p>
-              ${targetVideo ? `<video src="${targetVideo}" controls width="200"></video>` : ""}
-              ${audioBase64 ? `<audio controls src="data:audio/wav;base64,${audioBase64}"></audio>` : ""}
-            `;
-
-            phonemeFeedbackContainer.appendChild(card);
-          });
-        } catch (error) {
-          console.error("Error in analyze_phonetics:", error);
-          missedPhonemesElement.innerHTML = `<p>Error: ${error.message}</p>`;
+          missedPhonemesElement.innerHTML += `<p><strong>You struggle with the <em>${target_phoneme_spelling}</em></strong> sound.<br>
+              Words affected: ${all_words}<br>
+              It sounded like: ${phoneme_spoken_as_spelling}<br>
+              ${target_phoneme_explanation}</p>`;
         }
-      });
+      } catch (error) {
+        console.error("Error in analyze_phonetics:", error);
+        missedPhonemesElement.innerHTML = `<p>Error: ${error.message}</p>`;
+      }
+    });
 
 
 
-      document.getElementById("start").addEventListener("click", () => {
-        const wordElements = document.querySelectorAll("#scored_words span");
-        for (const wordEl of wordElements) {
-          wordEl.style.backgroundColor = "none";
-          wordEl.style.border = "none";
-          wordEl.dataset.pscore = 0;
-          wordEl.dataset.wordCorrect = false;
-        }
-        document.getElementById("start").disabled = true;
-        document.getElementById("stop").disabled = false;
-        feedbackGiver.start();
-      });
+    document.getElementById("start").addEventListener("click", () => {
+      const wordElements = document.querySelectorAll("#scored_words span");
+      for (const wordEl of wordElements) {
+        wordEl.style.backgroundColor = "none";
+        wordEl.style.border = "none";
+        wordEl.dataset.pscore = 0;
+        wordEl.dataset.wordCorrect = false;
+      }
+      document.getElementById("start").disabled = true;
+      document.getElementById("stop").disabled = false;
+      feedbackGiver.start();
+    });
 
-      document.getElementById("stop").addEventListener("click", () => {
-        feedbackGiver.stop();
-        document.getElementById("start").disabled = false;
-        document.getElementById("stop").disabled = true;
-      });
-    </script>
-  </body>
+    document.getElementById("stop").addEventListener("click", () => {
+      feedbackGiver.stop();
+      document.getElementById("start").disabled = false;
+      document.getElementById("stop").disabled = true;
+    });
+  </script>
+</body>
+
 </html>
