@@ -34,44 +34,67 @@ export class FeedbackGiver {
   }
 
   async getCER() {
-    const res = await fetch(
-      `${serverorigin}/score_words_cer?target=${encodeURIComponent(
-        JSON.stringify(this.target)
-      )}&tbw=${encodeURIComponent(
-        JSON.stringify(this.target_by_word)
-      )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
-    );
-    const data = await res.json();
-    const [scoredWords, overall] = data;
-    return [scoredWords, overall];
+    try {
+      const res = await fetch(
+        `${serverorigin}/score_words_cer?target=${encodeURIComponent(
+          JSON.stringify(this.target)
+        )}&tbw=${encodeURIComponent(
+          JSON.stringify(this.target_by_word)
+        )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
+      );
+      const data = await res.json();
+      console.log("data", data);
+      const [scoredWords, overall] = data;
+      return [scoredWords, overall];
+    } catch (error) {
+      console.error("Error in getCER:", error);
+      return [[], 0];
+    }
   }
 
   async getWFED() {
-    const res = await fetch(
-      `${serverorigin}/score_words_wfed?target=${encodeURIComponent(
-        JSON.stringify(this.target)
-      )}&tbw=${encodeURIComponent(
-        JSON.stringify(this.target_by_word)
-      )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
-    );
-    const data = await res.json();
-    const [scoredWords, overall] = data;
-    return [scoredWords, overall];
+    try {
+      const res = await fetch(
+        `${serverorigin}/score_words_wfed?target=${encodeURIComponent(
+          JSON.stringify(this.target)
+        )}&tbw=${encodeURIComponent(
+          JSON.stringify(this.target_by_word)
+        )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
+      );
+      const data = await res.json();
+      const [scoredWords, overall] = data;
+        return [scoredWords, overall];
+    } catch (error) {
+      console.error("Error in getWFED:", error);
+      return [[], 0];
+    }
   }
-  async getPhonemeNaturalLanguageFeedback() {
-    const res = await fetch(
-      `${serverorigin}/phoneme_written_feedback?target=${encodeURIComponent(JSON.stringify(this.target))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
-    );
-    return await res.json();
+  async getAllPhonemeWrittenFeedback() {
+    //  this will grab all phonemes and their respective descriptions and information
+    try {
+      const res = await fetch(
+        `${serverorigin}/phoneme_written_feedback?target=${encodeURIComponent(JSON.stringify(this.target))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
+      );
+
+      return await res.json();
+    } catch (error) {
+      console.error("Error in getPhonemeNaturalLanguageFeedback:", error);
+      return {};
+    }
   }
 
   async getUserPhoneticErrors() {
-    console.log("getUserPhoneticErrors called with transcription:", this.transcription);
-    const res = await fetch(
-      `${serverorigin}/user_phonetic_errors?target=${encodeURIComponent(JSON.stringify(this.target))}&tbw=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
-    );
-    console.log("res", res);
-    return await res.json();
+    //  This function is used to get the top 3 errors spoken by the user returns (mistake_count, word_set, mistake_severities, phoneme_spoken_as, score)
+    try {
+      const res = await fetch(
+        `${serverorigin}/user_phonetic_errors?target=${encodeURIComponent(JSON.stringify(this.target))}&tbw=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
+      );
+      console.log("res", res);
+      return await res.json();
+    } catch (error) {
+      console.error("Error in json res getUserPhoneticErrors:", error);
+      return [];
+    }
   }
 
   async start() {
