@@ -129,6 +129,7 @@ export class FeedbackGiver {
     source.start();
     // close the audio context after we have nicely played back the users audio and wait for buffer to close
     source.onended = () => {
+        source.disconnect();
         onPlaybackEnd();  // call UI callback
     };
   }
