@@ -27,6 +27,9 @@
   <p id="missed_phonemes"></p>
   <!-- container for richer per-phoneme feedback -->
   <div id="phoneme_feedback"></div>
+  <!-- Audio Playback After User Stops Recording -->
+  <!-- <audio id="user_audio" controls></audio> -->
+  <button id="play-button">Play</button>
 
   <script type="module">
     import { FeedbackGiver } from './FeedbackGiver.js';
@@ -101,28 +104,43 @@
 
     const feedbackGiver = new FeedbackGiver(target, target_by_words, on_transcription, on_word_spoken);
 
-      for (const word of feedbackGiver.words) {
-        scoredWordsElement.innerHTML += `<span data-pscore="0" data-word-correct="false">${word}</span> `;
-      }
+    // function to play the user audio
+    async function handlePlay() {
+      const button = document.getElementById("play-button");
+
+      button.innerText = "Playing...";
+      button.disabled = true;
+
+      await feedbackGiver.playUserAudio(() => {
+        button.innerText = "Play";
+        button.disabled = false;
+      });
+    }
+    document.getElementById("play-button").addEventListener("click", handlePlay);
+     
+    // add the words to the scored words element 
+    for (const word of feedbackGiver.words) {
+      scoredWordsElement.innerHTML += `<span data-pscore="0" data-word-correct="false">${word}</span> `;
+    }
 
     document.getElementById("analyze_phonetics").addEventListener("click", async () => {
       try {
         const missed_phonemes = await feedbackGiver.getUserPhoneticErrors();
         const all_phoneme_feedback = await feedbackGiver.getAllPhonemeWrittenFeedback();
-        
+
 
         missedPhonemesElement.innerHTML = "";
         const phonemeFeedbackContainer = document.getElementById("phoneme_feedback");
         phonemeFeedbackContainer.innerHTML = "";
 
         for (const [target_phoneme, error_data] of Object.entries(missed_phonemes)) {
-          const [mistake_count, word_set, mistake_severities, phoneme_spoken_as, score] = error_data;  
+          const [mistake_count, word_set, mistake_severities, phoneme_spoken_as, score] = error_data;
           console.log("final scoring of phones", score, "for the phoneme", target_phoneme, "which sounded like", phoneme_spoken_as);
           const all_words = word_set.map(idx => target_by_words[idx][0]);
           const phoneme_spoken_as_spelling = phoneme_spoken_as.map(phoneme => all_phoneme_feedback[phoneme]["phonetic spelling"]);
           const all_target_phoneme_feedback = all_phoneme_feedback[target_phoneme];
           const target_phoneme_explanation = all_target_phoneme_feedback["explanation"];
-          const target_phoneme_spelling = all_target_phoneme_feedback["phonetic spelling"]; 
+          const target_phoneme_spelling = all_target_phoneme_feedback["phonetic spelling"];
 
           missedPhonemesElement.innerHTML += `<p><strong>You struggle with the <em>${target_phoneme_spelling}</em></strong> sound.<br>
               Words affected: ${all_words}<br>
@@ -155,6 +173,9 @@
       document.getElementById("start").disabled = false;
       document.getElementById("stop").disabled = true;
     });
+
+
+
   </script>
 </body>
 

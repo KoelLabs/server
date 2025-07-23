@@ -10,6 +10,8 @@ export class FeedbackGiver {
     this.socket = null;
     this.audioContext = null;
     this.audioWorkletNode = null;
+    this.store_audio_chunks = [];
+    this.userAudioBuffer = null;
 
     this.on_word_spoken = on_word_spoken;
     this.words = [];
@@ -31,6 +33,24 @@ export class FeedbackGiver {
       this.transcription = [];  // Fallback to empty array
     }
     this.on_transcription(this.transcription);
+  }
+
+  #combineAudioChunks() {
+    if (!this.store_audio_chunks || this.store_audio_chunks.length === 0) {
+      console.log("no audio chunks to merge");
+      return null;
+    }
+    const totalLength = this.store_audio_chunks.reduce((sum, arr) => sum + arr.length, 0); // grabs all samples across all the chunks
+    const merged = new Float32Array(totalLength); // allocate the float
+    let chunkPosition = 0; 
+    for (const chunk of this.store_audio_chunks){
+      merged.set(chunk, chunkPosition);
+      chunkPosition += chunk.length;
+    }
+    if (merged.length !== totalLength) {
+      throw new Error("merged length does not match total length");
+    }
+    return merged;
   }
 
   async getCER() {
@@ -63,7 +83,7 @@ export class FeedbackGiver {
       );
       const data = await res.json();
       const [scoredWords, overall] = data;
-        return [scoredWords, overall];
+      return [scoredWords, overall];
     } catch (error) {
       console.error("Error in getWFED:", error);
       return [[], 0];
@@ -96,8 +116,29 @@ export class FeedbackGiver {
       return [];
     }
   }
+  preparePlayback(float32Array) {
+    this.userAudioBuffer = this.audioContext.createBuffer(1, float32Array.length, 16000);
+    this.userAudioBuffer.getChannelData(0).set(float32Array);
+    console.log("userAudioBuffer length from prep: ", this.userAudioBuffer.length);
+  }
+  async playUserAudio(onPlaybackEnd = () => {}) {
+    const source = this.audioContext.createBufferSource();
+    source.buffer = this.userAudioBuffer;
+    console.log("userAudioBuffer length from playing: ", this.userAudioBuffer.length);
+    source.connect(this.audioContext.destination);
+    source.start();
+    // close the audio context after we have nicely played back the users audio and wait for buffer to close
+    source.onended = () => {
+      this.audioContext.close().then(() => {
+        this.audioContext = null;
+        onPlaybackEnd();  // call UI callback
+      });
+    };
+  }
+
 
   async start() {
+    this.store_audio_chunks = [];
     // Clear previous transcription
     this.#setTranscription("");
 
@@ -111,12 +152,12 @@ export class FeedbackGiver {
       this.#setTranscription(event.data);
     };
 
-    // Start capturing audio
+    // Start capturing audio (microphone)
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
     });
 
-    // Create an AudioContext
+    // Create an AudioContext for usage throughout
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
       sampleRate: 16000,
       latencyHint: "interactive",
@@ -142,10 +183,10 @@ export class FeedbackGiver {
 
     // Connect AudioWorkletNode to process audio and send to WebSocket
     this.audioWorkletNode.port.onmessage = (event) => {
+      const chunk_to_store = event.data;
+      this.store_audio_chunks.push(chunk_to_store); // continuously store the audio chunks
       if (this.socket.readyState === WebSocket.OPEN) {
-        this.socket.send(event.data);
-      } else {
-        console.error("WebSocket not open, cannot send audio data");
+        this.socket.send(chunk_to_store);
       }
     };
 
@@ -153,6 +194,7 @@ export class FeedbackGiver {
   }
 
   async stop() {
+    let stored_audio = null;
     if (this.audioWorkletNode) {
       this.audioWorkletNode.disconnect();
     }
@@ -163,11 +205,23 @@ export class FeedbackGiver {
       this.recognition.onend = null;
       this.recognition.stop();
     }
-    if (this.audioContext) {
-      await this.audioContext.close();
-      this.audioContext = null;
+    // merging logic of audio chunks when user stops recording
+    if (this.store_audio_chunks.length > 0) {
+      stored_audio = this.#combineAudioChunks();
+      console.log("stored_audio! stored audio length: ", stored_audio.length);
+    } else {
+      console.log("no audio chunks to merge");
     }
+    this.store_audio_chunks = [];
+    if (stored_audio) {
+      this.preparePlayback(stored_audio);
+    } else {
+      console.log("no audio to play back");
+    }
+    
   }
+
+
 
   #startWordTranscription() {
     this.next_word_ix = 0;
