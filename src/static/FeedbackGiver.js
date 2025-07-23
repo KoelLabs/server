@@ -12,6 +12,9 @@ export class FeedbackGiver {
     this.audioWorkletNode = null;
     this.store_audio_chunks = [];
     this.userAudioBuffer = null;
+    this.stored_audio = null;
+    this.audioInput = null;
+    this.mediaStream = null;
 
     this.on_word_spoken = on_word_spoken;
     this.words = [];
@@ -116,9 +119,12 @@ export class FeedbackGiver {
       return [];
     }
   }
-  preparePlayback(float32Array) {
-    this.userAudioBuffer = this.audioContext.createBuffer(1, float32Array.length, 16000);
-    this.userAudioBuffer.getChannelData(0).set(float32Array);
+  preparePlayback() {
+    this.userAudioBuffer = null;
+    console.log("buffer gets cleared: ", this.userAudioBuffer);
+
+    this.userAudioBuffer = this.audioContext.createBuffer(1, this.stored_audio.length, 16000);
+    this.userAudioBuffer.getChannelData(0).set(this.stored_audio);
     console.log("userAudioBuffer length from prep: ", this.userAudioBuffer.length);
   }
   async playUserAudio(onPlaybackEnd = () => {}) {
@@ -133,12 +139,43 @@ export class FeedbackGiver {
         onPlaybackEnd();  // call UI callback
     };
   }
+  async #cleanupRecording() {
+    if (this.audioWorkletNode) {
+      this.audioWorkletNode.disconnect();
+      this.audioWorkletNode = null;
+    }
+    // Stop and clean up audio input
+    if (this.audioInput) {
+      this.audioInput.disconnect();
+      this.audioInput = null;
+    }
 
+    // Stop media stream tracks
+    if (this.mediaStream) {
+      this.mediaStream.getTracks().forEach(track => {
+        track.stop();
+      });
+      this.mediaStream = null;
+    }
+
+    if (this.socket) {
+      this.socket.close();
+      this.socket = null;
+    }
+    if (this.recognition) {
+      this.recognition.onend = null;
+      this.recognition.stop();
+      this.recognition = null;
+    }
+  }
 
   async start() {
+    await this.#cleanupRecording();
     this.store_audio_chunks = [];
+    
     // Clear previous transcription
     this.#setTranscription("");
+    this.stored_audio = null;
 
     // Open WebSocket connection
     this.socket = new WebSocket(
@@ -156,11 +193,18 @@ export class FeedbackGiver {
     });
 
     // Create an AudioContext for usage throughout
-    this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
-      sampleRate: 16000,
-      latencyHint: "interactive",
-    });
-
+    // Create AudioContext if it doesn't exist or is closed
+    if (!this.audioContext || this.audioContext.state === 'closed') {
+      console.log("audioContext is closed or doesnt exist, creating new one");
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+        sampleRate: 16000,
+        latencyHint: "interactive",
+      });
+    }
+    if (this.audioContext.state === 'suspended') {
+      console.log("audioContext is suspended, resuming");
+      await this.audioContext.resume();
+    }
     // Load the AudioWorkletProcessor (which handles audio processing)
     await this.audioContext.audioWorklet.addModule(
       `${serverorigin}/WavWorklet.js`
@@ -173,8 +217,8 @@ export class FeedbackGiver {
     );
 
     // Connect the audio input to the AudioWorkletNode
-    const audioInput = this.audioContext.createMediaStreamSource(stream);
-    audioInput.connect(this.audioWorkletNode);
+    this.audioInput = this.audioContext.createMediaStreamSource(stream);
+    this.audioInput.connect(this.audioWorkletNode);
 
     // Connect the AudioWorkletNode to the audio context destination
     this.audioWorkletNode.connect(this.audioContext.destination);
@@ -192,27 +236,17 @@ export class FeedbackGiver {
   }
 
   async stop() {
-    let stored_audio = null;
-    if (this.audioWorkletNode) {
-      this.audioWorkletNode.disconnect();
-    }
-    if (this.socket) {
-      this.socket.close();
-    }
-    if (this.recognition) {
-      this.recognition.onend = null;
-      this.recognition.stop();
-    }
+    await this.#cleanupRecording();
     // merging logic of audio chunks when user stops recording
     if (this.store_audio_chunks.length > 0) {
-      stored_audio = this.#combineAudioChunks();
-      console.log("stored_audio! stored audio length: ", stored_audio.length);
+      this.stored_audio = this.#combineAudioChunks();
+      console.log("stored_audio! stored audio length: ", this.stored_audio.length);
     } else {
       console.log("no audio chunks to merge");
     }
     this.store_audio_chunks = [];
-    if (stored_audio) {
-      this.preparePlayback(stored_audio);
+    if (this.stored_audio) {
+      this.preparePlayback();
     } else {
       console.log("no audio to play back");
     }
