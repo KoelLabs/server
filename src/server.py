@@ -27,6 +27,10 @@ SAMPLE_RATE = 16000
 NUM_SECONDS_PER_CHUNK = 2
 NUM_CHUNKS_ACCUMULATED = 5
 
+# Simple global storage for latest timestamps and transcript
+latest_transcript = []
+latest_timestamps = []
+
 # Initialize Flask app
 app = Flask(__name__)
 cors = CORS(app)  # allow CORS for all domains on all routes.
@@ -114,15 +118,15 @@ def confidence_score(logits, predicted_ids) -> tuple[np.ndarray, float]:
     return character_scores.numpy(), total_average.float().item()
 
 
-def feedback(target, target_by_words, speech_phones, timestamps):
-    if len(speech_phones) == 0:
+def feedback(target, target_by_words, speech_transcript, timestamps):
+    if len(speech_transcript) == 0:
         return []
-    # retrieve main info
+    # retrieve main info of 3 phoneme mistakes to give feedback on
     user_phonetic_errors_dict = user_phonetic_errors(
-        target, target_by_words, speech_phones, topk=3
+        target, target_by_words, speech_transcript, topk=3
     )
-    # load all phoneme feedback
-    all_phoneme_feedback = get_phoneme_written_feedback(target, speech_phones)
+    # load all written phoneme feedback relevant
+    all_phoneme_feedback = get_phoneme_written_feedback(target, speech_transcript)
     feedback_items = []
     for phoneme, error_info in user_phonetic_errors_dict.items():
         num_mistakes, which_words, mistake_severities, phonemes_spoken_as, score = (
@@ -265,23 +269,32 @@ def get_score_words_wfed():
 @app.route("/feedback", methods=["GET"])
 @cross_origin()
 def get_feedback():
+    # This endpoint takes target and target by words then processes the audio to get the timestampd and transcript
     # returns a list of feedback items, each item is a list of:
     # [target_phoneme_spelling, target_phoneme_explanation, speech_phoneme_words, speech_phoneme_spelling, speech_phoneme_error_timestamps]
+    global latest_transcript, latest_timestamps
+
     target = request.form["target"].strip()
     target_by_words = json.loads(request.form["tbw"])
-    audio_bytes = request.files["audio"].read()
-    speech_audio = np.frombuffer(audio_bytes, dtype=np.float32)
 
-    if len(speech_audio) < SAMPLE_RATE * 0.1:
-        raise ValueError(f"Audio too short: {len(speech_audio)} samples")
+    # Use global variables for latest transcript and timestamps if available
+    if latest_transcript and latest_timestamps:
+        speech_transcript = latest_transcript
+        timestamps = latest_timestamps
+    else:
+        raise ValueError("No speech transcript or timestamps available")
 
-    speech_phones, timestamps = transcribe_timestamped(speech_audio)
     out = feedback(
         target,
         target_by_words,
-        speech_phones,
+        speech_transcript,
         timestamps,  # per-phoneme timing info
     )
+
+    # Clear global variables after feedback is generated
+    latest_transcript = []
+    latest_timestamps = []
+
     return jsonify(out)
 
 
@@ -313,10 +326,19 @@ def stream(ws):
                         # transcribe_audio returns a list, so extend directly
                         new_transcription = transcribe_audio(audio)
                         transcription.extend(new_transcription)
+
                         ws.send(json.dumps(full_transcription + transcription))
                     else:
-                        new_transcription = transcribe_audio(combined)
+                        new_transcription, new_timestamps = transcribe_timestamped(
+                            audio
+                        )
                         full_transcription.extend(new_transcription)
+
+                        # Update global variables with latest timestamps and transcript
+                        global latest_transcript, latest_timestamps
+                        latest_transcript = full_transcription
+                        latest_timestamps = new_timestamps
+
                         ws.send(json.dumps(full_transcription))
                         combined = np.array([], dtype=np.float32)
                         num_chunks_accumulated = 0
