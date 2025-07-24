@@ -1,5 +1,5 @@
-const serverorigin = location.origin;
-const serverhost = location.host;
+const serverorigin = 'http://localhost:8080';
+const serverhost = 'localhost:8080';
 
 export class FeedbackGiver {
   constructor(target, target_by_word, on_transcription, on_word_spoken) {
@@ -29,26 +29,26 @@ export class FeedbackGiver {
     try {
       this.transcription = JSON.parse(transcription);
     } catch (error) {
-      console.error("Failed to parse transcription JSON:", error);
-      this.transcription = [];  // Fallback to empty array
+      console.error('Failed to parse transcription JSON:', error);
+      this.transcription = []; // Fallback to empty array
     }
     this.on_transcription(this.transcription);
   }
 
   #combineAudioChunks() {
     if (!this.store_audio_chunks || this.store_audio_chunks.length === 0) {
-      console.log("no audio chunks to merge");
+      console.log('no audio chunks to merge');
       return null;
     }
     const totalLength = this.store_audio_chunks.reduce((sum, arr) => sum + arr.length, 0); // grabs all samples across all the chunks
     const merged = new Float32Array(totalLength); // allocate the float
-    let chunkPosition = 0; 
-    for (const chunk of this.store_audio_chunks){
+    let chunkPosition = 0;
+    for (const chunk of this.store_audio_chunks) {
       merged.set(chunk, chunkPosition);
       chunkPosition += chunk.length;
     }
     if (merged.length !== totalLength) {
-      throw new Error("merged length does not match total length");
+      throw new Error('merged length does not match total length');
     }
     return merged;
   }
@@ -57,17 +57,17 @@ export class FeedbackGiver {
     try {
       const res = await fetch(
         `${serverorigin}/score_words_cer?target=${encodeURIComponent(
-          JSON.stringify(this.target)
+          JSON.stringify(this.target),
         )}&tbw=${encodeURIComponent(
-          JSON.stringify(this.target_by_word)
-        )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
+          JSON.stringify(this.target_by_word),
+        )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
       );
       const data = await res.json();
-      console.log("data", data);
+      console.log('data', data);
       const [scoredWords, overall] = data;
       return [scoredWords, overall];
     } catch (error) {
-      console.error("Error in getCER:", error);
+      console.error('Error in getCER:', error);
       return [[], 0];
     }
   }
@@ -76,16 +76,16 @@ export class FeedbackGiver {
     try {
       const res = await fetch(
         `${serverorigin}/score_words_wfed?target=${encodeURIComponent(
-          JSON.stringify(this.target)
+          JSON.stringify(this.target),
         )}&tbw=${encodeURIComponent(
-          JSON.stringify(this.target_by_word)
-        )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
+          JSON.stringify(this.target_by_word),
+        )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
       );
       const data = await res.json();
       const [scoredWords, overall] = data;
       return [scoredWords, overall];
     } catch (error) {
-      console.error("Error in getWFED:", error);
+      console.error('Error in getWFED:', error);
       return [[], 0];
     }
   }
@@ -93,12 +93,12 @@ export class FeedbackGiver {
     //  this will grab all phonemes and their respective descriptions and information
     try {
       const res = await fetch(
-        `${serverorigin}/phoneme_written_feedback?target=${encodeURIComponent(JSON.stringify(this.target))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
+        `${serverorigin}/phoneme_written_feedback?target=${encodeURIComponent(JSON.stringify(this.target))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
       );
 
       return await res.json();
     } catch (error) {
-      console.error("Error in getPhonemeNaturalLanguageFeedback:", error);
+      console.error('Error in getPhonemeNaturalLanguageFeedback:', error);
       return {};
     }
   }
@@ -107,46 +107,45 @@ export class FeedbackGiver {
     //  This function is used to get the top 3 errors spoken by the user returns (mistake_count, word_set, mistake_severities, phoneme_spoken_as, score)
     try {
       const res = await fetch(
-        `${serverorigin}/user_phonetic_errors?target=${encodeURIComponent(JSON.stringify(this.target))}&tbw=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
+        `${serverorigin}/user_phonetic_errors?target=${encodeURIComponent(JSON.stringify(this.target))}&tbw=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
       );
-      console.log("res", res);
+      console.log('res', res);
       return await res.json();
     } catch (error) {
-      console.error("Error in json res getUserPhoneticErrors:", error);
+      console.error('Error in json res getUserPhoneticErrors:', error);
       return [];
     }
   }
   preparePlayback(float32Array) {
     this.userAudioBuffer = this.audioContext.createBuffer(1, float32Array.length, 16000);
     this.userAudioBuffer.getChannelData(0).set(float32Array);
-    console.log("userAudioBuffer length from prep: ", this.userAudioBuffer.length);
+    console.log('userAudioBuffer length from prep: ', this.userAudioBuffer.length);
   }
   async playUserAudio(onPlaybackEnd = () => {}) {
     const source = this.audioContext.createBufferSource();
     source.buffer = this.userAudioBuffer;
-    console.log("userAudioBuffer length from playing: ", this.userAudioBuffer.length);
+    console.log('userAudioBuffer length from playing: ', this.userAudioBuffer.length);
     source.connect(this.audioContext.destination);
     source.start();
     // close the audio context after we have nicely played back the users audio and wait for buffer to close
     source.onended = () => {
-        source.disconnect();
-        onPlaybackEnd();  // call UI callback
+      source.disconnect();
+      onPlaybackEnd(); // call UI callback
     };
   }
-
 
   async start() {
     this.store_audio_chunks = [];
     // Clear previous transcription
-    this.#setTranscription("");
+    this.#setTranscription('');
 
     // Open WebSocket connection
     this.socket = new WebSocket(
-      `${location.protocol === "https:" ? "wss:" : "ws:"}//${serverhost}/stream`
+      `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${serverhost}/stream`,
     );
 
     // Handle incoming transcriptions
-    this.socket.onmessage = async (event) => {
+    this.socket.onmessage = async event => {
       this.#setTranscription(event.data);
     };
 
@@ -158,19 +157,14 @@ export class FeedbackGiver {
     // Create an AudioContext for usage throughout
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
       sampleRate: 16000,
-      latencyHint: "interactive",
+      latencyHint: 'interactive',
     });
 
     // Load the AudioWorkletProcessor (which handles audio processing)
-    await this.audioContext.audioWorklet.addModule(
-      `${serverorigin}/WavWorklet.js`
-    );
+    await this.audioContext.audioWorklet.addModule(`${serverorigin}/WavWorklet.js`);
 
     // Create the AudioWorkletNode
-    this.audioWorkletNode = new AudioWorkletNode(
-      this.audioContext,
-      "wav-worklet"
-    );
+    this.audioWorkletNode = new AudioWorkletNode(this.audioContext, 'wav-worklet');
 
     // Connect the audio input to the AudioWorkletNode
     const audioInput = this.audioContext.createMediaStreamSource(stream);
@@ -180,7 +174,7 @@ export class FeedbackGiver {
     this.audioWorkletNode.connect(this.audioContext.destination);
 
     // Connect AudioWorkletNode to process audio and send to WebSocket
-    this.audioWorkletNode.port.onmessage = (event) => {
+    this.audioWorkletNode.port.onmessage = event => {
       const chunk_to_store = event.data;
       this.store_audio_chunks.push(chunk_to_store); // continuously store the audio chunks
       if (this.socket.readyState === WebSocket.OPEN) {
@@ -206,20 +200,17 @@ export class FeedbackGiver {
     // merging logic of audio chunks when user stops recording
     if (this.store_audio_chunks.length > 0) {
       stored_audio = this.#combineAudioChunks();
-      console.log("stored_audio! stored audio length: ", stored_audio.length);
+      console.log('stored_audio! stored audio length: ', stored_audio.length);
     } else {
-      console.log("no audio chunks to merge");
+      console.log('no audio chunks to merge');
     }
     this.store_audio_chunks = [];
     if (stored_audio) {
       this.preparePlayback(stored_audio);
     } else {
-      console.log("no audio to play back");
+      console.log('no audio to play back');
     }
-    
   }
-
-
 
   #startWordTranscription() {
     this.next_word_ix = 0;
@@ -227,22 +218,21 @@ export class FeedbackGiver {
       this.are_words_correct[i] = false;
     }
 
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     this.recognition = new SpeechRecognition();
-    this.recognition.lang = "en-US";
+    this.recognition.lang = 'en-US';
     this.recognition.interimResults = true;
     this.recognition.maxAlternatives = 1;
     this.recognition.start();
     this.recognition.onend = () => this.recognition.start();
     const finalWords = [];
     let numCorrect = 0;
-    this.recognition.onresult = (event) => {
+    this.recognition.onresult = event => {
       const wordlist = [...event.results]
-        .map((result) => result[0].transcript.split(" "))
+        .map(result => result[0].transcript.split(' '))
         .reduce((a, b) => a.concat(b))
-        .filter((w) => w.length > 0);
+        .filter(w => w.length > 0);
       const isFinal = [...event.results].at(-1).isFinal;
       if (isFinal) {
         finalWords.push(...wordlist);
@@ -251,8 +241,8 @@ export class FeedbackGiver {
 
       const allWords = finalWords.concat(wordlist);
       if (
-        allWords[0].toLowerCase().replace(/[^a-z]/g, "") !=
-        this.words[0].toLowerCase().replace(/[^a-z]/g, "") &&
+        allWords[0].toLowerCase().replace(/[^a-z]/g, '') !=
+          this.words[0].toLowerCase().replace(/[^a-z]/g, '') &&
         allWords.length > 0
       ) {
         allWords.shift();
@@ -263,8 +253,7 @@ export class FeedbackGiver {
         const target = this.words[i];
 
         if (
-          word.toLowerCase().replace(/[^a-z]/g, "") ===
-          target.toLowerCase().replace(/[^a-z]/g, "")
+          word.toLowerCase().replace(/[^a-z]/g, '') === target.toLowerCase().replace(/[^a-z]/g, '')
         ) {
           this.are_words_correct[i] = true;
           numCorrect++;
@@ -278,7 +267,7 @@ export class FeedbackGiver {
             this.are_words_correct,
             this.next_word_ix,
             Math.round((1000 * numCorrect) / this.next_word_ix) / 10,
-            false
+            false,
           );
         } else {
           this.recognition.onend = null;
@@ -288,7 +277,7 @@ export class FeedbackGiver {
             this.are_words_correct,
             this.next_word_ix,
             Math.round((1000 * numCorrect) / this.words.length) / 10,
-            true
+            true,
           );
         }
       }
