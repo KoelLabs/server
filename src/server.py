@@ -11,12 +11,12 @@ import json
 from feedback import (
     score_words_cer,
     score_words_wfed,
-    phoneme_written_feedback,
+    get_phoneme_written_feedback,
     user_phonetic_errors,
 )
 import json
 
-from phoneme_utils import phrase_bounds, ALL_MAPPINGS
+from phoneme_utils import three_word_phrase_bounds, ALL_MAPPINGS
 import soundfile as sf
 from scipy.io import wavfile
 
@@ -114,19 +114,7 @@ def confidence_score(logits, predicted_ids) -> tuple[np.ndarray, float]:
     return character_scores.numpy(), total_average.float().item()
 
 
-def get_error_audio_clip(word_phone_pairings, timestamps, speech_audio, word_idx):
-
-    start, end = phrase_bounds(word_phone_pairings, timestamps, word_idx)
-    clip = speech_audio[int(start * SAMPLE_RATE) : int(end * SAMPLE_RATE)]
-
-    # Encode the clip as a WAV file in-memory and then base64 so it can be JSON-serialised.
-    buf = io.BytesIO()
-    wavfile.write(buf, SAMPLE_RATE, clip)
-    audio_b64 = base64.b64encode(buf.getvalue()).decode("ascii")
-    return audio_b64
-
-
-def feedback(target, target_by_words, speech_audio, speech_phones, timestamps):
+def feedback(target, target_by_words, speech_phones, timestamps):
     if len(speech_phones) == 0:
         return []
     # retrieve main info
@@ -134,31 +122,43 @@ def feedback(target, target_by_words, speech_audio, speech_phones, timestamps):
         target, target_by_words, speech_phones, topk=3
     )
     # load all phoneme feedback
-    all_phoneme_feedback = phoneme_written_feedback(target, speech_phones)
+    all_phoneme_feedback = get_phoneme_written_feedback(target, speech_phones)
     feedback_items = []
     for phoneme, error_info in user_phonetic_errors_dict.items():
-        num_mistakes, which_words, mistake_severities, phoneme_spoken_as, score = (
+        num_mistakes, which_words, mistake_severities, phonemes_spoken_as, score = (
             error_info
         )
-        phoneme_feedback = all_phoneme_feedback.get(phoneme)
-        target_phoneme_spelling = phoneme_feedback["phonetic spelling"]
-        target_phoneme_explanation = phoneme_feedback["explanation"]
-        # target_phoneme_video = phoneme_feedback["video"] # NOTE: this can be added once we create a page of all audio trancripts for videos
-        # target_phoneme_audio = phoneme_feedback["audio"] # NOTE: this can be added once we create a page of all audio trancripts for videos
-        speech_phoneme_words = target_by_words[which_words]
-        speech_phoneme_spelling = phoneme_feedback["phonetic spelling"]
-        speech_phoneme_audio = get_error_audio_clip(
-            target_by_words, timestamps, speech_audio, which_words
-        )
+        target_phoneme_feedback = all_phoneme_feedback.get(phoneme)
+        target_phoneme_spelling = target_phoneme_feedback["phonetic spelling"]
+        target_phoneme_explanation = target_phoneme_feedback["explanation"]
+        speech_phoneme_spellings = set()
+        for phoneme_spoken_as in phonemes_spoken_as:
+            speech_phoneme_feedback = all_phoneme_feedback.get(phoneme_spoken_as)
+            speech_phoneme_spellings = speech_phoneme_feedback["phonetic spelling"]
+            speech_phoneme_spellings = speech_phoneme_spellings.add(
+                speech_phoneme_spellings
+            )
 
+        # which_words is a set of word indices, so we need to get the words for all those indices
+        speech_phoneme_words = [target_by_words[idx][0] for idx in which_words]
+
+        # For audio clip, we'll use the first word index from the set, if we decide to give an audio example for every word they miss
+        speech_phoneme_error_timestamps = (
+            []
+        )  # this will hold (start,end) for each word they missed
+        for word_missed in which_words:
+            word_missed_phrase_start, word_missed_phrase_end = three_word_phrase_bounds(
+                target_by_words, timestamps, word_missed
+            )
+            speech_phoneme_error_timestamps.append(
+                (word_missed_phrase_start, word_missed_phrase_end)
+            )
         feedback_item = [
             target_phoneme_spelling,
             target_phoneme_explanation,
-            # target_phoneme_video,
-            # target_phoneme_audio = None,
             speech_phoneme_words,
-            speech_phoneme_spelling,
-            speech_phoneme_audio,
+            speech_phoneme_spellings,
+            speech_phoneme_error_timestamps,
         ]
         feedback_items.append(feedback_item)
 
@@ -215,17 +215,17 @@ def get_user_phonetic_errors():
     return jsonify(serializable_result)
 
 
-@app.route("/phoneme_written_feedback", methods=["GET"])
+@app.route("/get_phoneme_written_feedback", methods=["GET"])
 @cross_origin()
 # This function takes in the target and speech and returns a dictionary
-# of phoneme: {explanation, phonetic-spelling} for ALL phonemes in the target
+# of phoneme: {explanation, phonetic spelling} for ALL phonemes in the target
 # and speech.
 def get_phoneme_written_feedback():
     try:
         target = json.loads(request.args.get("target", "[]"))
         speech = json.loads(request.args.get("speech", "[]"))
 
-        result = phoneme_written_feedback(target, speech)
+        result = get_phoneme_written_feedback(target, speech)
         return jsonify(result)
     except Exception as e:
         return jsonify({"server error from get_phoneme_written_feedback": str(e)}), 500
@@ -265,6 +265,8 @@ def get_score_words_wfed():
 @app.route("/feedback", methods=["GET"])
 @cross_origin()
 def get_feedback():
+    # returns a list of feedback items, each item is a list of:
+    # [target_phoneme_spelling, target_phoneme_explanation, speech_phoneme_words, speech_phoneme_spelling, speech_phoneme_error_timestamps]
     target = request.form["target"].strip()
     target_by_words = json.loads(request.form["tbw"])
     audio_bytes = request.files["audio"].read()
@@ -277,7 +279,6 @@ def get_feedback():
     out = feedback(
         target,
         target_by_words,
-        speech_audio,
         speech_phones,
         timestamps,  # per-phoneme timing info
     )
