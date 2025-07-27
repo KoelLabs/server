@@ -15,6 +15,7 @@ export class FeedbackGiver {
     this.stored_audio = null;
     this.audioInput = null;
     this.mediaStream = null;
+    this.session_id = null;
 
     this.on_word_spoken = on_word_spoken;
     this.words = [];
@@ -28,14 +29,18 @@ export class FeedbackGiver {
   }
 
   #setTranscription(transcription) {
-    // Server should send JSON arrays directly
     try {
-      this.transcription = JSON.parse(transcription);
+      const parsed = JSON.parse(transcription);
+      this.transcription = parsed.transcript || [];
+      this.session_id = parsed.session_id || null;
+      console.log("this.transcription from setTranscription", this.transcription);
+      console.log("this.session_id from setTranscription", this.session_id);
+      this.on_transcription(this.transcription);
     } catch (error) {
       console.error("Failed to parse transcription JSON:", error);
-      this.transcription = [];  // Fallback to empty array
+      this.transcription = [];
+      this.session_id = null;
     }
-    this.on_transcription(this.transcription);
   }
 
   #combineAudioChunks() {
@@ -45,8 +50,8 @@ export class FeedbackGiver {
     }
     const totalLength = this.store_audio_chunks.reduce((sum, arr) => sum + arr.length, 0); // grabs all samples across all the chunks
     const merged = new Float32Array(totalLength); // allocate the float
-    let chunkPosition = 0; 
-    for (const chunk of this.store_audio_chunks){
+    let chunkPosition = 0;
+    for (const chunk of this.store_audio_chunks) {
       merged.set(chunk, chunkPosition);
       chunkPosition += chunk.length;
     }
@@ -92,11 +97,12 @@ export class FeedbackGiver {
       return [[], 0];
     }
   }
+  // TODO: delete later
   async getAllPhonemeWrittenFeedback() {
     //  this will grab all phonemes and their respective descriptions and information
     try {
       const res = await fetch(
-        `${serverorigin}/phoneme_written_feedback?target=${encodeURIComponent(JSON.stringify(this.target))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
+        `${serverorigin}/get_phoneme_written_feedback?target=${encodeURIComponent(JSON.stringify(this.target))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
       );
 
       return await res.json();
@@ -105,7 +111,7 @@ export class FeedbackGiver {
       return {};
     }
   }
-
+  // TODO: delete later
   async getUserPhoneticErrors() {
     //  This function is used to get the top 3 errors spoken by the user returns (mistake_count, word_set, mistake_severities, phoneme_spoken_as, score)
     try {
@@ -119,6 +125,23 @@ export class FeedbackGiver {
       return [];
     }
   }
+  async getFeedback() {
+    try {
+      if (!this.session_id) {
+        console.warn("No session_id available, waiting...");
+        return [];
+      }
+      console.log("we are sending the session id to server", this.session_id);
+      const res = await fetch(
+        `${serverorigin}/feedback?target=${encodeURIComponent(JSON.stringify(this.target))}&tbw=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}&session_id=${encodeURIComponent(this.session_id)}`
+      );
+      console.log("res", res);
+      return await res.json();
+    } catch (error) {
+      console.error("Error in getFeedback:", error);
+      return [];
+    }
+  }
   preparePlayback() {
     this.userAudioBuffer = null;
     console.log("buffer gets cleared: ", this.userAudioBuffer);
@@ -127,7 +150,7 @@ export class FeedbackGiver {
     this.userAudioBuffer.getChannelData(0).set(this.stored_audio);
     console.log("userAudioBuffer length from prep: ", this.userAudioBuffer.length);
   }
-  async playUserAudio(onPlaybackEnd = () => {}) {
+  async playUserAudio(onPlaybackEnd = () => { }) {
     const source = this.audioContext.createBufferSource();
     source.buffer = this.userAudioBuffer;
     console.log("userAudioBuffer length from playing: ", this.userAudioBuffer.length);
@@ -135,8 +158,8 @@ export class FeedbackGiver {
     source.start();
     // close the audio context after we have nicely played back the users audio and wait for buffer to close
     source.onended = () => {
-        source.disconnect();
-        onPlaybackEnd();  // call UI callback
+      source.disconnect();
+      onPlaybackEnd();  // call UI callback
     };
   }
   async #cleanupRecording() {
@@ -172,7 +195,7 @@ export class FeedbackGiver {
   async start() {
     await this.#cleanupRecording();
     this.store_audio_chunks = [];
-    
+
     // Clear previous transcription
     this.#setTranscription("");
     this.stored_audio = null;
@@ -236,6 +259,12 @@ export class FeedbackGiver {
   }
 
   async stop() {
+    if (this.socket) {
+      this.socket.onclose = async () => {
+        const feedback = await this.getFeedback();
+        console.log("Feedback:", feedback);
+      };
+    }
     await this.#cleanupRecording();
     // merging logic of audio chunks when user stops recording
     if (this.store_audio_chunks.length > 0) {
@@ -250,7 +279,7 @@ export class FeedbackGiver {
     } else {
       console.log("no audio to play back");
     }
-    
+
   }
 
 

@@ -22,6 +22,7 @@
   <button id="start">Start</button>
   <button id="stop" disabled>Stop</button>
   <button id="analyze_phonetics">Analyze Phonetics</button>
+  <button id="feedback_function">Get Feedback Function Test</button>
   <p>Transcription: <span id="transcription"></span></p>
   <p>Accent Similarity: <span id="score"></span>%</p>
   <p id="missed_phonemes"></p>
@@ -122,13 +123,17 @@
     for (const word of feedbackGiver.words) {
       scoredWordsElement.innerHTML += `<span data-pscore="0" data-word-correct="false">${word}</span> `;
     }
+    document.getElementById("feedback_function").addEventListener("click", async () => {
+      const feedback = await feedbackGiver.getFeedback();
+      console.log("feedback", feedback);
+    });
 
     document.getElementById("analyze_phonetics").addEventListener("click", async () => {
       try {
         const missed_phonemes = await feedbackGiver.getUserPhoneticErrors();
         const all_phoneme_feedback = await feedbackGiver.getAllPhonemeWrittenFeedback();
 
-
+        console.log("all_phoneme_feedback", all_phoneme_feedback);
         missedPhonemesElement.innerHTML = "";
         const phonemeFeedbackContainer = document.getElementById("phoneme_feedback");
         phonemeFeedbackContainer.innerHTML = "";

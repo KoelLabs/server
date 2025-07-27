@@ -28,8 +28,9 @@ NUM_SECONDS_PER_CHUNK = 2
 NUM_CHUNKS_ACCUMULATED = 5
 
 # Simple global storage for latest timestamps and transcript
-latest_transcript = []
-latest_timestamps = []
+import uuid
+
+session_data = {}
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -138,10 +139,8 @@ def feedback(target, target_by_words, speech_transcript, timestamps):
         speech_phoneme_spellings = set()
         for phoneme_spoken_as in phonemes_spoken_as:
             speech_phoneme_feedback = all_phoneme_feedback.get(phoneme_spoken_as)
-            speech_phoneme_spellings = speech_phoneme_feedback["phonetic spelling"]
-            speech_phoneme_spellings = speech_phoneme_spellings.add(
-                speech_phoneme_spellings
-            )
+            speech_phoneme_spelling = speech_phoneme_feedback["phonetic spelling"]
+            speech_phoneme_spellings.add(speech_phoneme_spelling)
 
         # which_words is a set of word indices, so we need to get the words for all those indices
         speech_phoneme_words = [target_by_words[idx][0] for idx in which_words]
@@ -232,7 +231,7 @@ def get_phoneme_written_feedback():
         result = get_phoneme_written_feedback(target, speech)
         return jsonify(result)
     except Exception as e:
-        return jsonify({"server error from get_phoneme_written_feedback": str(e)}), 500
+        return jsonify({"server error from phoneme_written_feedback": str(e)}), 500
 
 
 # REST endpoint
@@ -269,33 +268,34 @@ def get_score_words_wfed():
 @app.route("/feedback", methods=["GET"])
 @cross_origin()
 def get_feedback():
-    # This endpoint takes target and target by words then processes the audio to get the timestampd and transcript
-    # returns a list of feedback items, each item is a list of:
-    # [target_phoneme_spelling, target_phoneme_explanation, speech_phoneme_words, speech_phoneme_spelling, speech_phoneme_error_timestamps]
-    global latest_transcript, latest_timestamps
+    try:
+        # This endpoint takes target and target by words then processes the audio to get the timestampd and transcript
+        # returns a list of feedback items, each item is a list of:
+        # [target_phoneme_spelling, target_phoneme_explanation, speech_phoneme_words, speech_phoneme_spelling, speech_phoneme_error_timestamps]
+        session_id = request.args.get("session_id")
+        if not session_id:
+            raise ValueError("No session_id provided")
+        data = session_data.get(session_id)
+        speech_transcript = data["transcript"]
+        timestamps = data["timestamps"]
 
-    target = request.form["target"].strip()
-    target_by_words = json.loads(request.form["tbw"])
+        target = json.loads(request.args.get("target", "[]"))
+        target_by_word = json.loads(request.args.get("tbw", "[]"))
 
-    # Use global variables for latest transcript and timestamps if available
-    if latest_transcript and latest_timestamps:
-        speech_transcript = latest_transcript
-        timestamps = latest_timestamps
-    else:
-        raise ValueError("No speech transcript or timestamps available")
+        out = feedback(
+            target,
+            target_by_word,
+            speech_transcript,
+            timestamps,  # per-phoneme timing info
+        )
 
-    out = feedback(
-        target,
-        target_by_words,
-        speech_transcript,
-        timestamps,  # per-phoneme timing info
-    )
+        return jsonify(out)
+    except Exception as e:
+        import traceback
 
-    # Clear global variables after feedback is generated
-    latest_transcript = []
-    latest_timestamps = []
-
-    return jsonify(out)
+        print("Error in /feedback:", e)
+        traceback.print_exc()
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
 
 @sock.route("/stream")
@@ -306,7 +306,11 @@ def stream(ws):
     combined = np.array([], dtype=np.float32)
     num_chunks_accumulated = 0
     transcription = []
+    session_id = str(uuid.uuid4())
+    ws.send(json.dumps({"session_id": session_id, "transcript": []}))
 
+    print("ARUNA session_id in stream", session_id)
+    print("ARUNA session_data keys after storing in stream:", list(session_data.keys()))
     while True:
         try:
             # Receive audio data from the client
@@ -326,20 +330,24 @@ def stream(ws):
                         # transcribe_audio returns a list, so extend directly
                         new_transcription = transcribe_audio(audio)
                         transcription.extend(new_transcription)
-
-                        ws.send(json.dumps(full_transcription + transcription))
                     else:
                         new_transcription, new_timestamps = transcribe_timestamped(
                             audio
                         )
                         full_transcription.extend(new_transcription)
 
-                        # Update global variables with latest timestamps and transcript
-                        global latest_transcript, latest_timestamps
-                        latest_transcript = full_transcription
-                        latest_timestamps = new_timestamps
-
-                        ws.send(json.dumps(full_transcription))
+                        session_data[session_id] = {
+                            "transcript": full_transcription,
+                            "timestamps": new_timestamps,
+                        }
+                        ws.send(
+                            json.dumps(
+                                {
+                                    "session_id": session_id,
+                                    "transcript": full_transcription,
+                                }
+                            )
+                        )
                         combined = np.array([], dtype=np.float32)
                         num_chunks_accumulated = 0
                         transcription = []
