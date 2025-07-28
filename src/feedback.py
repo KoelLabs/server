@@ -17,10 +17,11 @@ model_vocab_json = os.path.join(os.path.dirname(__file__), "model_vocab_feedback
 def user_phonetic_errors(word_phone_pairings, topk=3):
     """
     Build a frequency dictionary of phoneme mistakes AND sorts by score
-    Returns {target_phoneme: (mistake_frequency, timestamps_of_user_phoneme_mistakes, timestamps_of_target_phoneme_mistakes, timestamps_of_user_phrase_mistakes, timestamps_of_target_phrase_mistakes, mistake_severities, phoneme_spoken_as, score)}
+    Returns {target_phoneme: (mistake_frequency, timestamps_of_user_phoneme_mistakes, timestamps_of_target_phoneme_mistakes, timestamps_of_user_phrase_mistakes, timestamps_of_target_phrase_mistakes, mistake_severities, phoneme_spoken_as, words_with_mistake, score, target_phoneme_written_feedback, speech_phoneme_written_feedback)}
     example: {'aɪ': (1, [(2.405345211581292, 2.425389755011136)], [(2.4764454113924055, 2.4965791139240507)], [(2.385300668151448, 2.425389755011136)], [(2.27510838607595, 2.8187183544303798)], 14.5, {'-'}, 15.5), 'n': (1, [(1.583518930957...}
     """
     phoneme_mistake_freq = {}
+    phoneme_written_feedback_dict = phoneme_written_feedback(word_phone_pairings)
 
     for idx, (word, pairs) in enumerate(word_phone_pairings):
         for target_phoneme_tuple, speech_phoneme_tuple in pairs:
@@ -36,7 +37,10 @@ def user_phonetic_errors(word_phone_pairings, topk=3):
                         [],
                         0,
                         set(),
+                        set(),
                         0.0,
+                        None,
+                        None,
                     )
 
                 # update mistake count and word set and mistake severity and phoneme spoken as
@@ -48,7 +52,10 @@ def user_phonetic_errors(word_phone_pairings, topk=3):
                     target_phrase_error_timestamps,
                     mistake_severities,
                     phoneme_spoken_as,
+                    words_with_mistake,
                     score,
+                    target_phoneme_written_feedback,
+                    speech_phoneme_written_feedback,
                 ) = phoneme_mistake_freq[target_phoneme]
                 user_error_timestamps.append((speech_start_time, speech_end_time))
                 target_error_timestamps.append((target_start_time, target_end_time))
@@ -84,8 +91,14 @@ def user_phonetic_errors(word_phone_pairings, topk=3):
                 )
                 phoneme_spoken_as.add(speech_phoneme)
                 score += mistake_severities + mistake_count
-
-                phoneme_mistake_freq[target_phoneme_tuple[0]] = (
+                words_with_mistake.add(word)
+                target_phoneme_written_feedback = phoneme_written_feedback_dict.get(
+                    target_phoneme
+                )
+                speech_phoneme_written_feedback = phoneme_written_feedback_dict.get(
+                    speech_phoneme
+                )
+                phoneme_mistake_freq[target_phoneme] = (
                     mistake_count,
                     user_error_timestamps,
                     target_error_timestamps,
@@ -93,11 +106,14 @@ def user_phonetic_errors(word_phone_pairings, topk=3):
                     target_phrase_error_timestamps,
                     mistake_severities,
                     phoneme_spoken_as,
+                    words_with_mistake,
                     score,
+                    target_phoneme_written_feedback,
+                    speech_phoneme_written_feedback,
                 )
 
     sorted_phoneme_mistake_freq = sorted(
-        phoneme_mistake_freq.items(), key=lambda x: x[1][7], reverse=True
+        phoneme_mistake_freq.items(), key=lambda x: x[1][8], reverse=True
     )
     topk_phoneme_mistake_freq = dict(sorted_phoneme_mistake_freq[:topk])
     return topk_phoneme_mistake_freq
@@ -144,7 +160,10 @@ def pair_by_words(target_timestamped, target_by_words, speech_timestamped):
 
 
 def score_words_cer(word_phone_pairings):
-
+    """
+    This function scores the words based on the character error rate
+    Returns a list of tuples with the (word, target_phoneme_sequence, speech_phoneme_sequence, score)
+    """
     word_scores = []
     average_score = 0
     for word, pairs in word_phone_pairings:
@@ -158,7 +177,10 @@ def score_words_cer(word_phone_pairings):
 
 
 def score_words_wfed(word_phone_pairings):
-
+    """
+    This function scores the words based on the weighted feature error rate
+    Returns a list of tuples with the (word, target_phoneme_sequence, speech_phoneme_sequence, score)
+    """
     word_scores = []
     average_score = 0
     for word, pairs in word_phone_pairings:
@@ -171,13 +193,15 @@ def score_words_wfed(word_phone_pairings):
     return word_scores, average_score
 
 
-def phoneme_written_feedback(target, speech):
+def phoneme_written_feedback(word_phone_pairings):
     """This function takes in the target and speech and returns a dictionary
     of phoneme: {explanation, phonetic spelling} for ALL phonemes in the target
     and speech.
     """
     all_phoneme_feedback = {}
-    all_speech_phonemes = set(target + speech)
+    # get all the speech phonemes at once on word_phone_pairings, not sending over transcript, reduce network cost
+    all_speech_phonemes = get_phone_pairing_vocab(word_phone_pairings)
+
     with open(model_vocab_json, "r", encoding="utf-8") as f:
         content = json.load(f)
     for phoneme in all_speech_phonemes:
@@ -195,3 +219,16 @@ def phoneme_written_feedback(target, speech):
         else:
             raise ValueError(f"Phoneme {phoneme} not found in model vocabulary")
     return all_phoneme_feedback
+
+
+def get_phone_pairing_vocab(word_phone_pairings):
+    """
+    This function gets the vocab of all the phonemes in the word_phone_pairings
+    Returns a set of phonemes
+    """
+    vocab = set()
+    for word, pairs in word_phone_pairings:
+        for target_phoneme, speech_phoneme in pairs:
+            vocab.add(target_phoneme[0]) if target_phoneme[0] != "-" else None
+            vocab.add(speech_phoneme[0]) if speech_phoneme[0] != "-" else None
+    return vocab

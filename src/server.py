@@ -11,8 +11,9 @@ import json
 from feedback import (
     score_words_cer,
     score_words_wfed,
-    get_phoneme_written_feedback,
+    phoneme_written_feedback,
     user_phonetic_errors,
+    pair_by_words,
 )
 import json
 
@@ -68,9 +69,12 @@ def transcribe_timestamped(audio):
     for time, _id in ids_w_time:
         if current_phoneme_id != _id:
             if current_phoneme_id != processor.tokenizer.pad_token_id:
+                # Apply ALL_MAPPINGS to the decoded phoneme to match transcription
+                decoded_phoneme = processor.decode(current_phoneme_id)
+                mapped_phoneme = ALL_MAPPINGS.get(decoded_phoneme, decoded_phoneme)
                 phonemes_with_time.append(
                     (
-                        processor.decode(current_phoneme_id),
+                        mapped_phoneme,
                         current_start_time,
                         time,
                     )
@@ -106,79 +110,6 @@ def _run_inference(audio, model, processor):
     return transcription, duration_sec, predicted_ids
 
 
-def confidence_score(logits, predicted_ids) -> tuple[np.ndarray, float]:
-    scores = torch.nn.functional.softmax(logits, dim=-1)
-    pred_scores = scores.gather(-1, predicted_ids.unsqueeze(-1))[:, :, 0]
-    mask = torch.logical_and(
-        predicted_ids.not_equal(processor.tokenizer.word_delimiter_token_id),
-        predicted_ids.not_equal(processor.tokenizer.pad_token_id),
-    )
-
-    character_scores = pred_scores.masked_select(mask)
-    total_average = torch.sum(character_scores) / len(character_scores)
-    return character_scores.numpy(), total_average.float().item()
-
-
-def feedback(target, target_by_words, speech_transcript, timestamps):
-    if len(speech_transcript) == 0:
-        return []
-    # retrieve main info of 3 phoneme mistakes to give feedback on
-    user_phonetic_errors_dict = user_phonetic_errors(
-        target, target_by_words, speech_transcript, topk=3
-    )
-    # load all written phoneme feedback relevant
-    all_phoneme_feedback = get_phoneme_written_feedback(target, speech_transcript)
-    feedback_items = []
-    for phoneme, error_info in user_phonetic_errors_dict.items():
-        num_mistakes, which_words, mistake_severities, phonemes_spoken_as, score = (
-            error_info
-        )
-        target_phoneme_feedback = all_phoneme_feedback.get(phoneme)
-        target_phoneme_spelling = target_phoneme_feedback["phonetic spelling"]
-        target_phoneme_explanation = target_phoneme_feedback["explanation"]
-        speech_phoneme_spellings = set()
-        for phoneme_spoken_as in phonemes_spoken_as:
-            speech_phoneme_feedback = all_phoneme_feedback.get(phoneme_spoken_as)
-            speech_phoneme_spelling = speech_phoneme_feedback["phonetic spelling"]
-            speech_phoneme_spellings.add(speech_phoneme_spelling)
-
-        # which_words is a set of word indices, so we need to get the words for all those indices
-        speech_phoneme_words = [target_by_words[idx][0] for idx in which_words]
-
-        # For audio clip, we'll use the first word index from the set, if we decide to give an audio example for every word they miss
-        speech_phoneme_error_timestamps = (
-            []
-        )  # this will hold (start,end) for each word they missed
-        for word_missed in which_words:
-            word_missed_phrase_start, word_missed_phrase_end = three_word_phrase_bounds(
-                target_by_words, timestamps, word_missed
-            )
-            speech_phoneme_error_timestamps.append(
-                (word_missed_phrase_start, word_missed_phrase_end)
-            )
-        feedback_item = [
-            target_phoneme_spelling,
-            target_phoneme_explanation,
-            speech_phoneme_words,
-            speech_phoneme_spellings,
-            speech_phoneme_error_timestamps,
-        ]
-        feedback_items.append(feedback_item)
-
-    return feedback_items
-
-
-def get_user_word_audio_clip(speech_word, timestamps, speech_audio):
-
-    first_phoneme = speech_word[0]
-    last_phoneme = speech_word[-1]
-
-    word_start_time = int(float(timestamps[first_phoneme][0]) * SAMPLE_RATE)
-    word_end_time = int(float(timestamps[last_phoneme][1]) * SAMPLE_RATE)
-
-    return speech_audio[word_start_time:word_end_time]
-
-
 # server /
 @app.route("/")
 @cross_origin()
@@ -193,45 +124,33 @@ def send_static(path):
     return send_from_directory("static", path)
 
 
+@app.route("/pair_by_words", methods=["GET"])
+@cross_origin()
+def get_pair_by_words():
+    try:
+        speech_timestamped = json.loads(request.args.get("speech_timestamped", "[]"))
+        if len(speech_timestamped) == 0:
+            return jsonify([])
+        target_timestamped = json.loads(request.args.get("target_timestamped", "[]"))
+        target_by_words = json.loads(request.args.get("target_by_words", "[]"))
+    except Exception as e:
+        return jsonify({"server error from get_pair_by_words": str(e)}), 500
+
+    return jsonify(
+        pair_by_words(target_timestamped, target_by_words, speech_timestamped)
+    )
+
+
 @app.route("/user_phonetic_errors", methods=["GET"])
 @cross_origin()
 def get_user_phonetic_errors():
-
-    target = json.loads(request.args.get("target", "[]"))
-    target_by_word = json.loads(request.args.get("tbw", "[]"))
-    speech = json.loads(request.args.get("speech", "[]"))
-
-    result = user_phonetic_errors(target, target_by_word, speech)
-
-    result_sorted_freq = sorted(result.items(), key=lambda x: x[1][0], reverse=True)
-    # Convert sets to lists for JSON serialization
-    serializable_result = {}
-    for phoneme, (count, words, severities, spoken_as, score) in result_sorted_freq:
-        serializable_result[phoneme] = [
-            count,
-            list(words),
-            severities,
-            list(spoken_as),
-            score,
-        ]
-
-    return jsonify(serializable_result)
-
-
-@app.route("/get_phoneme_written_feedback", methods=["GET"])
-@cross_origin()
-# This function takes in the target and speech and returns a dictionary
-# of phoneme: {explanation, phonetic spelling} for ALL phonemes in the target
-# and speech.
-def get_phoneme_written_feedback():
     try:
-        target = json.loads(request.args.get("target", "[]"))
-        speech = json.loads(request.args.get("speech", "[]"))
-
-        result = get_phoneme_written_feedback(target, speech)
-        return jsonify(result)
+        word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
+        if len(word_phone_pairings) == 0:
+            return jsonify([])
+        return jsonify(user_phonetic_errors(word_phone_pairings))
     except Exception as e:
-        return jsonify({"server error from phoneme_written_feedback": str(e)}), 500
+        return jsonify({"server error from get_user_phonetic_errors": str(e)}), 500
 
 
 # REST endpoint
@@ -239,12 +158,10 @@ def get_phoneme_written_feedback():
 @cross_origin()
 def get_score_words_cer():
     try:
-        target = json.loads(request.args.get("target", "[]"))
-        target_by_word = json.loads(request.args.get("tbw") or "null")
-        speech = json.loads(request.args.get("speech", "[]"))
-        if not speech:
-            return jsonify([[[word, seq, "", 0] for word, seq in target_by_word], 0])
-        word_scores = score_words_cer(target, target_by_word, speech)
+        word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
+        if len(word_phone_pairings) == 0:
+            return jsonify([])
+        word_scores = score_words_cer(word_phone_pairings)
         return jsonify(word_scores)
     except Exception as e:
         return jsonify({"server error from get_score_words_cer": str(e)}), 500
@@ -254,48 +171,13 @@ def get_score_words_cer():
 @cross_origin()
 def get_score_words_wfed():
     try:
-        target = json.loads(request.args.get("target", "[]"))
-        target_by_word = json.loads(request.args.get("tbw") or "null")
-        speech = json.loads(request.args.get("speech", "[]"))
-        if not speech:
-            return jsonify([[[word, seq, "", 0] for word, seq in target_by_word], 0])
-        word_scores = score_words_cer(target, target_by_word, speech)
+        word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
+        if len(word_phone_pairings) == 0:
+            return jsonify([])
+        word_scores = score_words_cer(word_phone_pairings)
         return jsonify(word_scores)
     except Exception as e:
         return jsonify({"server error from get_score_words_wfed": str(e)}), 500
-
-
-@app.route("/feedback", methods=["GET"])
-@cross_origin()
-def get_feedback():
-    try:
-        # This endpoint takes target and target by words then processes the audio to get the timestampd and transcript
-        # returns a list of feedback items, each item is a list of:
-        # [target_phoneme_spelling, target_phoneme_explanation, speech_phoneme_words, speech_phoneme_spelling, speech_phoneme_error_timestamps]
-        session_id = request.args.get("session_id")
-        if not session_id:
-            raise ValueError("No session_id provided")
-        data = session_data.get(session_id)
-        speech_transcript = data["transcript"]
-        timestamps = data["timestamps"]
-
-        target = json.loads(request.args.get("target", "[]"))
-        target_by_word = json.loads(request.args.get("tbw", "[]"))
-
-        out = feedback(
-            target,
-            target_by_word,
-            speech_transcript,
-            timestamps,  # per-phoneme timing info
-        )
-
-        return jsonify(out)
-    except Exception as e:
-        import traceback
-
-        print("Error in /feedback:", e)
-        traceback.print_exc()
-        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
 
 @sock.route("/stream")
@@ -308,9 +190,6 @@ def stream(ws):
     transcription = []
     session_id = str(uuid.uuid4())
     ws.send(json.dumps({"session_id": session_id, "transcript": []}))
-
-    print("ARUNA session_id in stream", session_id)
-    print("ARUNA session_data keys after storing in stream:", list(session_data.keys()))
     while True:
         try:
             # Receive audio data from the client
