@@ -37,16 +37,15 @@
 
 
 
-    const target = ['k', 'ɑ', 'l', 'ɪ', 'ŋ', 'k', 'ɑ', 'ɹ', 'd', 'z', 'ɑ', 'ɹ', 'ð', 'ə', 'w', 'eɪ', 'v', 'ə', 'v', 'ð', 'ə', 'f', 'j', 'u', 'tʃ', 'ɜ˞']
+    const target_timestamped = [('j', 0.24160443037974685, 0.2617381329113924), ('u', 0.2617381329113924, 0.281871835443038), ('ɡ', 0.34227294303797473, 0.36240664556962027), ('ɑ', 0.38254034810126586, 0.40267405063291145), ('t', 0.4429414556962025, 0.4630751582278481), ('ʌ', 0.4832088607594937, 0.5033425632911394), ('s', 0.6845458860759495, 0.7046795886075949), ('t', 0.7650806962025317, 0.7852143987341773), ('eɪ', 0.8053481012658229, 0.8254818037974684), ('æ', 1.0872199367088609, 1.1073536392405066), ('l', 1.369091772151899, 1.3892254746835444), ('ɝ', 1.4093591772151899, 1.4294928797468356), ('t', 1.6106962025316458, 1.630829905063291), ('ɔ', 2.0536376582278484, 2.073771360759494), ('l', 2.1945735759493674, 2.214707278481013), ('ð', 2.27510838607595, 2.295242088607595), ('ʌ', 2.295242088607595, 2.3153757911392407), ('t', 2.416044303797469, 2.436178006329114), ('aɪ', 2.4764454113924055, 2.4965791139240507), ('m', 2.7985846518987345, 2.8187183544303798)]
     const target_by_words = [
-      ["calling", ["k", "ɔ", "l", "ɪ", "ŋ"]],
-      ["cards", ["k", "ɑ", "ɹ", "d", "z"]],
-      ["are", ["ɑ", "ɹ"]],
-      ["the", ["ð", "ə"]],
-      ['wave', ["w", "eɪ", "v"]],
-      ["of", ["ə", "v"]],
-      ["the", ["ð", "ə"]],
-      ["future", ["f", "j", "u", "tʃ", "ɜ˞"]],
+      ["you", ['j', 'u']],
+      ["gotta", ['ɡ', 'ɑ', 't', 'ʌ']],
+      ["stay", ['s', 't', 'eɪ']],
+      ["alert", ['æ', 'l', 'ɝ', 't']],
+      ["all", ['ɔ', 'l']],
+      ["the", ["ð", 'ʌ']],
+      ["time", ['t', 'aɪ', 'm']]
     ]
 
     const transcriptionElement = document.getElementById("transcription");
@@ -103,7 +102,7 @@
     }
 
 
-    const feedbackGiver = new FeedbackGiver(target, target_by_words, on_transcription, on_word_spoken);
+    const feedbackGiver = new FeedbackGiver(target_timestamped, target_by_words, on_transcription, on_word_spoken);
 
     // function to play the user audio
     async function handlePlay() {
@@ -126,36 +125,6 @@
     document.getElementById("feedback_function").addEventListener("click", async () => {
       const feedback = await feedbackGiver.getFeedback();
       console.log("feedback", feedback);
-    });
-
-    document.getElementById("analyze_phonetics").addEventListener("click", async () => {
-      try {
-        const missed_phonemes = await feedbackGiver.getUserPhoneticErrors();
-        const all_phoneme_feedback = await feedbackGiver.getAllPhonemeWrittenFeedback();
-
-        console.log("all_phoneme_feedback", all_phoneme_feedback);
-        missedPhonemesElement.innerHTML = "";
-        const phonemeFeedbackContainer = document.getElementById("phoneme_feedback");
-        phonemeFeedbackContainer.innerHTML = "";
-
-        for (const [target_phoneme, error_data] of Object.entries(missed_phonemes)) {
-          const [mistake_count, word_set, mistake_severities, phoneme_spoken_as, score] = error_data;
-          console.log("final scoring of phones", score, "for the phoneme", target_phoneme, "which sounded like", phoneme_spoken_as);
-          const all_words = word_set.map(idx => target_by_words[idx][0]);
-          const phoneme_spoken_as_spelling = phoneme_spoken_as.map(phoneme => all_phoneme_feedback[phoneme]["phonetic spelling"]);
-          const all_target_phoneme_feedback = all_phoneme_feedback[target_phoneme];
-          const target_phoneme_explanation = all_target_phoneme_feedback["explanation"];
-          const target_phoneme_spelling = all_target_phoneme_feedback["phonetic spelling"];
-
-          missedPhonemesElement.innerHTML += `<p><strong>You struggle with the <em>${target_phoneme_spelling}</em></strong> sound.<br>
-              Words affected: ${all_words}<br>
-              It sounded like: ${phoneme_spoken_as_spelling}<br>
-              ${target_phoneme_explanation}</p>`;
-        }
-      } catch (error) {
-        console.error("Error in analyze_phonetics:", error);
-        missedPhonemesElement.innerHTML = `<p>Error: ${error.message}</p>`;
-      }
     });
 
 
