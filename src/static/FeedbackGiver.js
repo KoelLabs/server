@@ -3,10 +3,14 @@ const serverhost = location.host;
 
 export class FeedbackGiver {
   constructor(target, target_by_word, on_transcription, on_word_spoken) {
-    this.target = target;
+    this.target_transcript = target;
     this.target_by_word = target_by_word;
-    this.transcription = [];
+    this.target_timestamped = target; // Store the target timestamped data
+    this.speech_timestamped = []; // Will be populated from transcription
+    this.speech_transcript = [];
     this.on_transcription = on_transcription;
+    this.word_phone_pairings = null; // Store the computed pairings
+
     this.socket = null;
     this.audioContext = null;
     this.audioWorkletNode = null;
@@ -31,15 +35,14 @@ export class FeedbackGiver {
   #setTranscription(transcription) {
     try {
       const parsed = JSON.parse(transcription);
-      this.transcription = parsed.transcript || [];
+      this.speech_transcript = parsed.speech_transcript || [];
+      this.speech_timestamped = parsed.speech_timestamps || []; // Store the timestamped speech data
       this.session_id = parsed.session_id || null;
-      console.log("this.transcription from setTranscription", this.transcription);
+      console.log("this.speech_transcript from setTranscription", this.speech_transcript);
       console.log("this.session_id from setTranscription", this.session_id);
-      this.on_transcription(this.transcription);
+      this.on_transcription(this.speech_transcript);
     } catch (error) {
-      console.error("Failed to parse transcription JSON:", error);
-      this.transcription = [];
-      this.session_id = null;
+      console.error("Failed to parse transcription JSON in #setTranscription:", error);
     }
   }
 
@@ -61,14 +64,44 @@ export class FeedbackGiver {
     return merged;
   }
 
-  async getCER() {
+  async getWordPhonePairings() {
     try {
       const res = await fetch(
-        `${serverorigin}/score_words_cer?target=${encodeURIComponent(
-          JSON.stringify(this.target)
-        )}&tbw=${encodeURIComponent(
-          JSON.stringify(this.target_by_word)
-        )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
+        `${serverorigin}/pair_by_words?target_timestamped=${encodeURIComponent(JSON.stringify(this.target_timestamped))}&target_by_words=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech_timestamped=${encodeURIComponent(JSON.stringify(this.speech_timestamped))}`
+      );
+      const result = await res.json();
+      this.word_phone_pairings = result; // Store the result
+      return result;
+    } catch (error) {
+      console.error("Error in getWordPhonePairings:", error);
+      console.error(error.stack);
+      return [];
+    }
+  }
+
+  async computeWordPhonePairings() {
+    // If we already have the pairings, return them
+    if (this.word_phone_pairings) {
+      return this.word_phone_pairings;
+    }
+
+    // Otherwise compute them
+    return await this.getWordPhonePairings();
+  }
+
+  clearWordPhonePairings() {
+    this.word_phone_pairings = null;
+  }
+
+  async getCER() {
+    try {
+      // Ensure we have the word phone pairings
+      if (!this.word_phone_pairings) {
+        await this.computeWordPhonePairings();
+      }
+
+      const res = await fetch(
+        `${serverorigin}/score_words_cer?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}`
       );
       const data = await res.json();
       console.log("data", data);
@@ -82,12 +115,13 @@ export class FeedbackGiver {
 
   async getWFED() {
     try {
+      // Ensure we have the word phone pairings
+      if (!this.word_phone_pairings) {
+        await this.computeWordPhonePairings();
+      }
+
       const res = await fetch(
-        `${serverorigin}/score_words_wfed?target=${encodeURIComponent(
-          JSON.stringify(this.target)
-        )}&tbw=${encodeURIComponent(
-          JSON.stringify(this.target_by_word)
-        )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
+        `${serverorigin}/score_words_wfed?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}`
       );
       const data = await res.json();
       const [scoredWords, overall] = data;
@@ -97,49 +131,44 @@ export class FeedbackGiver {
       return [[], 0];
     }
   }
-  // TODO: delete later
-  async getAllPhonemeWrittenFeedback() {
-    //  this will grab all phonemes and their respective descriptions and information
-    try {
-      const res = await fetch(
-        `${serverorigin}/get_phoneme_written_feedback?target=${encodeURIComponent(JSON.stringify(this.target))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
-      );
-
-      return await res.json();
-    } catch (error) {
-      console.error("Error in getPhonemeNaturalLanguageFeedback:", error);
-      return {};
-    }
-  }
-  // TODO: delete later
-  async getUserPhoneticErrors() {
-    //  This function is used to get the top 3 errors spoken by the user returns (mistake_count, word_set, mistake_severities, phoneme_spoken_as, score)
-    try {
-      const res = await fetch(
-        `${serverorigin}/user_phonetic_errors?target=${encodeURIComponent(JSON.stringify(this.target))}&tbw=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`
-      );
-      console.log("res", res);
-      return await res.json();
-    } catch (error) {
-      console.error("Error in json res getUserPhoneticErrors:", error);
-      return [];
-    }
-  }
   async getFeedback() {
     try {
       if (!this.session_id) {
         console.warn("No session_id available, waiting...");
         return [];
       }
+
+      // Ensure we have the word phone pairings
+      if (!this.word_phone_pairings) {
+        await this.computeWordPhonePairings();
+      }
+
       console.log("we are sending the session id to server", this.session_id);
       const res = await fetch(
-        `${serverorigin}/feedback?target=${encodeURIComponent(JSON.stringify(this.target))}&tbw=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}&session_id=${encodeURIComponent(this.session_id)}`
+        `${serverorigin}/user_phonetic_errors?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}&session_id=${encodeURIComponent(this.session_id)}`
       );
       console.log("res", res);
       return await res.json();
     } catch (error) {
       console.error("Error in getFeedback:", error);
       return [];
+    }
+  }
+
+  async getUserPhoneticErrors() {
+    try {
+      // Ensure we have the word phone pairings
+      if (!this.word_phone_pairings) {
+        await this.computeWordPhonePairings();
+      }
+
+      const res = await fetch(
+        `${serverorigin}/user_phonetic_errors?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}`
+      );
+      return await res.json();
+    } catch (error) {
+      console.error("Error in getUserPhoneticErrors:", error);
+      return {};
     }
   }
   preparePlayback() {
@@ -199,6 +228,7 @@ export class FeedbackGiver {
     // Clear previous transcription
     this.#setTranscription("");
     this.stored_audio = null;
+    this.clearWordPhonePairings(); // Clear cached pairings for new recording
 
     // Open WebSocket connection
     this.socket = new WebSocket(
