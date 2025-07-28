@@ -167,11 +167,12 @@ def score_words_cer(word_phone_pairings):
     word_scores = []
     average_score = 0
     for word, pairs in word_phone_pairings:
-        cer = sum(1 for t, s in pairs if t != s) / len(pairs)
-        seq1 = "".join([t for t, _ in pairs])
-        seq2 = "".join([s for _, s in pairs])
-        word_scores.append((word, seq1, seq2, (1 - cer / 2)))
-        average_score += 1 - cer / 2
+        cer = sum(1 for t, s in pairs if t[0] != s[0])/len(pairs)
+        seq1 = "".join([t[0] for t, _ in pairs])
+        seq2 = "".join([s[0] for _, s in pairs])
+        score = (1.0 - cer)
+        word_scores.append((word, seq1, seq2, score))
+        average_score += score
     average_score /= len(word_phone_pairings)
     return word_scores, average_score
 
@@ -184,11 +185,12 @@ def score_words_wfed(word_phone_pairings):
     word_scores = []
     average_score = 0
     for word, pairs in word_phone_pairings:
-        seq1 = "".join([t for t, _ in pairs])
-        seq2 = "".join([s for _, s in pairs])
-        norm_score = (22 - fer(seq1, seq2)) / 22
-        word_scores.append((word, seq1, seq2, norm_score**2))
-        average_score += norm_score**2
+        seq1 = "".join([t[0] for t, _ in pairs])
+        seq2 = "".join([s[0] for _, s in pairs])
+        fer_score = fer(seq1, seq2)
+        score = (1 - fer_score)
+        word_scores.append((word, seq1, seq2, score))
+        average_score += score
     average_score /= len(word_phone_pairings)
     return word_scores, average_score
 
