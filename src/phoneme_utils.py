@@ -95,20 +95,6 @@ def weighted_deletion_cost(x):
 # ---- alignment functions ----
 
 
-def phrase_bounds(word_phone_pairings, timestamps, word_idx):
-    """Return (start_time, end_time) for the three-word window around idx_word."""
-    left_pairs = word_phone_pairings[max(0, word_idx - 1)][1]
-    right_pairs = word_phone_pairings[min(len(word_phone_pairings) - 1, word_idx + 1)][
-        1
-    ]
-
-    first_idx = left_pairs[0][2]  # speech index of first phoneme
-    last_idx = right_pairs[-1][2]  # speech index of last phoneme
-    start_time = timestamps[first_idx][1]  # timestamps = (phoneme, start, end)
-    end_time = timestamps[last_idx][2]
-    return start_time, end_time
-
-
 def get_fastdtw_aligned_phoneme_lists(target, speech):
     """Get aligned phoneme lists for target and speech phonemes (even for grouped phones like kʰ)
     example:
@@ -144,15 +130,23 @@ def needleman_wunsch(
     seq1,
     seq2,
     substitution_func=lambda x, y: 0 if x == y else -1,
-    deletetion_func=lambda _: -1,
+    deletion_func=lambda _: -1,
     insertion_func=lambda _: -1,
 ):
+    """Get aligned phoneme lists for target and speech phonemes (even for grouped phones like kʰ)
+    example:
+        target = ['l', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r']
+        speech = ['s', 'h', 'o', 'r', 'r', 't']
+    Example:
+        target: ['l', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r']
+        speech: ['-', '-', '-', 's', 'h', 'o', '-', '-', 'r', 'r', 't']
+    """
     n, m = len(seq1), len(seq2)
     dp = np.zeros((n + 1, m + 1))
 
     # Initialize DP table
     for i in range(n + 1):
-        dp[i][0] = i * deletetion_func(seq1[i - 1]) if i > 0 else 0
+        dp[i][0] = i * deletion_func(seq1[i - 1]) if i > 0 else 0
     for j in range(m + 1):
         dp[0][j] = j * insertion_func(seq2[j - 1]) if j > 0 else 0
 
@@ -160,7 +154,7 @@ def needleman_wunsch(
     for i in range(1, n + 1):
         for j in range(1, m + 1):
             match = dp[i - 1][j - 1] + substitution_func(seq1[i - 1], seq2[j - 1])
-            delete = dp[i - 1][j] + deletetion_func(seq1[i - 1])
+            delete = dp[i - 1][j] + deletion_func(seq1[i - 1])
             insert = dp[i][j - 1] + insertion_func(seq2[j - 1])
             dp[i][j] = max(match, delete, insert)
 
@@ -192,9 +186,18 @@ def needleman_wunsch(
     return list(reversed(aligned_seq1)), list(reversed(aligned_seq2))
 
 
-def weighted_needleman_wunsch(seq1, seq2):
-    vector_seq1 = sequence_to_vectors(seq1)
-    vector_seq2 = sequence_to_vectors(seq2)
+def weighted_needleman_wunsch(seq1, seq2, is_timestamp=False):
+    """
+    this function is needleman wunsch but weighted by feature error rate and can handle timestamped phonemes
+    """
+    if is_timestamp:
+        vector_seq1 = sequence_to_vectors(
+            ["".join(s[0]) for s in seq1]
+        )  # change the [(p, int, int)...] to [p, p...]
+        vector_seq2 = sequence_to_vectors(["".join(s[0]) for s in seq2])
+    else:
+        vector_seq1 = sequence_to_vectors(seq1)
+        vector_seq2 = sequence_to_vectors(seq2)
     aligned_seq1, aligned_seq2 = needleman_wunsch(
         [(s, v) for s, v in zip(seq1, vector_seq1)],
         [(s, v) for s, v in zip(seq2, vector_seq2)],
@@ -205,26 +208,3 @@ def weighted_needleman_wunsch(seq1, seq2):
     return [s if s == "-" else s[0] for s in aligned_seq1], [
         s if s == "-" else s[0] for s in aligned_seq2
     ]
-
-
-def main(args):
-    if len(args) < 3:
-        print(
-            "Usage: python ./scripts/forced_alignment/needleman_wunsch.py <weighted|unweighted> <seq1> <seq2>"
-        )
-        return
-    weighted = args[0] == "weighted"
-    seq1 = args[1]
-    seq2 = args[2]
-    if weighted:
-        aligned_seq1, aligned_seq2 = weighted_needleman_wunsch(seq1, seq2)
-    else:
-        aligned_seq1, aligned_seq2 = needleman_wunsch(seq1, seq2)
-    aligned_seq1 = "".join(aligned_seq1)
-    aligned_seq2 = "".join(aligned_seq2)
-    print(aligned_seq1)
-    print(aligned_seq2)
-
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
