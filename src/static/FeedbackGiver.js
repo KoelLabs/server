@@ -19,7 +19,6 @@ export class FeedbackGiver {
     this.stored_audio = null;
     this.audioInput = null;
     this.mediaStream = null;
-    this.session_id = null;
 
     this.on_word_spoken = on_word_spoken;
     this.words = [];
@@ -34,15 +33,22 @@ export class FeedbackGiver {
 
   #setTranscription(transcription) {
     try {
+      console.log("transcription", transcription);
+
+      // Handle empty or invalid input
+      if (!transcription || transcription === "" || typeof transcription !== "string") {
+        console.log("Empty or invalid transcription data, skipping");
+        return;
+      }
+
       const parsed = JSON.parse(transcription);
       this.speech_transcript = parsed.speech_transcript || [];
       this.speech_timestamped = parsed.speech_timestamps || []; // Store the timestamped speech data
-      this.session_id = parsed.session_id || null;
       console.log("this.speech_transcript from setTranscription", this.speech_transcript);
-      console.log("this.session_id from setTranscription", this.session_id);
       this.on_transcription(this.speech_transcript);
     } catch (error) {
       console.error("Failed to parse transcription JSON in #setTranscription:", error);
+      console.error("Raw transcription data:", transcription);
     }
   }
 
@@ -66,10 +72,20 @@ export class FeedbackGiver {
 
   async getWordPhonePairings() {
     try {
+      console.log("getting word phone pairings");
+
+      // Only make the request if we have valid speech data
+      if (!this.speech_timestamped || this.speech_timestamped.length === 0) {
+        console.log("No speech data available, skipping word phone pairings request");
+        return [];
+      }
+
+      console.log("speech_timestamped", this.speech_timestamped);
       const res = await fetch(
         `${serverorigin}/pair_by_words?target_timestamped=${encodeURIComponent(JSON.stringify(this.target_timestamped))}&target_by_words=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech_timestamped=${encodeURIComponent(JSON.stringify(this.speech_timestamped))}`
       );
       const result = await res.json();
+      console.log("ARUNA result from getWordPhonePairings", result);
       this.word_phone_pairings = result; // Store the result
       return result;
     } catch (error) {
@@ -82,7 +98,14 @@ export class FeedbackGiver {
   async computeWordPhonePairings() {
     // If we already have the pairings, return them
     if (this.word_phone_pairings) {
+      console.log("word_phone_pairings already exists, returning them");
       return this.word_phone_pairings;
+    }
+
+    // Only compute if we have speech data
+    if (!this.speech_timestamped || this.speech_timestamped.length === 0) {
+      console.log("No speech data available for computing word phone pairings");
+      return [];
     }
 
     // Otherwise compute them
@@ -133,19 +156,13 @@ export class FeedbackGiver {
   }
   async getFeedback() {
     try {
-      if (!this.session_id) {
-        console.warn("No session_id available, waiting...");
-        return [];
-      }
-
       // Ensure we have the word phone pairings
       if (!this.word_phone_pairings) {
         await this.computeWordPhonePairings();
       }
 
-      console.log("we are sending the session id to server", this.session_id);
       const res = await fetch(
-        `${serverorigin}/user_phonetic_errors?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}&session_id=${encodeURIComponent(this.session_id)}`
+        `${serverorigin}/user_phonetic_errors?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}`
       );
       console.log("res", res);
       return await res.json();
@@ -157,9 +174,14 @@ export class FeedbackGiver {
 
   async getUserPhoneticErrors() {
     try {
+      
       // Ensure we have the word phone pairings
       if (!this.word_phone_pairings) {
         await this.computeWordPhonePairings();
+      }
+      if (!this.word_phone_pairings || this.word_phone_pairings.length === 0) {
+        console.log("No word phone pairings available");
+        return {};
       }
 
       const res = await fetch(
@@ -226,7 +248,8 @@ export class FeedbackGiver {
     this.store_audio_chunks = [];
 
     // Clear previous transcription
-    this.#setTranscription("");
+    this.speech_transcript = [];
+    this.speech_timestamped = [];
     this.stored_audio = null;
     this.clearWordPhonePairings(); // Clear cached pairings for new recording
 

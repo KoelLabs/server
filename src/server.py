@@ -17,7 +17,7 @@ from feedback import (
 )
 import json
 
-from phoneme_utils import three_word_phrase_bounds, ALL_MAPPINGS
+from phoneme_utils import ALL_MAPPINGS
 import soundfile as sf
 from scipy.io import wavfile
 
@@ -31,7 +31,6 @@ NUM_CHUNKS_ACCUMULATED = 5
 # Simple global storage for latest timestamps and transcript
 import uuid
 
-session_data = {}
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -129,8 +128,6 @@ def send_static(path):
 def get_pair_by_words():
     try:
         speech_timestamped = json.loads(request.args.get("speech_timestamped", "[]"))
-        if len(speech_timestamped) == 0:
-            return jsonify([])
         target_timestamped = json.loads(request.args.get("target_timestamped", "[]"))
         target_by_words = json.loads(request.args.get("target_by_words", "[]"))
     except Exception as e:
@@ -152,15 +149,12 @@ def get_user_phonetic_errors():
     except Exception as e:
         return jsonify({"server error from get_user_phonetic_errors": str(e)}), 500
 
-
 # REST endpoint
 @app.route("/score_words_cer", methods=["GET"])
 @cross_origin()
 def get_score_words_cer():
     try:
         word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
-        if len(word_phone_pairings) == 0:
-            return jsonify([])
         word_scores = score_words_cer(word_phone_pairings)
         return jsonify(word_scores)
     except Exception as e:
@@ -172,9 +166,7 @@ def get_score_words_cer():
 def get_score_words_wfed():
     try:
         word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
-        if len(word_phone_pairings) == 0:
-            return jsonify([])
-        word_scores = score_words_cer(word_phone_pairings)
+        word_scores = score_words_wfed(word_phone_pairings)
         return jsonify(word_scores)
     except Exception as e:
         return jsonify({"server error from get_score_words_wfed": str(e)}), 500
@@ -188,8 +180,6 @@ def stream(ws):
     combined = np.array([], dtype=np.float32)
     num_chunks_accumulated = 0
     transcription = []
-    session_id = str(uuid.uuid4())
-    ws.send(json.dumps({"session_id": session_id, "transcript": []}))
     while True:
         try:
             # Receive audio data from the client
@@ -214,16 +204,11 @@ def stream(ws):
                             audio
                         )
                         full_transcription.extend(new_transcription)
-
-                        session_data[session_id] = {
-                            "transcript": full_transcription,
-                            "timestamps": new_timestamps,
-                        }
                         ws.send(
                             json.dumps(
                                 {
-                                    "session_id": session_id,
-                                    "transcript": full_transcription,
+                                    "speech_transcript": full_transcription,
+                                    "speech_timestamps": new_timestamps,
                                 }
                             )
                         )
