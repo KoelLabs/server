@@ -1,15 +1,6 @@
-import panphon
-import panphon.distance
-from panphon.distance import Distance
-import numpy as np
-import json
 import os
+import json
 from phoneme_utils import fer, weighted_needleman_wunsch
-
-# Create a panphon feature table
-ft = panphon.FeatureTable()
-# Create a distance object for reuse
-dist = Distance()
 
 model_vocab_json = os.path.join(os.path.dirname(__file__), "model_vocab_feedback.json")
 

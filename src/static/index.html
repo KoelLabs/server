@@ -1,210 +1,220 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real-Time Transcription</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Real-Time Transcription</title>
-</head>
+  <body>
+    <h1>Real-Time Transcription</h1>
+    <div>
+      <h2>Word by Word</h2>
+      <div id="scored_words"></div>
+      <span id="word"></span>
+      <p id="target_phoneme_discription"></p>
+      <p id="transcription_phoneme_discription"></p>
+    </div>
 
-<body>
-  <h1>Real-Time Transcription</h1>
-  <div>
-    <h2>Word by Word</h2>
-    <div id="scored_words"></div>
-    <span id="word"></span>
-    <!-- <button id="play_word">Play</button>
-      <input type="range" id="phoneme_pair" min="0" max="0" step="1" /> -->
-    <p id="target_phoneme_discription"></p>
-    <p id="transcription_phoneme_discription"></p>
-  </div>
+    <button id="start">Start</button>
+    <button id="stop" disabled>Stop</button>
+    <button id="feedback_function">Get Feedback Function Test</button>
+    <p>Transcription: <span id="transcription"></span></p>
+    <p>Accent Similarity: <span id="score"></span>%</p>
+    <p id="missed_phonemes"></p>
+    <div id="phoneme_feedback"></div>
+    <button id="play-button">Play</button>
+    <button id="play-timestamped-button">Play Timestamped</button>
 
-  <button id="start">Start</button>
-  <button id="stop" disabled>Stop</button>
-  <button id="feedback_function">Get Feedback Function Test</button>
-  <p>Transcription: <span id="transcription"></span></p>
-  <p>Accent Similarity: <span id="score"></span>%</p>
-  <p id="missed_phonemes"></p>
-  <!-- container for richer per-phoneme feedback -->
-  <div id="phoneme_feedback"></div>
-  <!-- Audio Playback After User Stops Recording -->
-  <!-- <audio id="user_audio" controls></audio> -->
-  <button id="play-button">Play</button>
-  <button id="play-timestamped-button">Play Timestamped</button>
+    <script type="module">
+      import { FeedbackGiver } from './FeedbackGiver.js';
 
-  <script type="module">
-    import { FeedbackGiver } from './FeedbackGiver.js';
+      const target_timestamped = [
+        ['j', 0.24160443037974685, 0.2617381329113924],
+        ['u', 0.2617381329113924, 0.281871835443038],
+        ['ɡ', 0.34227294303797473, 0.36240664556962027],
+        ['ɑ', 0.38254034810126586, 0.40267405063291145],
+        ['t', 0.4429414556962025, 0.4630751582278481],
+        ['ʌ', 0.4832088607594937, 0.5033425632911394],
+        ['s', 0.6845458860759495, 0.7046795886075949],
+        ['t', 0.7650806962025317, 0.7852143987341773],
+        ['eɪ', 0.8053481012658229, 0.8254818037974684],
+        ['æ', 1.0872199367088609, 1.1073536392405066],
+        ['l', 1.369091772151899, 1.3892254746835444],
+        ['ɜ˞', 1.4093591772151899, 1.4294928797468356],
+        ['t', 1.6106962025316458, 1.630829905063291],
+        ['ɔ', 2.0536376582278484, 2.073771360759494],
+        ['l', 2.1945735759493674, 2.214707278481013],
+        ['ð', 2.27510838607595, 2.295242088607595],
+        ['ʌ', 2.295242088607595, 2.3153757911392407],
+        ['t', 2.416044303797469, 2.436178006329114],
+        ['aɪ', 2.4764454113924055, 2.4965791139240507],
+        ['m', 2.7985846518987345, 2.8187183544303798],
+      ];
+      const target_by_words = [
+        ['you', ['j', 'u']],
+        ['gotta', ['ɡ', 'ɑ', 't', 'ʌ']],
+        ['stay', ['s', 't', 'eɪ']],
+        ['alert', ['æ', 'l', 'ɝ', 't']],
+        ['all', ['ɔ', 'l']],
+        ['the', ['ð', 'ʌ']],
+        ['time', ['t', 'aɪ', 'm']],
+      ];
 
+      const transcriptionElement = document.getElementById('transcription');
+      const missedPhonemesElement = document.getElementById('missed_phonemes');
+      const feedbackElement = document.getElementById('feedback');
+      const scoreElement = document.getElementById('score');
+      const scoredWordsElement = document.getElementById('scored_words');
 
-
-    const target_timestamped = [['j', 0.24160443037974685, 0.2617381329113924], ['u', 0.2617381329113924, 0.281871835443038], ['ɡ', 0.34227294303797473, 0.36240664556962027], ['ɑ', 0.38254034810126586, 0.40267405063291145], ['t', 0.4429414556962025, 0.4630751582278481], ['ʌ', 0.4832088607594937, 0.5033425632911394], ['s', 0.6845458860759495, 0.7046795886075949], ['t', 0.7650806962025317, 0.7852143987341773], ['eɪ', 0.8053481012658229, 0.8254818037974684], ['æ', 1.0872199367088609, 1.1073536392405066], ['l', 1.369091772151899, 1.3892254746835444], ['ɜ˞', 1.4093591772151899, 1.4294928797468356], ['t', 1.6106962025316458, 1.630829905063291], ['ɔ', 2.0536376582278484, 2.073771360759494], ['l', 2.1945735759493674, 2.214707278481013], ['ð', 2.27510838607595, 2.295242088607595], ['ʌ', 2.295242088607595, 2.3153757911392407], ['t', 2.416044303797469, 2.436178006329114], ['aɪ', 2.4764454113924055, 2.4965791139240507], ['m', 2.7985846518987345, 2.8187183544303798]]
-    const target_by_words = [
-      ["you", ['j', 'u']],
-      ["gotta", ['ɡ', 'ɑ', 't', 'ʌ']],
-      ["stay", ['s', 't', 'eɪ']],
-      ["alert", ['æ', 'l', 'ɝ', 't']],
-      ["all", ['ɔ', 'l']],
-      ["the", ["ð", 'ʌ']],
-      ["time", ['t', 'aɪ', 'm']]
-    ]
-
-    const transcriptionElement = document.getElementById("transcription");
-    const missedPhonemesElement = document.getElementById("missed_phonemes");
-    const feedbackElement = document.getElementById("feedback");
-    const scoreElement = document.getElementById("score");
-    const scoredWordsElement = document.getElementById("scored_words");
-
-    function color_word(el) {
-      const score = parseFloat(el.dataset.pscore);
-      const isCorrect = el.dataset.wordCorrect === "true";
-      if (isCorrect || score > 0.8) {
-        el.style.backgroundColor = `hsl(${score * 120}, 100%, 50%)`;
-      } else {
-        el.style.backgroundColor = `red`;
-      }
-    }
-
-    async function on_transcription(transcription) {
-      transcriptionElement.textContent = transcription;
-      const [scoredWords, overall] = await feedbackGiver.getCER();
-      console.log('Phoneme Score:', overall);
-      const wordElements = document.querySelectorAll("#scored_words span");
-      for (let i = 0; i < scoredWords.length; i++) {
-        const wordscore = scoredWords[i];
-        const score = wordscore.at(-1);
-        wordElements[i].dataset.pscore = score;
-        if (i < feedbackGiver.next_word_ix) {
-          color_word(wordElements[i]);
+      function color_word(el) {
+        const score = parseFloat(el.dataset.pscore);
+        const isCorrect = el.dataset.wordCorrect === 'true';
+        if (isCorrect || score > 0.8) {
+          el.style.backgroundColor = `hsl(${score * 120}, 100%, 50%)`;
+        } else {
+          el.style.backgroundColor = `red`;
         }
       }
-      scoreElement.textContent = Math.min(Math.round(100 * overall + 3), 100);
-    }
 
-
-    function on_word_spoken(words, are_words_correct, next_word_ix, percentage_correct, is_done) {
-      console.log('Percentage Words Correct:', percentage_correct);
-      const wordElements = document.querySelectorAll("#scored_words span");
-      for (let i = 0; i < next_word_ix; i++) {
-        const el = wordElements[i];
-        el.dataset.wordCorrect = are_words_correct[i];
-        el.style.border = "none";
-        color_word(el);
+      async function on_transcription(transcription) {
+        transcriptionElement.textContent = transcription;
+        const [scoredWords, overall] = await feedbackGiver.getCER();
+        console.log('Phoneme Score:', overall);
+        const wordElements = document.querySelectorAll('#scored_words span');
+        for (let i = 0; i < scoredWords.length; i++) {
+          const wordscore = scoredWords[i];
+          const score = wordscore.at(-1);
+          wordElements[i].dataset.pscore = score;
+          if (i < feedbackGiver.next_word_ix) {
+            color_word(wordElements[i]);
+          }
+        }
+        scoreElement.textContent = Math.min(Math.round(100 * overall + 3), 100);
       }
-      if (is_done) {
-        setTimeout(() => {
-          feedbackGiver.stop();
-          document.getElementById("start").disabled = false;
-          document.getElementById("stop").disabled = true;
-        }, 3000);
-      } else {
-        const el = wordElements[next_word_ix];
-        el.style.border = "3px solid red";
+
+      function on_word_spoken(words, are_words_correct, next_word_ix, percentage_correct, is_done) {
+        console.log('Percentage Words Correct:', percentage_correct);
+        const wordElements = document.querySelectorAll('#scored_words span');
+        for (let i = 0; i < next_word_ix; i++) {
+          const el = wordElements[i];
+          el.dataset.wordCorrect = are_words_correct[i];
+          el.style.border = 'none';
+          color_word(el);
+        }
+        if (is_done) {
+          setTimeout(() => {
+            feedbackGiver.stop();
+            document.getElementById('start').disabled = false;
+            document.getElementById('stop').disabled = true;
+          }, 3000);
+        } else {
+          const el = wordElements[next_word_ix];
+          el.style.border = '3px solid red';
+        }
       }
-    }
 
+      const feedbackGiver = new FeedbackGiver(
+        target_timestamped,
+        target_by_words,
+        on_transcription,
+        on_word_spoken,
+      );
 
-    const feedbackGiver = new FeedbackGiver(target_timestamped, target_by_words, on_transcription, on_word_spoken);
+      // function to play the user audio
+      async function handlePlay() {
+        const button = document.getElementById('play-button');
+        button.innerText = 'Playing...';
+        button.disabled = true;
 
-    // function to play the user audio
-    async function handlePlay() {
-      const button = document.getElementById("play-button");
-      button.innerText = "Playing...";
-      button.disabled = true;
+        await feedbackGiver.playUserAudio(() => {
+          button.innerText = 'Play';
+          button.disabled = false;
+        });
+      }
 
-      await feedbackGiver.playUserAudio(() => {
-        button.innerText = "Play";
-        button.disabled = false;
+      document.getElementById('play-button').addEventListener('click', handlePlay);
+
+      // add the words to the scored words element
+      for (const word of feedbackGiver.words) {
+        scoredWordsElement.innerHTML += `<span data-pscore="0" data-word-correct="false">${word}</span> `;
+      }
+      document.getElementById('feedback_function').addEventListener('click', async () => {
+        const feedback = await feedbackGiver.getFeedback();
+        console.log('feedback', feedback);
+
+        // Clear previous feedback buttons
+        const phonemeFeedbackElement = document.getElementById('phoneme_feedback');
+        phonemeFeedbackElement.innerHTML = '';
+
+        for (const [phoneme, details] of Object.entries(feedback)) {
+          // const userErrorTimestamps = details[1]; // index 1 is the field you need
+          const userErrorPhraseTimestamps = details[3]; // index 3 is the field you need
+          console.log(`User-error timestamps for ${phoneme}:`, userErrorPhraseTimestamps);
+
+          // userErrorTimestamps is an array of [start, end] timestamp pairs
+          if (userErrorPhraseTimestamps.length > 0) {
+            // Create a section for this phoneme
+            const phonemeSection = document.createElement('div');
+            const phonemeTitle = document.createElement('h4');
+            phonemeTitle.textContent = `Phoneme: "${phoneme}"`;
+            phonemeSection.appendChild(phonemeTitle);
+
+            // Create buttons for each timestamp pair
+            userErrorPhraseTimestamps.forEach((timestampPair, index) => {
+              const [startTimestamp, endTimestamp] = timestampPair;
+              const duration = Math.max(0, endTimestamp - startTimestamp).toFixed(2);
+
+              // Only create button if duration is greater than 0
+              if (endTimestamp - startTimestamp > 0) {
+                const button = document.createElement('button');
+                button.textContent = `Play Error ${index + 1} (${duration}s)`;
+
+                // Add click handler to play the specific timestamp
+                button.addEventListener('click', async () => {
+                  const originalText = button.textContent;
+                  button.textContent = 'Playing...';
+                  button.disabled = true;
+
+                  try {
+                    await feedbackGiver.playTimestampedAudio(startTimestamp, endTimestamp);
+                  } catch (error) {
+                    console.error('Error playing timestamped audio:', error);
+                  } finally {
+                    setTimeout(() => {
+                      button.textContent = originalText;
+                      button.disabled = false;
+                    }, 1000);
+                  }
+                });
+
+                phonemeSection.appendChild(button);
+              }
+            });
+
+            phonemeFeedbackElement.appendChild(phonemeSection);
+          }
+        }
       });
-    }
 
-    document.getElementById("play-button").addEventListener("click", handlePlay);
-
-    // add the words to the scored words element 
-    for (const word of feedbackGiver.words) {
-      scoredWordsElement.innerHTML += `<span data-pscore="0" data-word-correct="false">${word}</span> `;
-    }
-    document.getElementById("feedback_function").addEventListener("click", async () => {
-      const feedback = await feedbackGiver.getFeedback();
-      console.log("feedback", feedback);
-
-      // Clear previous feedback buttons
-      const phonemeFeedbackElement = document.getElementById("phoneme_feedback");
-      phonemeFeedbackElement.innerHTML = "";
-
-      for (const [phoneme, details] of Object.entries(feedback)) {
-        // const userErrorTimestamps = details[1]; // index 1 is the field you need
-        const userErrorPhraseTimestamps = details[3]; // index 3 is the field you need
-        console.log(`User-error timestamps for ${phoneme}:`, userErrorPhraseTimestamps);
-
-        // userErrorTimestamps is an array of [start, end] timestamp pairs
-        if (userErrorPhraseTimestamps.length > 0) {
-          // Create a section for this phoneme
-          const phonemeSection = document.createElement("div");
-          const phonemeTitle = document.createElement("h4");
-          phonemeTitle.textContent = `Phoneme: "${phoneme}"`;
-          phonemeSection.appendChild(phonemeTitle);
-
-          // Create buttons for each timestamp pair
-          userErrorPhraseTimestamps.forEach((timestampPair, index) => {
-            const [startTimestamp, endTimestamp] = timestampPair;
-            const duration = Math.max(0, endTimestamp - startTimestamp).toFixed(2);
-
-            // Only create button if duration is greater than 0
-            if (endTimestamp - startTimestamp > 0) {
-              const button = document.createElement("button");
-              button.textContent = `Play Error ${index + 1} (${duration}s)`;
-
-              // Add click handler to play the specific timestamp
-              button.addEventListener("click", async () => {
-                const originalText = button.textContent;
-                button.textContent = "Playing...";
-                button.disabled = true;
-
-                try {
-                  await feedbackGiver.playTimestampedAudio(startTimestamp, endTimestamp);
-                } catch (error) {
-                  console.error("Error playing timestamped audio:", error);
-                } finally {
-                  setTimeout(() => {
-                    button.textContent = originalText;
-                    button.disabled = false;
-                  }, 1000);
-                }
-              });
-
-              phonemeSection.appendChild(button);
-            }
-          });
-
-          phonemeFeedbackElement.appendChild(phonemeSection);
+      document.getElementById('start').addEventListener('click', () => {
+        const wordElements = document.querySelectorAll('#scored_words span');
+        for (const wordEl of wordElements) {
+          wordEl.style.backgroundColor = 'none';
+          wordEl.style.border = 'none';
+          wordEl.dataset.pscore = 0;
+          wordEl.dataset.wordCorrect = false;
         }
-      }
-    });
+        document.getElementById('start').disabled = true;
+        document.getElementById('stop').disabled = true;
+        feedbackGiver.start();
+      });
 
-
-
-    document.getElementById("start").addEventListener("click", () => {
-      const wordElements = document.querySelectorAll("#scored_words span");
-      for (const wordEl of wordElements) {
-        wordEl.style.backgroundColor = "none";
-        wordEl.style.border = "none";
-        wordEl.dataset.pscore = 0;
-        wordEl.dataset.wordCorrect = false;
-      }
-      document.getElementById("start").disabled = true;
-      document.getElementById("stop").disabled = true;
-      feedbackGiver.start();
-    });
-
-    document.getElementById("stop").addEventListener("click", () => {
-      feedbackGiver.stop();
-      document.getElementById("start").disabled = false;
-      document.getElementById("stop").disabled = true;
-    });
-
-
-
-  </script>
-</body>
-
+      document.getElementById('stop').addEventListener('click', () => {
+        feedbackGiver.stop();
+        document.getElementById('start').disabled = false;
+        document.getElementById('stop').disabled = true;
+      });
+    </script>
+  </body>
 </html>

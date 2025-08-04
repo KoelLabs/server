@@ -1,20 +1,12 @@
-# Conversion between different phonetic codes
-# Modified from https://github.com/jhasegaw/phonecodes/blob/master/src/phonecodes.py
-
-import sys
+import numpy as np
 
 import panphon
 import panphon.distance
-import numpy as np
-from fastdtw import fastdtw
-from scipy.spatial.distance import euclidean
 
 # Create a panphon feature table
 ft = panphon.FeatureTable()
 panphon_dist = panphon.distance.Distance()
 inverse_double_weight_sum = 1 / (sum(ft.weights) * 2)
-
-IPA_SYMBOLS = [ipa for ipa, *_ in ft.segments]
 
 # Phoneme mapping for panphon compatibility
 # Some IPA phonemes have multiple Unicode representations.
@@ -45,12 +37,6 @@ def fer(prediction, ground_truth):
     )
 
 
-def map_phoneme_for_panphon(phoneme_string):
-    """Map phonemes (or lists of phonemes) to their panphon-compatible forms."""
-
-    return [PANPHONE_MAPPINGS.get(ch, ch) for ch in phoneme_string]
-
-
 # Convert a phoneme to a numerical feature vector
 def phoneme_to_vector(phoneme):
     vectors = ft.word_to_vector_list(phoneme, numeric=True)
@@ -62,11 +48,7 @@ def phoneme_to_vector(phoneme):
 
 # Convert sequences of phonemes to sequences of vectors
 def sequence_to_vectors(seq):
-    vectors = []
-    for p in seq:
-        vec = phoneme_to_vector(p)
-        vectors.append(vec)
-    return vectors
+    return [phoneme_to_vector(p) for p in seq]
 
 
 def weighted_substitution_cost(x, y):
@@ -82,39 +64,6 @@ def weighted_deletion_cost(x):
 
 
 # ---- alignment functions ----
-
-
-def get_fastdtw_aligned_phoneme_lists(target, speech):
-    """Get aligned phoneme lists for target and speech phonemes (even for grouped phones like kʰ)
-    example:
-        target = ['l', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r']
-        speech = ['s', 'h', 'o', 'r', 'r', 't']
-    Example:
-        target ['l', 'o', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r', 'r', 'r']
-        speech ['s', 'h', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'r', 'r', 't']
-    """
-
-    seq1_vectors = sequence_to_vectors(target)
-    seq2_vectors = sequence_to_vectors(speech)
-
-    if not seq1_vectors or not seq2_vectors:
-        raise ValueError(
-            "One or both sequences could not be converted to feature vectors."
-        )
-
-    # Use FastDTW with Euclidean distance on the vectors
-    distance, path = fastdtw(seq1_vectors, seq2_vectors, dist=euclidean)
-
-    # Align the original phoneme sequences based on the path
-    aligned_seq1 = []
-    aligned_seq2 = []
-    for i, j in path:
-        aligned_seq1.append(target[i] if i < len(target) else "-")
-        aligned_seq2.append(speech[j] if j < len(speech) else "-")
-
-    return aligned_seq1, aligned_seq2
-
-
 def needleman_wunsch(
     seq1,
     seq2,

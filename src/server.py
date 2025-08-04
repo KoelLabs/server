@@ -1,37 +1,28 @@
+import os
+import json
+
+import torch
+import numpy as np
+from transformers import AutoProcessor, AutoModelForCTC
+
 from flask import Flask, send_from_directory, request, jsonify
 from flask_cors import CORS, cross_origin
 from flask_sock import Sock
 from flask.json.provider import _default as _json_default
-import torch
-from transformers import AutoProcessor, AutoModelForCTC
-import numpy as np
-import os
-import io, base64
-import json
-
 
 from feedback import (
     score_words_cer,
     score_words_wfed,
-    phoneme_written_feedback,
     user_phonetic_errors,
     pair_by_words,
 )
-import json
-
 from phoneme_utils import ALL_MAPPINGS
-import soundfile as sf
-from scipy.io import wavfile
 
-DEBUG = True
+DEBUG = False
 
 # Constants
 SAMPLE_RATE = 16000
 NUM_SECONDS_PER_CHUNK = 2
-
-# Simple global storage for latest timestamps and transcript
-import uuid
-
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -218,6 +209,8 @@ def stream(ws):
                     combined = np.array([], dtype=np.float32)
 
                     if DEBUG:
+                        from scipy.io import wavfile
+
                         wavfile.write("audio.wav", SAMPLE_RATE, audio)
                         wavfile.write("combined.wav", SAMPLE_RATE, combined)
 
