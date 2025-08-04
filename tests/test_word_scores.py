@@ -130,7 +130,7 @@ def test_score_words_cer(client):
     words, overall_score = data
     print("words", words)
     assert round(overall_score, 2) == 0.95
-    
+
     # test that all words except the last one are perfect matches
     for eng_word, _, _, score in words[:-1]:
         assert score == 1.0
