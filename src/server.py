@@ -39,10 +39,12 @@ cors = CORS(app)  # allow CORS for all domains on all routes.
 app.config["CORS_HEADERS"] = "Content-Type"
 sock = Sock(app)
 
+
 def json_default(obj):
     if isinstance(obj, set):
         return list(obj)
     return _json_default(obj)
+
 
 app.json.default = json_default
 
@@ -145,13 +147,16 @@ def get_pair_by_words():
         pair_by_words(target_timestamped, target_by_words, speech_timestamped)
     )
 
+
 @app.route("/user_phonetic_errors", methods=["GET"])
 @cross_origin()
 def get_user_phonetic_errors():
     word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
-    if (word_phone_pairings is None):
+    if word_phone_pairings is None:
         return jsonify([])
     return jsonify(user_phonetic_errors(word_phone_pairings))
+
+
 # REST endpoint
 @app.route("/score_words_cer", methods=["GET"])
 @cross_origin()
@@ -180,6 +185,7 @@ def stream(ws):
     buffer = b""  # Buffer to hold audio chunks
 
     full_transcription = []
+    full_timestamps = []
     combined = np.array([], dtype=np.float32)
     while True:
         try:
@@ -198,21 +204,18 @@ def stream(ws):
                     audio = np.frombuffer(buffer, dtype=np.float32)
                     combined = np.concatenate([combined, audio])
 
-                    
-                    new_transcription, new_timestamps = transcribe_timestamped(
-                        audio
-                    )
+                    new_transcription, new_timestamps = transcribe_timestamped(audio)
                     full_transcription.extend(new_transcription)
+                    full_timestamps.extend(new_timestamps)
                     ws.send(
                         json.dumps(
                             {
                                 "speech_transcript": full_transcription,
-                                "speech_timestamps": new_timestamps,
+                                "speech_timestamps": full_timestamps,
                             }
                         )
                     )
                     combined = np.array([], dtype=np.float32)
-    
 
                     if DEBUG:
                         wavfile.write("audio.wav", SAMPLE_RATE, audio)
