@@ -46,18 +46,7 @@ def fer(prediction, ground_truth):
 
 
 def map_phoneme_for_panphon(phoneme_string):
-    """Map phonemes (or lists of phonemes) to their panphon-compatible forms.
-
-    The original implementation returned a *list* of characters for an input
-    string.  That made downstream code think a *single* phoneme was a list and
-    therefore unhashable (e.g. when used as dict keys).  We now:
-
-    1. If the input is a *string* representing one phoneme, replace any
-       characters using `PHONEME_MAPPINGS` and return the *string*.
-    2. If the input is a *list* (e.g. an existing list of phoneme strings), we
-       map each element individually and return a *list* of strings – keeping
-       the original container type intact.
-    """
+    """Map phonemes (or lists of phonemes) to their panphon-compatible forms."""
 
     return [PANPHONE_MAPPINGS.get(ch, ch) for ch in phoneme_string]
 
