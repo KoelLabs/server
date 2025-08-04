@@ -1,35 +1,7 @@
 import json
 import urllib.parse
 
-TARGET = [
-    "kʰ",
-    "ɔ",
-    "l",
-    "ɪ",
-    "ŋ",
-    "kʰ",
-    "ɑ",
-    "ɹ",
-    "d",
-    "d",
-    "z",
-    "ɑ",
-    "ɹ",
-    "ð",
-    "ə",
-    "w",
-    "eɪ",
-    "v",
-    "ə",
-    "v",
-    "ð",
-    "ə",
-    "f",
-    "j",
-    "u",
-    "tʃ",
-    "ɜ˞",
-]
+TARGET = ['kʰ', 'ɔ', 'l', 'ɪ', 'ŋ', 'kʰ', 'ɑ', 'ɹ', 'd', 'd', 'z', 'ɑ', 'ɹ', 'ð', 'ə', 'w', 'eɪ', 'v', 'ə', 'v', 'ð', 'ə', 'f', 'j', 'u', 'tʃ', 'ɜ˞']  # fmt: skip
 TARGET_BY_WORDS = [
     ["calling", ["kʰ", "ɔ", "l", "ɪ", "ŋ"]],
     ["cards", ["kʰ", "ɑ", "ɹ", "d", "z"]],
@@ -149,7 +121,6 @@ def test_score_words_cer(client):
 
     # Now call score_words_cer with the word phone pairings
     word_phone_pairings_param = urllib.parse.quote(json.dumps(word_phone_pairings))
-
     response = client.get(
         f"/score_words_cer?word_phone_pairings={word_phone_pairings_param}"
     )
@@ -159,6 +130,7 @@ def test_score_words_cer(client):
     words, overall_score = data
     print("words", words)
     assert round(overall_score, 2) == 0.95
+    
     # test that all words except the last one are perfect matches
     for eng_word, _, _, score in words[:-1]:
         assert score == 1.0

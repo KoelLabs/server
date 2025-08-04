@@ -1,9 +1,16 @@
-const serverorigin = location.origin;
-const serverhost = location.host;
-
 export class FeedbackGiver {
-  constructor(target, target_by_word, on_transcription, on_word_spoken) {
-    this.target_transcript = target;
+  constructor(
+    target,
+    target_by_word,
+    on_transcription,
+    on_word_spoken,
+    serverorigin = location.origin,
+    serverhost = location.host,
+  ) {
+    this.serverorigin = serverorigin;
+    this.serverhost = serverhost;
+
+    this.target = target;
     this.target_by_word = target_by_word;
     this.target_timestamped = target; // Store the target timestamped data
     this.speech_timestamped = []; // Will be populated from transcription
@@ -57,7 +64,7 @@ export class FeedbackGiver {
 
   #combineAudioChunks() {
     if (!this.store_audio_chunks || this.store_audio_chunks.length === 0) {
-      console.log("no audio chunks to merge");
+      console.log('no audio chunks to merge');
       return null;
     }
     const totalLength = this.store_audio_chunks.reduce((sum, arr) => sum + arr.length, 0); // grabs all samples across all the chunks
@@ -68,7 +75,7 @@ export class FeedbackGiver {
       chunkPosition += chunk.length;
     }
     if (merged.length !== totalLength) {
-      throw new Error("merged length does not match total length");
+      throw new Error('merged length does not match total length');
     }
     return merged;
   }
@@ -85,7 +92,7 @@ export class FeedbackGiver {
 
       console.log("speech_timestamped", this.speech_timestamped);
       const res = await fetch(
-        `${serverorigin}/pair_by_words?target_timestamped=${encodeURIComponent(JSON.stringify(this.target_timestamped))}&target_by_words=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech_timestamped=${encodeURIComponent(JSON.stringify(this.speech_timestamped))}`
+        `${this.serverorigin}/pair_by_words?target_timestamped=${encodeURIComponent(JSON.stringify(this.target_timestamped))}&target_by_words=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech_timestamped=${encodeURIComponent(JSON.stringify(this.speech_timestamped))}`
       );
       const result = await res.json();
       console.log("ARUNA result from getWordPhonePairings", result);
@@ -127,14 +134,14 @@ export class FeedbackGiver {
       }
 
       const res = await fetch(
-        `${serverorigin}/score_words_cer?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}`
+        `${this.serverorigin}/score_words_cer?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}`
       );
       const data = await res.json();
-      console.log("data", data);
+      console.log('data', data);
       const [scoredWords, overall] = data;
       return [scoredWords, overall];
     } catch (error) {
-      console.error("Error in getCER:", error);
+      console.error('Error in getCER:', error);
       return [[], 0];
     }
   }
@@ -147,13 +154,13 @@ export class FeedbackGiver {
       }
 
       const res = await fetch(
-        `${serverorigin}/score_words_wfed?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}`
+        `${this.serverorigin}/score_words_wfed?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}`
       );
       const data = await res.json();
       const [scoredWords, overall] = data;
       return [scoredWords, overall];
     } catch (error) {
-      console.error("Error in getWFED:", error);
+      console.error('Error in getWFED:', error);
       return [[], 0];
     }
   }
@@ -165,7 +172,7 @@ export class FeedbackGiver {
       }
 
       const res = await fetch(
-        `${serverorigin}/user_phonetic_errors?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}`
+        `${this.serverorigin}/user_phonetic_errors?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}`
       );
       console.log("res", res);
       return await res.json();
@@ -188,7 +195,7 @@ export class FeedbackGiver {
       }
 
       const res = await fetch(
-        `${serverorigin}/user_phonetic_errors?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}`
+        `${this.serverorigin}/user_phonetic_errors?word_phone_pairings=${encodeURIComponent(JSON.stringify(this.word_phone_pairings))}`
       );
       return await res.json();
     } catch (error) {
@@ -207,7 +214,7 @@ export class FeedbackGiver {
   async playUserAudio(onPlaybackEnd = () => { }) {
     const source = this.audioContext.createBufferSource();
     source.buffer = this.userAudioBuffer;
-    console.log("userAudioBuffer length from playing: ", this.userAudioBuffer.length);
+    console.log('userAudioBuffer length from playing: ', this.userAudioBuffer.length);
     source.connect(this.audioContext.destination);
     source.start();
     // close the audio context after we have nicely played back the users audio and wait for buffer to close
@@ -259,9 +266,8 @@ export class FeedbackGiver {
       this.recognition.stop();
       this.recognition = null;
     }
-
   }
-
+    
   async start() {
     await this.#cleanupRecording();
     this.store_audio_chunks = [];
@@ -277,7 +283,7 @@ export class FeedbackGiver {
 
     // Open WebSocket connection
     this.socket = new WebSocket(
-      `${location.protocol === "https:" ? "wss:" : "ws:"}//${serverhost}/stream`
+      `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${this.serverhost}/stream`,
     );
 
     // Handle incoming transcriptions
@@ -295,7 +301,6 @@ export class FeedbackGiver {
       audio: true,
     });
 
-    // Create an AudioContext for usage throughout
     // Create AudioContext if it doesn't exist or is closed
     if (!this.audioContext || this.audioContext.state === 'closed') {
       console.log("audioContext is closed or doesnt exist, creating new one");
@@ -308,16 +313,12 @@ export class FeedbackGiver {
       console.log("audioContext is suspended, resuming");
       await this.audioContext.resume();
     }
+    
     // Load the AudioWorkletProcessor (which handles audio processing)
-    await this.audioContext.audioWorklet.addModule(
-      `${serverorigin}/WavWorklet.js`
-    );
+    await this.audioContext.audioWorklet.addModule(`${this.serverorigin}/WavWorklet.js`);
 
     // Create the AudioWorkletNode
-    this.audioWorkletNode = new AudioWorkletNode(
-      this.audioContext,
-      "wav-worklet"
-    );
+    this.audioWorkletNode = new AudioWorkletNode(this.audioContext, 'wav-worklet');
 
     // Connect the audio input to the AudioWorkletNode
     this.audioInput = this.audioContext.createMediaStreamSource(stream);
@@ -327,7 +328,7 @@ export class FeedbackGiver {
     this.audioWorkletNode.connect(this.audioContext.destination);
 
     // Connect AudioWorkletNode to process audio and send to WebSocket
-    this.audioWorkletNode.port.onmessage = (event) => {
+    this.audioWorkletNode.port.onmessage = event => {
       const chunk_to_store = event.data;
       this.store_audio_chunks.push(chunk_to_store); // continuously store the audio chunks
       if (this.socket.readyState === WebSocket.OPEN) {
@@ -351,15 +352,15 @@ export class FeedbackGiver {
       this.stored_audio = this.#combineAudioChunks();
       console.log("stored_audio! stored audio length: ", this.stored_audio.length);
     } else {
-      console.log("no audio chunks to merge");
+      console.log('no audio chunks to merge');
     }
     this.store_audio_chunks = [];
     if (this.stored_audio) {
       this.preparePlayback();
     } else {
-      console.log("no audio to play back");
+      console.log('no audio to play back');
     }
-
+    
     if (this.socket) {
       return new Promise((resolve) => {
         this.socket.onclose = resolve;
@@ -369,30 +370,27 @@ export class FeedbackGiver {
     }
   }
 
-
-
   #startWordTranscription() {
     this.next_word_ix = 0;
     for (let i = 0; i < this.words.length; i++) {
       this.are_words_correct[i] = false;
     }
 
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     this.recognition = new SpeechRecognition();
-    this.recognition.lang = "en-US";
+    this.recognition.lang = 'en-US';
     this.recognition.interimResults = true;
     this.recognition.maxAlternatives = 1;
     this.recognition.start();
     this.recognition.onend = () => this.recognition.start();
     const finalWords = [];
     let numCorrect = 0;
-    this.recognition.onresult = (event) => {
+    this.recognition.onresult = event => {
       const wordlist = [...event.results]
-        .map((result) => result[0].transcript.split(" "))
+        .map(result => result[0].transcript.split(' '))
         .reduce((a, b) => a.concat(b))
-        .filter((w) => w.length > 0);
+        .filter(w => w.length > 0);
       const isFinal = [...event.results].at(-1).isFinal;
       if (isFinal) {
         finalWords.push(...wordlist);
@@ -401,8 +399,8 @@ export class FeedbackGiver {
 
       const allWords = finalWords.concat(wordlist);
       if (
-        allWords[0].toLowerCase().replace(/[^a-z]/g, "") !=
-        this.words[0].toLowerCase().replace(/[^a-z]/g, "") &&
+        allWords[0].toLowerCase().replace(/[^a-z]/g, '') !=
+          this.words[0].toLowerCase().replace(/[^a-z]/g, '') &&
         allWords.length > 0
       ) {
         allWords.shift();
@@ -413,8 +411,7 @@ export class FeedbackGiver {
         const target = this.words[i];
 
         if (
-          word.toLowerCase().replace(/[^a-z]/g, "") ===
-          target.toLowerCase().replace(/[^a-z]/g, "")
+          word.toLowerCase().replace(/[^a-z]/g, '') === target.toLowerCase().replace(/[^a-z]/g, '')
         ) {
           this.are_words_correct[i] = true;
           numCorrect++;
@@ -428,7 +425,7 @@ export class FeedbackGiver {
             this.are_words_correct,
             this.next_word_ix,
             Math.round((1000 * numCorrect) / this.next_word_ix) / 10,
-            false
+            false,
           );
         } else {
           this.recognition.onend = null;
@@ -438,7 +435,7 @@ export class FeedbackGiver {
             this.are_words_correct,
             this.next_word_ix,
             Math.round((1000 * numCorrect) / this.words.length) / 10,
-            true
+            true,
           );
         }
       }
