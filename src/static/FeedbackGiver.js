@@ -1,8 +1,15 @@
-const serverorigin = 'http://localhost:8080';
-const serverhost = 'localhost:8080';
-
 export class FeedbackGiver {
-  constructor(target, target_by_word, on_transcription, on_word_spoken) {
+  constructor(
+    target,
+    target_by_word,
+    on_transcription,
+    on_word_spoken,
+    serverorigin = location.origin,
+    serverhost = location.host,
+  ) {
+    this.serverorigin = serverorigin;
+    this.serverhost = serverhost;
+
     this.target = target;
     this.target_by_word = target_by_word;
     this.transcription = [];
@@ -56,7 +63,7 @@ export class FeedbackGiver {
   async getCER() {
     try {
       const res = await fetch(
-        `${serverorigin}/score_words_cer?target=${encodeURIComponent(
+        `${this.serverorigin}/score_words_cer?target=${encodeURIComponent(
           JSON.stringify(this.target),
         )}&tbw=${encodeURIComponent(
           JSON.stringify(this.target_by_word),
@@ -75,7 +82,7 @@ export class FeedbackGiver {
   async getWFED() {
     try {
       const res = await fetch(
-        `${serverorigin}/score_words_wfed?target=${encodeURIComponent(
+        `${this.serverorigin}/score_words_wfed?target=${encodeURIComponent(
           JSON.stringify(this.target),
         )}&tbw=${encodeURIComponent(
           JSON.stringify(this.target_by_word),
@@ -93,7 +100,7 @@ export class FeedbackGiver {
     //  this will grab all phonemes and their respective descriptions and information
     try {
       const res = await fetch(
-        `${serverorigin}/phoneme_written_feedback?target=${encodeURIComponent(JSON.stringify(this.target))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
+        `${this.serverorigin}/phoneme_written_feedback?target=${encodeURIComponent(JSON.stringify(this.target))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
       );
 
       return await res.json();
@@ -107,7 +114,7 @@ export class FeedbackGiver {
     //  This function is used to get the top 3 errors spoken by the user returns (mistake_count, word_set, mistake_severities, phoneme_spoken_as, score)
     try {
       const res = await fetch(
-        `${serverorigin}/user_phonetic_errors?target=${encodeURIComponent(JSON.stringify(this.target))}&tbw=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
+        `${this.serverorigin}/user_phonetic_errors?target=${encodeURIComponent(JSON.stringify(this.target))}&tbw=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
       );
       console.log('res', res);
       return await res.json();
@@ -141,7 +148,7 @@ export class FeedbackGiver {
 
     // Open WebSocket connection
     this.socket = new WebSocket(
-      `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${serverhost}/stream`,
+      `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${this.serverhost}/stream`,
     );
 
     // Handle incoming transcriptions
@@ -161,7 +168,7 @@ export class FeedbackGiver {
     });
 
     // Load the AudioWorkletProcessor (which handles audio processing)
-    await this.audioContext.audioWorklet.addModule(`${serverorigin}/WavWorklet.js`);
+    await this.audioContext.audioWorklet.addModule(`${this.serverorigin}/WavWorklet.js`);
 
     // Create the AudioWorkletNode
     this.audioWorkletNode = new AudioWorkletNode(this.audioContext, 'wav-worklet');
