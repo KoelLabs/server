@@ -1,12 +1,14 @@
 from flask import Flask, send_from_directory, request, jsonify
 from flask_cors import CORS, cross_origin
 from flask_sock import Sock
+from flask.json.provider import _default as _json_default
 import torch
 from transformers import AutoProcessor, AutoModelForCTC
 import numpy as np
 import os
 import io, base64
 import json
+
 
 from feedback import (
     score_words_cer,
@@ -26,7 +28,6 @@ DEBUG = True
 # Constants
 SAMPLE_RATE = 16000
 NUM_SECONDS_PER_CHUNK = 2
-NUM_CHUNKS_ACCUMULATED = 5
 
 # Simple global storage for latest timestamps and transcript
 import uuid
@@ -37,6 +38,13 @@ app = Flask(__name__)
 cors = CORS(app)  # allow CORS for all domains on all routes.
 app.config["CORS_HEADERS"] = "Content-Type"
 sock = Sock(app)
+
+def json_default(obj):
+    if isinstance(obj, set):
+        return list(obj)
+    return _json_default(obj)
+
+app.json.default = json_default
 
 # Load Wav2Vec2 model
 model_id = "KoelLabs/xlsr-english-01"
@@ -137,18 +145,13 @@ def get_pair_by_words():
         pair_by_words(target_timestamped, target_by_words, speech_timestamped)
     )
 
-
 @app.route("/user_phonetic_errors", methods=["GET"])
 @cross_origin()
 def get_user_phonetic_errors():
-    try:
-        word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
-        if len(word_phone_pairings) == 0:
-            return jsonify([])
-        return jsonify(user_phonetic_errors(word_phone_pairings))
-    except Exception as e:
-        return jsonify({"server error from get_user_phonetic_errors": str(e)}), 500
-
+    word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
+    if (word_phone_pairings is None):
+        return jsonify([])
+    return jsonify(user_phonetic_errors(word_phone_pairings))
 # REST endpoint
 @app.route("/score_words_cer", methods=["GET"])
 @cross_origin()
@@ -178,43 +181,38 @@ def stream(ws):
 
     full_transcription = []
     combined = np.array([], dtype=np.float32)
-    num_chunks_accumulated = 0
-    transcription = []
     while True:
         try:
             # Receive audio data from the client
             data = ws.receive()
+            if data == "stop":
+                break
+
             if data:
                 buffer += data
                 # Process chunks when buffer reaches certain size
                 if (
                     len(buffer) // 4 > SAMPLE_RATE * NUM_SECONDS_PER_CHUNK
                 ):  # Adjust size for chunk processing
-                    num_chunks_accumulated += 1
 
                     audio = np.frombuffer(buffer, dtype=np.float32)
                     combined = np.concatenate([combined, audio])
 
-                    if num_chunks_accumulated < NUM_CHUNKS_ACCUMULATED:
-                        # transcribe_audio returns a list, so extend directly
-                        new_transcription = transcribe_audio(audio)
-                        transcription.extend(new_transcription)
-                    else:
-                        new_transcription, new_timestamps = transcribe_timestamped(
-                            audio
+                    
+                    new_transcription, new_timestamps = transcribe_timestamped(
+                        audio
+                    )
+                    full_transcription.extend(new_transcription)
+                    ws.send(
+                        json.dumps(
+                            {
+                                "speech_transcript": full_transcription,
+                                "speech_timestamps": new_timestamps,
+                            }
                         )
-                        full_transcription.extend(new_transcription)
-                        ws.send(
-                            json.dumps(
-                                {
-                                    "speech_transcript": full_transcription,
-                                    "speech_timestamps": new_timestamps,
-                                }
-                            )
-                        )
-                        combined = np.array([], dtype=np.float32)
-                        num_chunks_accumulated = 0
-                        transcription = []
+                    )
+                    combined = np.array([], dtype=np.float32)
+    
 
                     if DEBUG:
                         wavfile.write("audio.wav", SAMPLE_RATE, audio)

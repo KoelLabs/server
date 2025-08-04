@@ -29,6 +29,9 @@ export class FeedbackGiver {
     }
     this.next_word_ix = 0;
     this.recognition = null;
+
+    // Add properties to accumulate transcription data
+    this.latest_transcription_data = "";
   }
 
   #setTranscription(transcription) {
@@ -174,7 +177,7 @@ export class FeedbackGiver {
 
   async getUserPhoneticErrors() {
     try {
-      
+
       // Ensure we have the word phone pairings
       if (!this.word_phone_pairings) {
         await this.computeWordPhonePairings();
@@ -209,9 +212,27 @@ export class FeedbackGiver {
     source.start();
     // close the audio context after we have nicely played back the users audio and wait for buffer to close
     source.onended = () => {
-      source.disconnect();
-      onPlaybackEnd();  // call UI callback
+      source.suspend();
+      onPlaybackEnd();  
     };
+  }
+  async playTimestampedAudio(start_timestamp, end_timestamp) {
+    if (!this.userAudioBuffer) {
+      console.log("no user audio buffer to play");
+      return;
+    }
+
+    const source = this.audioContext.createBufferSource();
+    source.buffer = this.userAudioBuffer;
+    source.connect(this.audioContext.destination);
+
+    const offset = start_timestamp;              // where in the buffer to begin
+    const duration = end_timestamp - start_timestamp;
+
+    source.start(0, offset, duration);             // play immediately
+    source.onended = () => source.disconnect();
+
+    console.log(`played ${duration}s from ${offset}s`);
   }
   async #cleanupRecording() {
     if (this.audioWorkletNode) {
@@ -232,15 +253,12 @@ export class FeedbackGiver {
       this.mediaStream = null;
     }
 
-    if (this.socket) {
-      this.socket.close();
-      this.socket = null;
-    }
     if (this.recognition) {
       this.recognition.onend = null;
       this.recognition.stop();
       this.recognition = null;
     }
+
   }
 
   async start() {
@@ -253,6 +271,9 @@ export class FeedbackGiver {
     this.stored_audio = null;
     this.clearWordPhonePairings(); // Clear cached pairings for new recording
 
+    // Reset latest transcription
+    this.latest_transcription_data = "";
+
     // Open WebSocket connection
     this.socket = new WebSocket(
       `${location.protocol === "https:" ? "wss:" : "ws:"}//${serverhost}/stream`
@@ -260,7 +281,12 @@ export class FeedbackGiver {
 
     // Handle incoming transcriptions
     this.socket.onmessage = async (event) => {
-      this.#setTranscription(event.data);
+      // Accumulate transcription data instead of immediately processing it
+      // We'll process the final transcription when recording stops
+      console.log("event.data", event.data);
+
+      // Always keep the most recent transcription snapshot
+      this.latest_transcription_data = event.data;
     };
 
     // Start capturing audio (microphone)
@@ -312,11 +338,11 @@ export class FeedbackGiver {
   }
 
   async stop() {
-    if (this.socket) {
-      this.socket.onclose = async () => {
-        const feedback = await this.getFeedback();
-        console.log("Feedback:", feedback);
-      };
+    // Use the latest transcription snapshot we've received so far.
+    if (this.latest_transcription_data) {
+      this.#setTranscription(this.latest_transcription_data);
+    } else {
+      console.warn("No transcription data received from server before stop");
     }
     await this.#cleanupRecording();
     // merging logic of audio chunks when user stops recording
@@ -333,6 +359,13 @@ export class FeedbackGiver {
       console.log("no audio to play back");
     }
 
+    if (this.socket) {
+      return new Promise((resolve) => {
+        this.socket.onclose = resolve;
+        this.socket.send("stop")
+        this.socket = null;
+      });
+    }
   }
 
 
