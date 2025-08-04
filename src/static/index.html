@@ -30,6 +30,7 @@
   <!-- Audio Playback After User Stops Recording -->
   <!-- <audio id="user_audio" controls></audio> -->
   <button id="play-button">Play</button>
+  <button id="play-timestamped-button">Play Timestamped</button>
 
   <script type="module">
     import { FeedbackGiver } from './FeedbackGiver.js';
@@ -79,6 +80,7 @@
       scoreElement.textContent = Math.min(Math.round(100 * overall + 3), 100);
     }
 
+
     function on_word_spoken(words, are_words_correct, next_word_ix, percentage_correct, is_done) {
       console.log('Percentage Words Correct:', percentage_correct);
       const wordElements = document.querySelectorAll("#scored_words span");
@@ -106,7 +108,6 @@
     // function to play the user audio
     async function handlePlay() {
       const button = document.getElementById("play-button");
-
       button.innerText = "Playing...";
       button.disabled = true;
 
@@ -115,6 +116,7 @@
         button.disabled = false;
       });
     }
+
     document.getElementById("play-button").addEventListener("click", handlePlay);
 
     // add the words to the scored words element 
@@ -124,6 +126,59 @@
     document.getElementById("feedback_function").addEventListener("click", async () => {
       const feedback = await feedbackGiver.getFeedback();
       console.log("feedback", feedback);
+
+      // Clear previous feedback buttons
+      const phonemeFeedbackElement = document.getElementById("phoneme_feedback");
+      phonemeFeedbackElement.innerHTML = "";
+
+      for (const [phoneme, details] of Object.entries(feedback)) {
+        // const userErrorTimestamps = details[1]; // index 1 is the field you need
+        const userErrorPhraseTimestamps = details[3]; // index 3 is the field you need
+        console.log(`User-error timestamps for ${phoneme}:`, userErrorPhraseTimestamps);
+
+        // userErrorTimestamps is an array of [start, end] timestamp pairs
+        if (userErrorPhraseTimestamps.length > 0) {
+          // Create a section for this phoneme
+          const phonemeSection = document.createElement("div");
+          const phonemeTitle = document.createElement("h4");
+          phonemeTitle.textContent = `Phoneme: "${phoneme}"`;
+          phonemeSection.appendChild(phonemeTitle);
+
+          // Create buttons for each timestamp pair
+          userErrorPhraseTimestamps.forEach((timestampPair, index) => {
+            const [startTimestamp, endTimestamp] = timestampPair;
+            const duration = Math.max(0, endTimestamp - startTimestamp).toFixed(2);
+
+            // Only create button if duration is greater than 0
+            if (endTimestamp - startTimestamp > 0) {
+              const button = document.createElement("button");
+              button.textContent = `Play Error ${index + 1} (${duration}s)`;
+
+              // Add click handler to play the specific timestamp
+              button.addEventListener("click", async () => {
+                const originalText = button.textContent;
+                button.textContent = "Playing...";
+                button.disabled = true;
+
+                try {
+                  await feedbackGiver.playTimestampedAudio(startTimestamp, endTimestamp);
+                } catch (error) {
+                  console.error("Error playing timestamped audio:", error);
+                } finally {
+                  setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                  }, 1000);
+                }
+              });
+
+              phonemeSection.appendChild(button);
+            }
+          });
+
+          phonemeFeedbackElement.appendChild(phonemeSection);
+        }
+      }
     });
 
 
@@ -137,7 +192,7 @@
         wordEl.dataset.wordCorrect = false;
       }
       document.getElementById("start").disabled = true;
-      document.getElementById("stop").disabled = false;
+      document.getElementById("stop").disabled = true;
       feedbackGiver.start();
     });
 

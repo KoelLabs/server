@@ -213,7 +213,7 @@ export class FeedbackGiver {
     // close the audio context after we have nicely played back the users audio and wait for buffer to close
     source.onended = () => {
       source.suspend();
-      onPlaybackEnd();  
+      onPlaybackEnd();
     };
   }
   async playTimestampedAudio(start_timestamp, end_timestamp) {
@@ -221,6 +221,7 @@ export class FeedbackGiver {
       console.log("no user audio buffer to play");
       return;
     }
+
 
     const source = this.audioContext.createBufferSource();
     source.buffer = this.userAudioBuffer;
