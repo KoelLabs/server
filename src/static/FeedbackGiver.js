@@ -210,16 +210,16 @@ export class FeedbackGiver {
   async playUserAudio(onPlaybackEnd = () => { }) {
     const source = this.audioContext.createBufferSource();
     source.buffer = this.userAudioBuffer;
-    console.log('userAudioBuffer length from playing: ', this.userAudioBuffer.length);
     source.connect(this.audioContext.destination);
+
     source.start();
-    // close the audio context after we have nicely played back the users audio and wait for buffer to close
-    source.onended = () => {
-      source.suspend();
-      onPlaybackEnd();
-    };
+    await new Promise((resolve) => {
+      source.onended = resolve;
+    });
+    source.suspend();
+    onPlaybackEnd();
   }
-  async playTimestampedAudio(start_timestamp, end_timestamp) {
+  async playTimestampedAudio(start_timestamp, end_timestamp, onPlaybackEnd = () => { }) {
     if (!this.userAudioBuffer) {
       console.log("no user audio buffer to play");
       return;
@@ -234,7 +234,14 @@ export class FeedbackGiver {
     const duration = end_timestamp - start_timestamp;
 
     source.start(0, offset, duration);             // play immediately
-    source.onended = () => source.suspend();
+
+    // Return a promise that resolves when playback finishes
+    await new Promise((resolve) => {
+      source.onended = resolve;
+    });
+
+    source.suspend();
+    onPlaybackEnd();
 
     console.log(`playing ${duration}s from ${offset}s`);
   }
@@ -283,7 +290,7 @@ export class FeedbackGiver {
       console.log("event.data", event.data);
       // Immediately process each transcription update so consumers can react (e.g. update word coloring)
       this.#setTranscription(event.data);
- 
+
     };
 
     // Start capturing audio (microphone)
@@ -303,7 +310,7 @@ export class FeedbackGiver {
       console.log("audioContext is suspended, resuming");
       await this.audioContext.resume();
     }
-    
+
     // Load the AudioWorkletProcessor (which handles audio processing)
     await this.audioContext.audioWorklet.addModule(`${this.serverorigin}/WavWorklet.js`);
 
@@ -331,7 +338,7 @@ export class FeedbackGiver {
 
   async stop() {
     // Use the latest transcription snapshot we've received so far.
-    
+
     await this.#cleanupRecording();
     // merging logic of audio chunks when user stops recording
     if (this.store_audio_chunks.length > 0) {
