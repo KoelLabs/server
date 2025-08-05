@@ -235,7 +235,7 @@ export class FeedbackGiver {
     const duration = end_timestamp - start_timestamp;
 
     source.start(0, offset, duration);             // play immediately
-    source.onended = () => source.disconnect();
+    source.onended = () => source.suspend();
 
     console.log(`played ${duration}s from ${offset}s`);
   }
