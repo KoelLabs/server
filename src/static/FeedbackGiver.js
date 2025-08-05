@@ -122,10 +122,6 @@ export class FeedbackGiver {
     return await this.getWordPhonePairings();
   }
 
-  clearWordPhonePairings() {
-    this.word_phone_pairings = null;
-  }
-
   async getCER() {
     try {
       // Ensure we have the word phone pairings
@@ -276,8 +272,8 @@ export class FeedbackGiver {
     this.speech_transcript = [];
     this.speech_timestamped = [];
     this.stored_audio = null;
-    this.clearWordPhonePairings(); // Clear cached pairings for new recording
-
+    this.word_phone_pairings = null;
+    
     // Reset latest transcription
     this.latest_transcription_data = "";
 
