@@ -1,6 +1,11 @@
 import os
 import json
-from phoneme_utils import fer, weighted_needleman_wunsch
+from phoneme_utils import (
+    fer,
+    weighted_needleman_wunsch,
+    map_target_data,
+    validate_target_data,
+)
 
 MODEL_VOCAB_JSON = os.path.join(os.path.dirname(__file__), "model_vocab_feedback.json")
 
@@ -119,6 +124,13 @@ def pair_by_words(target_timestamped, target_by_words, speech_timestamped):
     target_phoneme_timestamped = (phoneme, start_time, end_time)
     speech_phoneme_timestamped = (phoneme, start_time, end_time)
     """
+    # NOTE: this is a temporary patch to simplify phones
+    target_timestamped, target_by_words = map_target_data(
+        target_timestamped, target_by_words
+    )
+    # validate the target data is aligned with the target by words
+    validate_target_data(target_timestamped, target_by_words)
+
     aligned_target, aligned_speech = weighted_needleman_wunsch(
         target_timestamped, speech_timestamped, is_timestamp=True
     )

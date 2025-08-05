@@ -21,7 +21,7 @@ from phoneme_utils import ALL_MAPPINGS
 DEBUG = False
 
 # Constants
-SAMPLE_RATE = 16000
+SAMPLE_RATE = 16_000
 NUM_SECONDS_PER_CHUNK = 2
 
 # Initialize Flask app

@@ -26,6 +26,36 @@ PHONEMES_TO_MASK = {
 ALL_MAPPINGS = {**PANPHONE_MAPPINGS, **PHONEMES_TO_MASK}
 
 
+def map_target_data(
+    target_timestamped: list[tuple[str, float, float]],
+    target_by_words: list[list],
+) -> tuple[list[tuple[str, float, float]], list[list]]:
+    """Return copies of *target_timestamped* and *target_by_words* with every
+    phoneme converted using ``ALL_MAPPINGS``."""
+
+    mp = lambda p: ALL_MAPPINGS.get(p, p)
+
+    mapped_ts = [(mp(p), s, e) for p, s, e in target_timestamped]
+    mapped_bw = [[w, [mp(p) for p in phs]] for w, phs in target_by_words]
+
+    return mapped_ts, mapped_bw
+
+
+def validate_target_data(
+    target_timestamped: list[tuple[str, float, float]],
+    target_by_words: list[list],
+) -> None:
+    """Ensure the flattened phoneme sequences in the two inputs are identical."""
+
+    seq_ts = [p for p, _, _ in target_timestamped]
+    seq_bw = [p for _, phs in target_by_words for p in phs]
+
+    if seq_ts != seq_bw:
+        raise ValueError(
+            "target_by_words does not align with target_timestamped", seq_ts, seq_bw
+        )
+
+
 def fer(prediction, ground_truth):
     """
     Feature Error Rate: the edits weighted by their acoustic features summed up and divided by the length of the ground truth.
