@@ -185,7 +185,9 @@ def stream(ws):
     while True:
         try:
             # Receive audio data from the client
-            data = ws.receive()
+            data = (
+                ws.receive()
+            )  # NOTE: anything left in the buffer will not be processed if client stops streaming
             if data == "stop":
                 break
 
