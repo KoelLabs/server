@@ -3,7 +3,8 @@ import json
 from phoneme_utils import (
     fer,
     weighted_needleman_wunsch,
-    map_target_data,
+    map_timestamped_phonemes,
+    map_phones_by_word,
     validate_target_data,
 )
 
@@ -124,11 +125,9 @@ def pair_by_words(target_timestamped, target_by_words, speech_timestamped):
     target_phoneme_timestamped = (phoneme, start_time, end_time)
     speech_phoneme_timestamped = (phoneme, start_time, end_time)
     """
-    # NOTE: this is a temporary patch to simplify phones
-    target_timestamped, target_by_words = map_target_data(
-        target_timestamped, target_by_words
-    )
-    # validate the target data is aligned with the target by words
+    speech_timestamped = map_timestamped_phonemes(speech_timestamped)
+    target_timestamped = map_timestamped_phonemes(target_timestamped)
+    target_by_words = map_phones_by_word(target_by_words)
     validate_target_data(target_timestamped, target_by_words)
 
     aligned_target, aligned_speech = weighted_needleman_wunsch(

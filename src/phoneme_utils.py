@@ -9,36 +9,28 @@ panphon_dist = panphon.distance.Distance()
 inverse_double_weight_sum = 1 / (sum(ft.weights) * 2)
 
 # Phoneme mapping for panphon compatibility
-# Some IPA phonemes have multiple Unicode representations.
 PANPHONE_MAPPINGS = {
-    "ɝ": "ɜ˞",  # r-colored schwa (U+025D) -> schwa + r-coloring diacritic (U+025C + U+02DE)
+    "ɝ": "ɜ˞",
     "ɚ": "ə˞",
-    "g": "ɡ",  # model vocab has correct ɡ but we add this since its hard to distinguish
 }
-# just a few phonemes that are hard to distinguish, we mask them to the closest phoneme to improve scores and omitt unecessary feedback
+# Temporary simplification of similar phonemes
 PHONEMES_TO_MASK = {
     "ʌ": "ə",
     "ɔ": "ɑ",
     "kʰ": "k",
     "sʰ": "s",
 }
-
 ALL_MAPPINGS = {**PANPHONE_MAPPINGS, **PHONEMES_TO_MASK}
 
 
-def map_target_data(
-    target_timestamped: list[tuple[str, float, float]],
-    target_by_words: list[list],
-) -> tuple[list[tuple[str, float, float]], list[list]]:
-    """Return copies of *target_timestamped* and *target_by_words* with every
-    phoneme converted using ``ALL_MAPPINGS``."""
+def map_timestamped_phonemes(timestamped: list[tuple[str, float, float]]):
+    return [(ALL_MAPPINGS.get(p, p), s, e) for p, s, e in timestamped]
 
-    mp = lambda p: ALL_MAPPINGS.get(p, p)
 
-    mapped_ts = [(mp(p), s, e) for p, s, e in target_timestamped]
-    mapped_bw = [[w, [mp(p) for p in phs]] for w, phs in target_by_words]
-
-    return mapped_ts, mapped_bw
+def map_phones_by_word(
+    phones_by_words: list[tuple[str, list[str]]],
+):
+    return [[w, [ALL_MAPPINGS.get(p, p) for p in phs]] for w, phs in phones_by_words]
 
 
 def validate_target_data(

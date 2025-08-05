@@ -16,7 +16,6 @@ from feedback import (
     user_phonetic_errors,
     pair_by_words,
 )
-from phoneme_utils import ALL_MAPPINGS
 
 DEBUG = False
 
@@ -69,12 +68,9 @@ def transcribe_timestamped(audio):
     for time, _id in ids_w_time:
         if current_phoneme_id != _id:
             if current_phoneme_id != processor.tokenizer.pad_token_id:
-                # Apply ALL_MAPPINGS to the decoded phoneme to match transcription
-                decoded_phoneme = processor.decode(current_phoneme_id)
-                mapped_phoneme = ALL_MAPPINGS.get(decoded_phoneme, decoded_phoneme)
                 phonemes_with_time.append(
                     (
-                        mapped_phoneme,
+                        processor.decode(current_phoneme_id),
                         current_start_time,
                         time,
                     )
@@ -102,9 +98,7 @@ def _run_inference(audio, model, processor):
     predicted_ids = torch.argmax(logits, dim=-1)[0].tolist()
     tokens = processor.tokenizer.convert_ids_to_tokens(predicted_ids)
     transcription = [
-        ALL_MAPPINGS.get(t, t)
-        for t in tokens
-        if t not in processor.tokenizer.all_special_tokens
+        t for t in tokens if t not in processor.tokenizer.all_special_tokens
     ]
     duration_sec = input_values.shape[1] / processor.feature_extractor.sampling_rate
     return transcription, duration_sec, predicted_ids
