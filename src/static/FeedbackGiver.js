@@ -203,7 +203,7 @@ export class FeedbackGiver {
       return {};
     }
   }
-  preparePlayback() {
+  #preparePlayback() {
     this.userAudioBuffer = null;
     console.log("buffer gets cleared: ", this.userAudioBuffer);
 
@@ -356,7 +356,7 @@ export class FeedbackGiver {
     }
     this.store_audio_chunks = [];
     if (this.stored_audio) {
-      this.preparePlayback();
+      this.#preparePlayback();
     } else {
       console.log('no audio to play back');
     }
