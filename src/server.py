@@ -132,7 +132,7 @@ def get_pair_by_words():
         target_timestamped = json.loads(request.args.get("target_timestamped", "[]"))
         target_by_words = json.loads(request.args.get("target_by_words", "[]"))
     except Exception as e:
-        return jsonify({"server error from get_pair_by_words": str(e)}), 500
+        return jsonify({"client called get_pair_by_words incorrectly": str(e)}), 400
 
     return jsonify(
         pair_by_words(target_timestamped, target_by_words, speech_timestamped)
@@ -142,9 +142,13 @@ def get_pair_by_words():
 @app.route("/user_phonetic_errors", methods=["GET"])
 @cross_origin()
 def get_user_phonetic_errors():
-    word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
-    if word_phone_pairings is None:
-        return jsonify([])
+    try:
+        word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
+    except Exception as e:
+        return (
+            jsonify({"client called get_user_phonetic_errors incorrectly": str(e)}),
+            400,
+        )
     return jsonify(user_phonetic_errors(word_phone_pairings))
 
 
@@ -154,10 +158,10 @@ def get_user_phonetic_errors():
 def get_score_words_cer():
     try:
         word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
-        word_scores = score_words_cer(word_phone_pairings)
-        return jsonify(word_scores)
     except Exception as e:
-        return jsonify({"server error from get_score_words_cer": str(e)}), 500
+        return jsonify({"client called get_score_words_cer incorrectly": str(e)}), 400
+    word_scores = score_words_cer(word_phone_pairings)
+    return jsonify(word_scores)
 
 
 @app.route("/score_words_wfed", methods=["GET"])
@@ -165,10 +169,10 @@ def get_score_words_cer():
 def get_score_words_wfed():
     try:
         word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
-        word_scores = score_words_wfed(word_phone_pairings)
-        return jsonify(word_scores)
     except Exception as e:
-        return jsonify({"server error from get_score_words_wfed": str(e)}), 500
+        return jsonify({"client called get_score_words_wfed incorrectly": str(e)}), 400
+    word_scores = score_words_wfed(word_phone_pairings)
+    return jsonify(word_scores)
 
 
 @sock.route("/stream")
