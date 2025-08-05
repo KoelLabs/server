@@ -130,9 +130,9 @@ def weighted_needleman_wunsch(seq1, seq2, is_timestamp=False):
     """
     if is_timestamp:
         vector_seq1 = sequence_to_vectors(
-            ["".join(s[0]) for s in seq1]
+            [s[0] for s in seq1]
         )  # change the [(p, int, int)...] to [p, p...]
-        vector_seq2 = sequence_to_vectors(["".join(s[0]) for s in seq2])
+        vector_seq2 = sequence_to_vectors([s[0] for s in seq2])
     else:
         vector_seq1 = sequence_to_vectors(seq1)
         vector_seq2 = sequence_to_vectors(seq2)
