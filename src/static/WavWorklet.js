@@ -36,4 +36,4 @@ class WavWorklet extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor("wav-worklet", WavWorklet);
+registerProcessor('wav-worklet', WavWorklet);

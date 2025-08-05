@@ -4,39 +4,39 @@ import panphon
 import panphon.distance
 
 # Create a panphon feature table
-ft = panphon.FeatureTable()
-panphon_dist = panphon.distance.Distance()
-inverse_double_weight_sum = 1 / (sum(ft.weights) * 2)
+_ft = panphon.FeatureTable()
+_panphon_dist = panphon.distance.Distance()
+_inverse_double_weight_sum = 1 / (sum(_ft.weights) * 2)
 
 # Phoneme mapping for panphon compatibility
-PANPHONE_MAPPINGS = {
+_PANPHONE_MAPPINGS = {
     "ɝ": "ɜ˞",
     "ɚ": "ə˞",
 }
 # Temporary simplification of similar phonemes
-PHONEMES_TO_MASK = {
+_PHONEMES_TO_MASK = {
     "ʌ": "ə",
     "ɔ": "ɑ",
     "kʰ": "k",
     "sʰ": "s",
 }
-ALL_MAPPINGS = {**PANPHONE_MAPPINGS, **PHONEMES_TO_MASK}
+_ALL_MAPPINGS = {**_PANPHONE_MAPPINGS, **_PHONEMES_TO_MASK}
 
 
 def map_timestamped_phonemes(timestamped: list[tuple[str, float, float]]):
-    return [(ALL_MAPPINGS.get(p, p), s, e) for p, s, e in timestamped]
+    return [(_ALL_MAPPINGS.get(p, p), s, e) for p, s, e in timestamped]
 
 
 def map_phones_by_word(
     phones_by_words: list[tuple[str, list[str]]],
 ):
-    return [[w, [ALL_MAPPINGS.get(p, p) for p in phs]] for w, phs in phones_by_words]
+    return [[w, [_ALL_MAPPINGS.get(p, p) for p in phs]] for w, phs in phones_by_words]
 
 
 def validate_target_data(
     target_timestamped: list[tuple[str, float, float]],
     target_by_words: list[list],
-) -> None:
+):
     """Ensure the flattened phoneme sequences in the two inputs are identical."""
 
     seq_ts = [p for p, _, _ in target_timestamped]
@@ -53,36 +53,36 @@ def fer(prediction, ground_truth):
     Feature Error Rate: the edits weighted by their acoustic features summed up and divided by the length of the ground truth.
     """
     return (
-        inverse_double_weight_sum
-        * panphon_dist.weighted_feature_edit_distance(ground_truth, prediction)
+        _inverse_double_weight_sum
+        * _panphon_dist.weighted_feature_edit_distance(ground_truth, prediction)
         / len(ground_truth)
     )
 
 
-# Convert a phoneme to a numerical feature vector
-def phoneme_to_vector(phoneme):
-    vectors = ft.word_to_vector_list(phoneme, numeric=True)
+def _phoneme_to_vector(phoneme):
+    """Convert a phoneme to a numerical feature vector"""
+    vectors = _ft.word_to_vector_list(phoneme, numeric=True)
     if vectors:
         return np.array(vectors[0])  # Take the first vector if multiple exist
     else:
         raise ValueError(f"vector not found for phoneme: {phoneme}")
 
 
-# Convert sequences of phonemes to sequences of vectors
-def sequence_to_vectors(seq):
-    return [phoneme_to_vector(p) for p in seq]
+def _sequence_to_vectors(seq):
+    """Convert sequences of phonemes to sequences of vectors"""
+    return [_phoneme_to_vector(p) for p in seq]
 
 
-def weighted_substitution_cost(x, y):
-    return -abs(panphon_dist.weighted_substitution_cost(x, y))
+def _weighted_substitution_cost(x, y):
+    return -abs(_panphon_dist.weighted_substitution_cost(x, y))
 
 
-def weighted_insertion_cost(x):
-    return -abs(panphon_dist.weighted_insertion_cost(x))
+def _weighted_insertion_cost(x):
+    return -abs(_panphon_dist.weighted_insertion_cost(x))
 
 
-def weighted_deletion_cost(x):
-    return -abs(panphon_dist.weighted_deletion_cost(x))
+def _weighted_deletion_cost(x):
+    return -abs(_panphon_dist.weighted_deletion_cost(x))
 
 
 # ---- alignment functions ----
@@ -93,13 +93,15 @@ def needleman_wunsch(
     deletion_func=lambda _: -1,
     insertion_func=lambda _: -1,
 ):
-    """Get aligned phoneme lists for target and speech phonemes (even for grouped phones like kʰ)
-    example:
-        target = ['l', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r']
-        speech = ['s', 'h', 'o', 'r', 'r', 't']
+    """
+    Get aligned phoneme lists for target and speech phonemes
     Example:
-        target: ['l', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r']
-        speech: ['-', '-', '-', 's', 'h', 'o', '-', '-', 'r', 'r', 't']
+        seq1 = ['l', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r']
+        seq2 = ['s', 'h', 'o', 'r', 'r', 't']
+        aligned_seq1, aligned_seq2 = needleman_wunsch(seq1, seq2)
+      Outputs:
+        aligned_seq1: ['l', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r']
+        aligned_seq2: ['-', '-', '-', 's', 'h', 'o', '-', '-', 'r', 'r', 't']
     """
     n, m = len(seq1), len(seq2)
     dp = np.zeros((n + 1, m + 1))
@@ -146,25 +148,26 @@ def needleman_wunsch(
     return list(reversed(aligned_seq1)), list(reversed(aligned_seq2))
 
 
-def weighted_needleman_wunsch(seq1, seq2, is_timestamp=False):
+def weighted_needleman_wunsch(seq1, seq2, is_timestamped=False):
     """
-    this function is needleman wunsch but weighted by feature error rate and can handle timestamped phonemes
+    :func:`needleman_wunsch` weighted by feature error rate
     """
-    if is_timestamp:
-        vector_seq1 = sequence_to_vectors(
-            [s[0] for s in seq1]
-        )  # change the [(p, int, int)...] to [p, p...]
-        vector_seq2 = sequence_to_vectors([s[0] for s in seq2])
+    if is_timestamped:
+        # change the [(p, int, int)...] to [p, p...]
+        vector_seq1 = _sequence_to_vectors([s[0] for s in seq1])
+        vector_seq2 = _sequence_to_vectors([s[0] for s in seq2])
     else:
-        vector_seq1 = sequence_to_vectors(seq1)
-        vector_seq2 = sequence_to_vectors(seq2)
+        vector_seq1 = _sequence_to_vectors(seq1)
+        vector_seq2 = _sequence_to_vectors(seq2)
+
     aligned_seq1, aligned_seq2 = needleman_wunsch(
         [(s, v) for s, v in zip(seq1, vector_seq1)],
         [(s, v) for s, v in zip(seq2, vector_seq2)],
-        lambda x, y: weighted_substitution_cost(list(x[1]), list(y[1])),
-        lambda x: weighted_deletion_cost(list(x[1])),
-        lambda x: weighted_insertion_cost(list(x[1])),
+        lambda x, y: _weighted_substitution_cost(list(x[1]), list(y[1])),
+        lambda x: _weighted_deletion_cost(list(x[1])),
+        lambda x: _weighted_insertion_cost(list(x[1])),
     )
+
     return [s if s == "-" else s[0] for s in aligned_seq1], [
         s if s == "-" else s[0] for s in aligned_seq2
     ]

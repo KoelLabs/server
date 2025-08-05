@@ -1,4 +1,3 @@
-import os
 import json
 
 import torch
@@ -17,9 +16,8 @@ from feedback import (
     pair_by_words,
 )
 
-DEBUG = False
-
 # Constants
+DEBUG = False
 SAMPLE_RATE = 16_000
 NUM_SECONDS_PER_CHUNK = 2
 
@@ -30,31 +28,23 @@ app.config["CORS_HEADERS"] = "Content-Type"
 sock = Sock(app)
 
 
+# Extend JSON stringifying fallbacks
 def json_default(obj):
     if isinstance(obj, set):
         return list(obj)
     return _json_default(obj)
 
 
-app.json.default = json_default
+app.json.default = json_default  # type: ignore
 
 # Load Wav2Vec2 model
 model_id = "KoelLabs/xlsr-english-01"
 processor = AutoProcessor.from_pretrained(model_id)
 model = AutoModelForCTC.from_pretrained(model_id)
-
-model_vocab_json = os.path.join(os.path.dirname(__file__), "model_vocab_feedback.json")
-
-
-def transcribe_audio(audio: np.ndarray) -> list[str]:
-    """
-    Transcribe audio and return both transcription and timestamp information.
-    """
-    transcription, _, _ = _run_inference(audio, model, processor)
-    return transcription
+assert processor.feature_extractor.sampling_rate == SAMPLE_RATE
 
 
-def transcribe_timestamped(audio):
+def transcribe_timestamped(audio: np.ndarray):
     transcription, duration_sec, predicted_ids = _run_inference(audio, model, processor)
 
     ids_w_time = [
@@ -146,7 +136,6 @@ def get_user_phonetic_errors():
     return jsonify(user_phonetic_errors(word_phone_pairings))
 
 
-# REST endpoint
 @app.route("/score_words_cer", methods=["GET"])
 @cross_origin()
 def get_score_words_cer():
@@ -179,21 +168,21 @@ def stream(ws):
     while True:
         try:
             # Receive audio data from the client
-            data = (
-                ws.receive()
-            )  # NOTE: anything left in the buffer will not be processed if client stops streaming
+            data = ws.receive()
             if data == "stop":
+                # TODO: should still process anything left over in the buffer
                 break
 
             if data:
                 buffer += data
-                # Process chunks when buffer reaches certain size
+                # Process when buffer has at least one chunk in it
                 if (
-                    len(buffer) // 4 > SAMPLE_RATE * NUM_SECONDS_PER_CHUNK
-                ):  # Adjust size for chunk processing
-
+                    len(buffer)
+                    > SAMPLE_RATE
+                    * NUM_SECONDS_PER_CHUNK
+                    * np.dtype(np.float32).itemsize
+                ):
                     audio = np.frombuffer(buffer, dtype=np.float32)
-                    combined = np.concatenate([combined, audio])
 
                     new_transcription, new_timestamps = transcribe_timestamped(audio)
                     full_transcription.extend(new_transcription)
@@ -206,12 +195,12 @@ def stream(ws):
                             }
                         )
                     )
-                    combined = np.array([], dtype=np.float32)
 
                     if DEBUG:
                         from scipy.io import wavfile
 
                         wavfile.write("audio.wav", SAMPLE_RATE, audio)
+                        combined = np.concatenate([combined, audio])
                         wavfile.write("combined.wav", SAMPLE_RATE, combined)
 
                     buffer = b""  # Clear the buffer

@@ -131,7 +131,7 @@ def pair_by_words(target_timestamped, target_by_words, speech_timestamped):
     validate_target_data(target_timestamped, target_by_words)
 
     aligned_target, aligned_speech = weighted_needleman_wunsch(
-        target_timestamped, speech_timestamped, is_timestamp=True
+        target_timestamped, speech_timestamped, is_timestamped=True
     )
     paired = zip(aligned_target, aligned_speech)
 

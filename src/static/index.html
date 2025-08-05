@@ -127,10 +127,9 @@
         button.innerText = 'Playing...';
         button.disabled = true;
 
-        await feedbackGiver.playUserAudio(() => {
-          button.innerText = 'Play';
-          button.disabled = false;
-        });
+        await feedbackGiver.playUserAudio();
+        button.innerText = 'Play';
+        button.disabled = false;
       }
 
       document.getElementById('play-button').addEventListener('click', handlePlay);
@@ -177,7 +176,7 @@
                   button.disabled = true;
 
                   try {
-                    await feedbackGiver.playTimestampedAudio(startTimestamp, endTimestamp);
+                    await feedbackGiver.playUserAudio(startTimestamp, endTimestamp);
                   } catch (error) {
                     console.error('Error playing timestamped audio:', error);
                   } finally {
