@@ -1,5 +1,5 @@
 const SAMPLE_RATE = 16_000;
-export class FeedbackGiver { 
+export class FeedbackGiver {
   constructor(
     target,
     target_by_word,
@@ -38,8 +38,7 @@ export class FeedbackGiver {
     this.next_word_ix = 0;
     this.recognition = null;
 
-    // Add properties to accumulate transcription data
-    this.latest_transcription_data = "";
+
   }
 
   #setTranscription(transcription) {
@@ -237,7 +236,7 @@ export class FeedbackGiver {
     source.start(0, offset, duration);             // play immediately
     source.onended = () => source.suspend();
 
-    console.log(`played ${duration}s from ${offset}s`);
+    console.log(`playing ${duration}s from ${offset}s`);
   }
   async #cleanupRecording() {
     if (this.audioWorkletNode) {
@@ -264,19 +263,15 @@ export class FeedbackGiver {
       this.recognition = null;
     }
   }
-    
+
   async start() {
     await this.#cleanupRecording();
     this.store_audio_chunks = [];
-
-    // Clear previous transcription
     this.speech_transcript = [];
     this.speech_timestamped = [];
     this.stored_audio = null;
     this.word_phone_pairings = null;
 
-    // Reset latest transcription
-    this.latest_transcription_data = "";
 
     // Open WebSocket connection
     this.socket = new WebSocket(
@@ -285,12 +280,10 @@ export class FeedbackGiver {
 
     // Handle incoming transcriptions
     this.socket.onmessage = async (event) => {
-      // Accumulate transcription data instead of immediately processing it
-      // We'll process the final transcription when recording stops
       console.log("event.data", event.data);
-
-      // Always keep the most recent transcription snapshot
-      this.latest_transcription_data = event.data;
+      // Immediately process each transcription update so consumers can react (e.g. update word coloring)
+      this.#setTranscription(event.data);
+ 
     };
 
     // Start capturing audio (microphone)
@@ -338,11 +331,7 @@ export class FeedbackGiver {
 
   async stop() {
     // Use the latest transcription snapshot we've received so far.
-    if (this.latest_transcription_data) {
-      this.#setTranscription(this.latest_transcription_data);
-    } else {
-      console.warn("No transcription data received from server before stop");
-    }
+    
     await this.#cleanupRecording();
     // merging logic of audio chunks when user stops recording
     if (this.store_audio_chunks.length > 0) {
@@ -357,7 +346,7 @@ export class FeedbackGiver {
     } else {
       console.log('no audio to play back');
     }
-    
+
     if (this.socket) {
       return new Promise((resolve) => {
         this.socket.onclose = resolve;
@@ -397,7 +386,7 @@ export class FeedbackGiver {
       const allWords = finalWords.concat(wordlist);
       if (
         allWords[0].toLowerCase().replace(/[^a-z]/g, '') !=
-          this.words[0].toLowerCase().replace(/[^a-z]/g, '') &&
+        this.words[0].toLowerCase().replace(/[^a-z]/g, '') &&
         allWords.length > 0
       ) {
         allWords.shift();
