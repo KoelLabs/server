@@ -2,7 +2,10 @@ import os
 import json
 from phoneme_utils import fer, weighted_needleman_wunsch
 
-model_vocab_json = os.path.join(os.path.dirname(__file__), "model_vocab_feedback.json")
+MODEL_VOCAB_JSON = os.path.join(os.path.dirname(__file__), "model_vocab_feedback.json")
+
+with open(MODEL_VOCAB_JSON, "r", encoding="utf-8") as f:
+    VOCAB_CONTENT = json.load(f)
 
 
 def user_phonetic_errors(word_phone_pairings, topk=3):
@@ -195,11 +198,9 @@ def phoneme_written_feedback(word_phone_pairings):
     # get all the speech phonemes at once on word_phone_pairings, not sending over transcript, reduce network cost
     all_speech_phonemes = get_phone_pairing_vocab(word_phone_pairings)
 
-    with open(model_vocab_json, "r", encoding="utf-8") as f:
-        content = json.load(f)
     for phoneme in all_speech_phonemes:
         phoneme_feedback = next(
-            (item for item in content if item["phoneme"] == phoneme), None
+            (item for item in VOCAB_CONTENT if item["phoneme"] == phoneme), None
         )
         if phoneme_feedback:
             all_phoneme_feedback[phoneme] = {
