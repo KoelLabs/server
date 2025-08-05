@@ -1,4 +1,5 @@
-export class FeedbackGiver {
+const SAMPLE_RATE = 16_000;
+export class FeedbackGiver { 
   constructor(
     target,
     target_by_word,
@@ -203,7 +204,7 @@ export class FeedbackGiver {
     this.userAudioBuffer = null;
     console.log("buffer gets cleared: ", this.userAudioBuffer);
 
-    this.userAudioBuffer = this.audioContext.createBuffer(1, this.stored_audio.length, 16000);
+    this.userAudioBuffer = this.audioContext.createBuffer(1, this.stored_audio.length, SAMPLE_RATE);
     this.userAudioBuffer.getChannelData(0).set(this.stored_audio);
     console.log("userAudioBuffer length from prep: ", this.userAudioBuffer.length);
   }
@@ -273,7 +274,7 @@ export class FeedbackGiver {
     this.speech_timestamped = [];
     this.stored_audio = null;
     this.word_phone_pairings = null;
-    
+
     // Reset latest transcription
     this.latest_transcription_data = "";
 
@@ -301,7 +302,7 @@ export class FeedbackGiver {
     if (!this.audioContext || this.audioContext.state === 'closed') {
       console.log("audioContext is closed or doesnt exist, creating new one");
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
-        sampleRate: 16000,
+        sampleRate: SAMPLE_RATE,
         latencyHint: "interactive",
       });
     }
