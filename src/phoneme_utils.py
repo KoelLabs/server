@@ -12,6 +12,8 @@ _inverse_double_weight_sum = 1 / (sum(_ft.weights) * 2)
 _PANPHONE_MAPPINGS = {
     "ɝ": "ɜ˞",
     "ɚ": "ə˞",
+    "ŋ̍": "ŋ̩",
+    "ĩ": "ɪ̰",
 }
 # Temporary simplification of similar phonemes
 _PHONEMES_TO_MASK = {

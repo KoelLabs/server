@@ -3,46 +3,46 @@
     "phoneme": "a",
     "description": ["front open unrounded vowel"],
     "explanation": "relax your mouth! As if you are singing do-re-mi-fa-so-la-tee-do, pronounce the 'ah' in la with a your jaw dropped and and tongue to the floor of your mouth and the tip of your tongue behind your bottom teeth",
-    "confused phone": "ɑ",
+    "confused_phone": "ɑ",
     "examples": [
       {
         "word": "l*aa*",
-        "phonetic spelling": "L-AA"
+        "phonetic_spelling": "L-AA"
       }
     ],
-    "phonetic spelling": "AAH",
+    "phonetic_spelling": "AAH",
     "video": "https://www.youtube.com/watch?v=oqhY70fPZW0&t=320s"
   },
   {
     "phoneme": "æ",
     "description": ["front near-open unrounded vowel"],
     "explanation": "Try smiling but with your mouth wide open! Your mouth should be wide enough to fit more than two fingers between your teeth! It feels weird but your lips should be tense (think of when you are apply chapstick!) and your tongue is flat on the floor of your mouth with the very tip of your tongue at the front of your mouth",
-    "confused phone": "ɑ",
+    "confused_phone": "ɑ",
     "examples": [
       {
         "word": "*a*pple",
-        "phonetic spelling": "AH-P-L"
+        "phonetic_spelling": "AH-P-L"
       },
       {
         "word": "l*a*st",
-        "phonetic spelling": "L-AH-ST"
+        "phonetic_spelling": "L-AH-ST"
       }
     ],
-    "phonetic spelling": "AH!",
+    "phonetic_spelling": "AH!",
     "video": "https://www.youtube.com/watch?v=mynucZiy-Ug&t=69s"
   },
   {
     "phoneme": "ɔ",
     "description": ["back open-mid rounded vowel"],
     "explanation": "Round your lips to form a circle while you're trying to say 'awe'. Drop your jaw slightly. Pull your tongue back as if you are about the gargle water. Rounding your lips is important!",
-    "confused phone": "ɒ",
+    "confused_phone": "ɒ",
     "examples": [
       {
         "word": "th*ou*ght",
-        "phonetic spelling": "TH-AW-T"
+        "phonetic_spelling": "TH-AW-T"
       }
     ],
-    "phonetic spelling": "AW",
+    "phonetic_spelling": "AW",
     "video": "https://www.youtube.com/watch?v=pr_KAu-_Hmo"
   },
   {
@@ -52,14 +52,14 @@
     "examples": [
       {
         "word": "b*oy*",
-        "phonetic spelling": "B-OY"
+        "phonetic_spelling": "B-OY"
       },
       {
         "word": "t*oy*",
-        "phonetic spelling": "T-OY"
+        "phonetic_spelling": "T-OY"
       }
     ],
-    "phonetic spelling": "OY",
+    "phonetic_spelling": "OY",
     "video": "https://www.youtube.com/watch?v=lFRrEI85IcM&t=12s"
   },
   {
@@ -70,14 +70,14 @@
     "examples": [
       {
         "word": "f*a*ther",
-        "phonetic spelling": "F-AH-TH-ER"
+        "phonetic_spelling": "F-AH-TH-ER"
       },
       {
         "word": "h*o*t",
-        "phonetic spelling": "H-AH-T"
+        "phonetic_spelling": "H-AH-T"
       }
     ],
-    "phonetic spelling": "AH",
+    "phonetic_spelling": "AH",
     "video": "https://www.youtube.com/watch?v=oqhY70fPZW0"
   },
   {
@@ -88,14 +88,14 @@
     "examples": [
       {
         "word": "l*o*t",
-        "phonetic spelling": "L-AH-T"
+        "phonetic_spelling": "L-AH-T"
       },
       {
         "word": "cl*o*th",
-        "phonetic spelling": "KL-AH-TH"
+        "phonetic_spelling": "KL-AH-TH"
       }
     ],
-    "phonetic spelling": "AW",
+    "phonetic_spelling": "AW",
     "video": "https://www.youtube.com/watch?v=VB569GYZs1Y"
   },
   {
@@ -105,14 +105,14 @@
     "examples": [
       {
         "word": "*ey*e",
-        "phonetic spelling": "AY"
+        "phonetic_spelling": "AY"
       },
       {
         "word": "p*i*e",
-        "phonetic spelling": "P-AY"
+        "phonetic_spelling": "P-AY"
       }
     ],
-    "phonetic spelling": "AY",
+    "phonetic_spelling": "AY",
     "video": "https://www.youtube.com/watch?v=2m-hY6NZbfo&t=179s"
   },
   {
@@ -122,14 +122,14 @@
     "examples": [
       {
         "word": "h*ow*",
-        "phonetic spelling": "H-OW"
+        "phonetic_spelling": "H-OW"
       },
       {
         "word": "c*ow*",
-        "phonetic spelling": "K-OW"
+        "phonetic_spelling": "K-OW"
       }
     ],
-    "phonetic spelling": "OW",
+    "phonetic_spelling": "OW",
     "video": "https://www.youtube.com/watch?v=82Wl5LrfQq8"
   },
   {
@@ -140,14 +140,14 @@
     "examples": [
       {
         "word": "s*ee*",
-        "phonetic spelling": "S-EE"
+        "phonetic_spelling": "S-EE"
       },
       {
         "word": "b*ee*",
-        "phonetic spelling": "B-EE"
+        "phonetic_spelling": "B-EE"
       }
     ],
-    "phonetic spelling": "EE",
+    "phonetic_spelling": "EE",
     "video": "https://www.youtube.com/watch?v=UzIIfn1ooJ0"
   },
   {
@@ -158,14 +158,14 @@
     "examples": [
       {
         "word": "s*i*t",
-        "phonetic spelling": "S-IH-T"
+        "phonetic_spelling": "S-IH-T"
       },
       {
         "word": "b*i*t",
-        "phonetic spelling": "B-IH-T"
+        "phonetic_spelling": "B-IH-T"
       }
     ],
-    "phonetic spelling": "IH",
+    "phonetic_spelling": "IH",
     "video": "https://www.youtube.com/watch?v=UzIIfn1ooJ0"
   },
   {
@@ -175,10 +175,10 @@
     "examples": [
       {
         "word": "b*e*t",
-        "phonetic spelling": "B-EH-T"
+        "phonetic_spelling": "B-EH-T"
       }
     ],
-    "phonetic spelling": "EH",
+    "phonetic_spelling": "EH",
     "video": "https://www.youtube.com/watch?v=d98t4b3XLjg"
   },
   {
@@ -188,14 +188,14 @@
     "examples": [
       {
         "word": "s*ay*",
-        "phonetic spelling": "S-AY"
+        "phonetic_spelling": "S-AY"
       },
       {
         "word": "d*ay*",
-        "phonetic spelling": "D-AY"
+        "phonetic_spelling": "D-AY"
       }
     ],
-    "phonetic spelling": "EI",
+    "phonetic_spelling": "EI",
     "video": "https://www.youtube.com/watch?v=oTAzk9xm5i8"
   },
   {
@@ -205,14 +205,14 @@
     "examples": [
       {
         "word": "g*o*",
-        "phonetic spelling": "G-OW"
+        "phonetic_spelling": "G-OW"
       },
       {
         "word": "n*o*",
-        "phonetic spelling": "N-OW"
+        "phonetic_spelling": "N-OW"
       }
     ],
-    "phonetic spelling": "OW",
+    "phonetic_spelling": "OW",
     "video": "https://www.youtube.com/watch?v=4kPJLHiiGdU"
   },
   {
@@ -222,15 +222,15 @@
     "examples": [
       {
         "word": "b*oo*t",
-        "phonetic spelling": "B-OO-T"
+        "phonetic_spelling": "B-OO-T"
       },
       {
         "word": "f*oo*d",
-        "phonetic spelling": "F-OO-D"
+        "phonetic_spelling": "F-OO-D"
       }
     ],
     "confused_phone": "ʊ",
-    "phonetic spelling": "OO",
+    "phonetic_spelling": "OO",
     "video": "https://www.youtube.com/watch?v=Layyaha9du8"
   },
   {
@@ -240,14 +240,14 @@
     "examples": [
       {
         "word": "*a*bout",
-        "phonetic spelling": "UH-B-OW-T"
+        "phonetic_spelling": "UH-B-OW-T"
       },
       {
         "word": "sof*a*",
-        "phonetic spelling": "S-OH-F-UH"
+        "phonetic_spelling": "S-OH-F-UH"
       }
     ],
-    "phonetic spelling": "UH",
+    "phonetic_spelling": "UH",
     "video": "https://www.youtube.com/watch?v=m1mDSUSwNls"
   },
   {
@@ -258,14 +258,14 @@
     "examples": [
       {
         "word": "f*oo*t",
-        "phonetic spelling": "F-uh-T"
+        "phonetic_spelling": "F-uh-T"
       },
       {
         "word": "g*oo*d",
-        "phonetic spelling": "G-uh-D"
+        "phonetic_spelling": "G-uh-D"
       }
     ],
-    "phonetic spelling": "uh",
+    "phonetic_spelling": "uh",
     "video": "https://www.youtube.com/watch?v=Layyaha9du8"
   },
   {
@@ -276,32 +276,15 @@
     "examples": [
       {
         "word": "c*up*",
-        "phonetic spelling": "K-UH-P"
+        "phonetic_spelling": "K-UH-P"
       },
       {
         "word": "l*u*ck",
-        "phonetic spelling": "L-UH-K"
+        "phonetic_spelling": "L-UH-K"
       }
     ],
-    "phonetic spelling": "UH",
+    "phonetic_spelling": "UH",
     "video": "https://www.youtube.com/watch?v=zUpF0pYoTZ8"
-  },
-  {
-    "phoneme": "ɚ",
-    "description": ["central mid rhotacized unrounded vowel"],
-    "explanation": "Say the 'er' in 'butter' in American English. Start with a relaxed 'uh' and then curl the tip of your tongue slightly back toward the roof of your mouth to get that 'r' coloring.",
-    "examples": [
-      {
-        "word": "butt*er*",
-        "phonetic spelling": "B-UH-D-UR"
-      },
-      {
-        "word": "sist*er*",
-        "phonetic spelling": "S-IH-S-T-UR"
-      }
-    ],
-    "phonetic spelling": "UR",
-    "video": "https://www.youtube.com/watch?v=AzNRoSGBh44"
   },
   {
     "phoneme": "ə˞",
@@ -310,32 +293,15 @@
     "examples": [
       {
         "word": "butt*er*",
-        "phonetic spelling": "B-UH-D-UR"
+        "phonetic_spelling": "B-UH-D-UR"
       },
       {
         "word": "sist*er*",
-        "phonetic spelling": "S-IH-S-T-UR"
+        "phonetic_spelling": "S-IH-S-T-UR"
       }
     ],
-    "phonetic spelling": "UR",
+    "phonetic_spelling": "UR",
     "video": "https://www.youtube.com/watch?v=AzNRoSGBh44"
-  },
-  {
-    "phoneme": "ɝ",
-    "description": ["central open-mid rhotacized unrounded vowel"],
-    "explanation": "First try to say 'eee' in peas! Your teeth should be less than a finger space apart. Now without changing anything else, can you slide your tongue back, as if you are about the swallow your tongue, and curl the tip just slightly up without touching any part of the mouth? If this is difficult, try using a finger or spoon to gently push up the tip of your tongue back and up. This sound generally appears in the middle or at the end of words",
-    "examples": [
-      {
-        "word": "h*er*",
-        "phonetic spelling": "H-ER"
-      },
-      {
-        "word": "w*or*d",
-        "phonetic spelling": "W-ER-D"
-      }
-    ],
-    "phonetic spelling": "ER",
-    "video": "https://www.youtube.com/watch?app=desktop&v=6ppOrwjvslc&t=269s"
   },
   {
     "phoneme": "ɜ˞",
@@ -344,14 +310,14 @@
     "examples": [
       {
         "word": "h*er*",
-        "phonetic spelling": "H-ER"
+        "phonetic_spelling": "H-ER"
       },
       {
         "word": "w*or*d",
-        "phonetic spelling": "W-ER-D"
+        "phonetic_spelling": "W-ER-D"
       }
     ],
-    "phonetic spelling": "ER",
+    "phonetic_spelling": "ER",
     "video": "https://www.youtube.com/watch?app=desktop&v=6ppOrwjvslc&t=269s"
   },
   {
@@ -361,15 +327,15 @@
     "examples": [
       {
         "word": "b*e*d",
-        "phonetic spelling": "B-EH-D"
+        "phonetic_spelling": "B-EH-D"
       },
       {
         "word": "h*ea*d",
-        "phonetic spelling": "H-EH-D"
+        "phonetic_spelling": "H-EH-D"
       }
     ],
-    "phonetic spelling": "EH",
-    "video": "none"
+    "phonetic_spelling": "EH",
+    "video": null
   },
   {
     "phoneme": "ɹ",
@@ -378,14 +344,14 @@
     "examples": [
       {
         "word": "*r*ed",
-        "phonetic spelling": "R-EH-D"
+        "phonetic_spelling": "R-EH-D"
       },
       {
         "word": "c*a*r",
-        "phonetic spelling": "K-AH-R"
+        "phonetic_spelling": "K-AH-R"
       }
     ],
-    "phonetic spelling": "R",
+    "phonetic_spelling": "R",
     "video": "https://www.youtube.com/watch?v=3XRTN5gW4oU"
   },
   {
@@ -395,14 +361,14 @@
     "examples": [
       {
         "word": "bu*tt*er",
-        "phonetic spelling": "B-UH-d-UR"
+        "phonetic_spelling": "B-UH-d-UR"
       },
       {
         "word": "la*dd*er",
-        "phonetic spelling": "L-AH-d-UR"
+        "phonetic_spelling": "L-AH-d-UR"
       }
     ],
-    "phonetic spelling": "d",
+    "phonetic_spelling": "d",
     "video": "https://www.youtube.com/watch?v=aRVV8_262Tc"
   },
   {
@@ -411,15 +377,15 @@
     "explanation": "First place the tip of your tongue behind your front teeth. While your teeth touch, use your voice to create a puff of air to create the 't' sound. Now placing your hand on your throat, create the puff of air while vibrating your vocal cords (you should feel this on your throat).",
     "examples": [
       {
-        "word": "dog",
-        "position": 0
+        "word": "*d*og",
+        "phonetic_spelling": "D-AW-G"
       },
       {
-        "word": "bad",
-        "position": 1
+        "word": "ba*d*",
+        "phonetic_spelling": "B-AH-D"
       }
     ],
-    "phonetic spelling": "D",
+    "phonetic_spelling": "D",
     "video": "https://www.youtube.com/watch?v=VOqSPW2QVhA"
   },
   {
@@ -429,14 +395,14 @@
     "examples": [
       {
         "word": "*t*op",
-        "phonetic spelling": "T-AW-P"
+        "phonetic_spelling": "T-AW-P"
       },
       {
         "word": "ca*t*",
-        "phonetic spelling": "K-AH-T"
+        "phonetic_spelling": "K-AH-T"
       }
     ],
-    "phonetic spelling": "T",
+    "phonetic_spelling": "T",
     "video": "https://www.youtube.com/watch?v=f3PzY9x0GzI"
   },
   {
@@ -446,14 +412,14 @@
     "examples": [
       {
         "word": "*ch*op",
-        "phonetic spelling": "CH-AW-P"
+        "phonetic_spelling": "CH-AW-P"
       },
       {
         "word": "ma*tch*",
-        "phonetic spelling": "M-AH-CH"
+        "phonetic_spelling": "M-AH-CH"
       }
     ],
-    "phonetic spelling": "CH",
+    "phonetic_spelling": "CH",
     "video": "https://www.youtube.com/watch?app=desktop&v=WoyI_omRpcw&t=503s"
   },
   {
@@ -463,14 +429,14 @@
     "examples": [
       {
         "word": "*sh*e",
-        "phonetic spelling": "SH-EE"
+        "phonetic_spelling": "SH-EE"
       },
       {
         "word": "*sh*oes",
-        "phonetic spelling": "SH-OO-Z"
+        "phonetic_spelling": "SH-OO-Z"
       }
     ],
-    "phonetic spelling": "SH",
+    "phonetic_spelling": "SH",
     "video": "https://www.youtube.com/watch?v=vobVV8Cydd8&t=1s"
   },
   {
@@ -480,14 +446,14 @@
     "examples": [
       {
         "word": "mea*s*ure",
-        "phonetic spelling": "M-EH-ZSH-ER"
+        "phonetic_spelling": "M-EH-ZSH-ER"
       },
       {
         "word": "*g*enre",
-        "phonetic spelling": "ZSH-AWN-RUH"
+        "phonetic_spelling": "ZSH-AWN-RUH"
       }
     ],
-    "phonetic spelling": "ZSH",
+    "phonetic_spelling": "ZSH",
     "video": "https://www.youtube.com/watch?v=k8ImSmVOSVA"
   },
   {
@@ -497,14 +463,14 @@
     "examples": [
       {
         "word": "*j*u*dge*",
-        "phonetic spelling": "DCH-UH-DCH"
+        "phonetic_spelling": "DCH-UH-DCH"
       },
       {
         "word": "*a*ge",
-        "phonetic spelling": "AY-DCH"
+        "phonetic_spelling": "AY-DCH"
       }
     ],
-    "phonetic spelling": "DCH",
+    "phonetic_spelling": "DCH",
     "video": "https://www.youtube.com/watch?v=gD2cHUvdZM8&t=54s"
   },
   {
@@ -514,14 +480,14 @@
     "examples": [
       {
         "word": "*b*at",
-        "phonetic spelling": "B-AH-T"
+        "phonetic_spelling": "B-AH-T"
       },
       {
         "word": "ca*b*",
-        "phonetic spelling": "K-AH-B"
+        "phonetic_spelling": "K-AH-B"
       }
     ],
-    "phonetic spelling": "B",
+    "phonetic_spelling": "B",
     "video": "https://www.youtube.com/watch?v=l52Wu-YX7X8"
   },
   {
@@ -531,14 +497,14 @@
     "examples": [
       {
         "word": "*f*ish",
-        "phonetic spelling": "F-ISH"
+        "phonetic_spelling": "F-ISH"
       },
       {
         "word": "lea*f*",
-        "phonetic spelling": "L-EE-F"
+        "phonetic_spelling": "L-EE-F"
       }
     ],
-    "phonetic spelling": "F",
+    "phonetic_spelling": "F",
     "video": "https://www.youtube.com/watch?v=SBkdzOGJPgE"
   },
   {
@@ -548,14 +514,14 @@
     "examples": [
       {
         "word": "*h*at",
-        "phonetic spelling": "H-AH-T"
+        "phonetic_spelling": "H-AH-T"
       },
       {
         "word": "*h*ello",
-        "phonetic spelling": "H-EH-LO"
+        "phonetic_spelling": "H-EH-LO"
       }
     ],
-    "phonetic spelling": "H",
+    "phonetic_spelling": "H",
     "video": "https://www.youtube.com/watch?v=zdIDRMamBvk"
   },
   {
@@ -565,14 +531,14 @@
     "examples": [
       {
         "word": "*y*es",
-        "phonetic spelling": "Y-EH-S"
+        "phonetic_spelling": "Y-EH-S"
       },
       {
         "word": "*y*ellow",
-        "phonetic spelling": "Y-EH-LOW"
+        "phonetic_spelling": "Y-EH-LOW"
       }
     ],
-    "phonetic spelling": "YE",
+    "phonetic_spelling": "YE",
     "video": "https://www.youtube.com/watch?v=jXY5wj56kQY"
   },
   {
@@ -582,27 +548,27 @@
     "examples": [
       {
         "word": "*c*at",
-        "phonetic spelling": "K-AH-T"
+        "phonetic_spelling": "K-AH-T"
       },
       {
         "word": "ba*ck*",
-        "phonetic spelling": "B-AH-K"
+        "phonetic_spelling": "B-AH-K"
       }
     ],
-    "phonetic spelling": "K",
+    "phonetic_spelling": "K",
     "video": "https://www.youtube.com/watch?v=eEfWDUjX-1I&t=68s"
   },
   {
     "phoneme": "kʰ",
-    "description": ["consonant plosive velar voiceless", "aspirated "],
+    "description": ["consonant plosive velar voiceless", "aspirated"],
     "explanation": "Raise the back of your tongue to touch the soft part of the roof of your mouth (as if you may swallow your tongue) and then release it suddenly while using your vocal cords to create a sound. It's like a small explosion of sound from the back of your mouth. Now, add a puff of air after the 'k' sound, like a small burst of breath.",
     "examples": [
       {
         "word": "*c*all",
-        "phonetic spelling": "KH-AH-L"
+        "phonetic_spelling": "KH-AH-L"
       }
     ],
-    "phonetic spelling": "KH",
+    "phonetic_spelling": "KH",
     "video": "https://www.youtube.com/watch?v=PLZDL8cr7Aw"
   },
   {
@@ -612,31 +578,31 @@
     "examples": [
       {
         "word": "*l*amp",
-        "phonetic spelling": "L-AH-MP"
+        "phonetic_spelling": "L-AH-MP"
       },
       {
         "word": "ba*ll*",
-        "phonetic spelling": "B-AH-L"
+        "phonetic_spelling": "B-AH-L"
       }
     ],
-    "phonetic spelling": "L",
+    "phonetic_spelling": "L",
     "video": "https://www.youtube.com/watch?v=7Wc_WLrCy6A&t=59s"
   },
   {
     "phoneme": "l̩",
-    "description": ["alveolar consonant lateral-approximant voiced", " syllabic"],
+    "description": ["alveolar consonant lateral-approximant voiced", "syllabic"],
     "explanation": "Place the tip of your tongue against the gums just behind your upper front teeth, allowing air to flow around the sides of your tongue while using your vocal cords to create a sound. This sound can stand alone as a syllable, like in 'bottle'.",
     "examples": [
       {
         "word": "bo*ttle*",
-        "phonetic spelling": "B-AH-D-iL"
+        "phonetic_spelling": "B-AH-D-iL"
       },
       {
-        "word": "l*i*ttl*e",
-        "phonetic spelling": "L-IH-D-iL"
+        "word": "li*ttl*e",
+        "phonetic_spelling": "L-IH-D-iL"
       }
     ],
-    "phonetic spelling": "iL",
+    "phonetic_spelling": "iL",
     "video": "https://www.youtube.com/watch?v=_zNDDTRHkTQ&t=3s"
   },
   {
@@ -646,31 +612,31 @@
     "examples": [
       {
         "word": "*m*other",
-        "phonetic spelling": "M-UH-TH-ER"
+        "phonetic_spelling": "M-UH-TH-ER"
       },
       {
         "word": "*a*mber",
-        "phonetic spelling": "AHM-B-ER"
+        "phonetic_spelling": "AHM-B-ER"
       }
     ],
-    "phonetic spelling": "M",
+    "phonetic_spelling": "M",
     "video": "https://www.youtube.com/watch?v=dUf3U4tCJlY"
   },
   {
     "phoneme": "m̩",
-    "description": ["bilabial consonant nasal voiced", " syllabic"],
+    "description": ["bilabial consonant nasal voiced", "syllabic"],
     "explanation": "M sound but treated as a short vowel and consonant together! Press your lips together and hum, allowing the sound to come through your nose. Your vocal cords should vibrate, creating a soft buzzing sound. This sound can stand alone as a syllable, like in 'rhythm'. This means that the vowel before this sound is merged into this 'm' sound rather than the vowel sound being pronounced alone.",
     "examples": [
       {
         "word": "rhyth*m*",
-        "phonetic spelling": "R-IH-TH-iM"
+        "phonetic_spelling": "R-IH-TH-iM"
       },
       {
         "word": "sy*stem*",
-        "phonetic spelling": "S-IH-S-T-iM"
+        "phonetic_spelling": "S-IH-S-T-iM"
       }
     ],
-    "phonetic spelling": "iM",
+    "phonetic_spelling": "iM",
     "video": "https://www.youtube.com/watch?v=dUf3U4tCJlY"
   },
   {
@@ -680,27 +646,27 @@
     "examples": [
       {
         "word": "*n*o",
-        "phonetic spelling": "N-OH"
+        "phonetic_spelling": "N-OH"
       },
       {
         "word": "s*un*",
-        "phonetic spelling": "S-UH-N"
+        "phonetic_spelling": "S-UH-N"
       }
     ],
-    "phonetic spelling": "N",
+    "phonetic_spelling": "N",
     "video": "https://www.youtube.com/watch?v=SqKXiVHPgDE"
   },
   {
     "phoneme": "n̩",
-    "description": ["alveolar consonant nasal voiced", " syllabic"],
+    "description": ["alveolar consonant nasal voiced", "syllabic"],
     "explanation": "'N' sound but treated as a short vowel and consonant together! Place the tip of your tongue against the gums just behind your upper front teeth and hum, allowing the sound to come through your nose. Your vocal cords should vibrate, creating a soft buzzing sound. This sound can stand alone as a syllable, like in 'button'. This means that the vowel before this sound is merged into this 'n' sound rather than the vowel sound being pronounced alone.",
     "examples": [
       {
-        "word": "sudden*",
-        "phonetic spelling": "S-UH-D-iN"
+        "word": "sudd*en*",
+        "phonetic_spelling": "S-UH-D-iN"
       }
     ],
-    "phonetic spelling": "iN",
+    "phonetic_spelling": "iN",
     "video": "https://www.youtube.com/watch?v=SqKXiVHPgDE"
   },
   {
@@ -710,14 +676,14 @@
     "examples": [
       {
         "word": "*p*at",
-        "phonetic spelling": "P-AH-T"
+        "phonetic_spelling": "P-AH-T"
       },
       {
         "word": "ca*p*",
-        "phonetic spelling": "K-AH-P"
+        "phonetic_spelling": "K-AH-P"
       }
     ],
-    "phonetic spelling": "P",
+    "phonetic_spelling": "P",
     "video": "https://www.youtube.com/watch?v=cADJGa12CHs"
   },
   {
@@ -727,14 +693,14 @@
     "examples": [
       {
         "word": "*s*ee",
-        "phonetic spelling": "S-EE"
+        "phonetic_spelling": "S-EE"
       },
       {
         "word": "bu*s*",
-        "phonetic spelling": "B-UH-S"
+        "phonetic_spelling": "B-UH-S"
       }
     ],
-    "phonetic spelling": "S",
+    "phonetic_spelling": "S",
     "video": "https://www.youtube.com/watch?v=W3VO9ZCu4HY"
   },
   {
@@ -744,14 +710,14 @@
     "examples": [
       {
         "word": "*v*an",
-        "position": 0
+        "phonetic_spelling": "V-AH-N"
       },
       {
         "word": "lo*v*e",
-        "position": 1
+        "phonetic_spelling": "L-UH-V"
       }
     ],
-    "phonetic spelling": "V",
+    "phonetic_spelling": "V",
     "video": "https://www.youtube.com/watch?v=jppm3jS7i-IE"
   },
   {
@@ -761,15 +727,15 @@
     "examples": [
       {
         "word": "*w*et",
-        "phonetic spelling": "W-EH-T"
+        "phonetic_spelling": "W-EH-T"
       },
       {
         "word": "*w*indow",
-        "phonetic spelling": "W-IH-N-D-OW"
+        "phonetic_spelling": "W-IH-N-D-OW"
       }
     ],
     "confused-phoneme": "v",
-    "phonetic spelling": "W",
+    "phonetic_spelling": "W",
     "video": "https://www.youtube.com/watch?app=desktop&v=nMB5mX_PGHQ&t=220s&t=148"
   },
   {
@@ -779,14 +745,14 @@
     "examples": [
       {
         "word": "*z*oo",
-        "phonetic spelling": "Z-OO"
+        "phonetic_spelling": "Z-OO"
       },
       {
         "word": "*b*uzz",
-        "phonetic spelling": "B-UH-Z"
+        "phonetic_spelling": "B-UH-Z"
       }
     ],
-    "phonetic spelling": "Z",
+    "phonetic_spelling": "Z",
     "video": "https://www.youtube.com/watch?v=ajt_TR6pKSk"
   },
   {
@@ -796,14 +762,14 @@
     "examples": [
       {
         "word": "*th*is",
-        "phonetic spelling": "TH (buzzed)-IH-S"
+        "phonetic_spelling": "TH (buzzed)-IH-S"
       },
       {
         "word": "*th*at",
-        "phonetic spelling": "TH (buzzed)-AH-T"
+        "phonetic_spelling": "TH (buzzed)-AH-T"
       }
     ],
-    "phonetic spelling": "TH (buzzed)",
+    "phonetic_spelling": "TH (buzzed)",
     "video": "https://www.youtube.com/watch?v=jFSzhE3Y50c"
   },
   {
@@ -813,14 +779,14 @@
     "examples": [
       {
         "word": "*th*ink",
-        "phonetic spelling": "TH-IH-NK"
+        "phonetic_spelling": "TH-IH-NK"
       },
       {
         "word": "ba*th*",
-        "phonetic spelling": "B-AH-TH"
+        "phonetic_spelling": "B-AH-TH"
       }
     ],
-    "phonetic spelling": "TH (silent)",
+    "phonetic_spelling": "TH (silent)",
     "video": "https://www.youtube.com/watch?v=oVs-H8u6wzk"
   },
   {
@@ -830,14 +796,14 @@
     "examples": [
       {
         "word": "si*ng*",
-        "phonetic spelling": "S-IH-NG"
+        "phonetic_spelling": "S-IH-NG"
       },
       {
         "word": "ri*ng*",
-        "phonetic spelling": "R-IH-NG"
+        "phonetic_spelling": "R-IH-NG"
       }
     ],
-    "phonetic spelling": "NG",
+    "phonetic_spelling": "NG",
     "video": "https://www.youtube.com/watch?v=LiHHQJgEfJIE"
   },
   {
@@ -847,30 +813,22 @@
     "examples": [
       {
         "word": "*g*o",
-        "phonetic spelling": "G-OH"
+        "phonetic_spelling": "G-OH"
       },
       {
         "word": "ba*g*",
-        "phonetic spelling": "B-AH-G"
+        "phonetic_spelling": "B-AH-G"
       }
     ],
-    "phonetic spelling": "G",
+    "phonetic_spelling": "G",
     "video": "https://www.youtube.com/watch?v=iVPtWNUVGPA"
-  },
-  {
-    "phoneme": "ŋ̍",
-    "description": ["consonant nasal velar voiced"],
-    "explanation": "NG sound but treated as a short vowel and consonant together! Raise the back of your tongue to the soft part of the roof of your mouth (as if you may swallow your tongue) and hum, allowing the sound to come through your nose. Your vocal cords should vibrate, creating a soft buzzing sound. This sound can stand alone as a syllable. This means that the vowel before this sound is merged into this 'n' sound rather than the vowel sound being pronounced alone. ",
-    "examples": [],
-    "phonetic spelling": "IN",
-    "video": "https://www.youtube.com/watch?v=SqKXiVHPgDE"
   },
   {
     "phoneme": "ŋ̩",
     "description": ["consonant nasal velar voiced"],
     "explanation": "NG sound but treated as a short vowel and consonant together! Raise the back of your tongue to the soft part of the roof of your mouth (as if you may swallow your tongue) and hum, allowing the sound to come through your nose. Your vocal cords should vibrate, creating a soft buzzing sound. This sound can stand alone as a syllable. This means that the vowel before this sound is merged into this 'n' sound rather than the vowel sound being pronounced alone. ",
     "examples": [],
-    "phonetic spelling": "IN",
+    "phonetic_spelling": "IN",
     "video": "https://www.youtube.com/watch?v=SqKXiVHPgDE"
   },
   {
@@ -878,7 +836,7 @@
     "description": ["consonant non-sibilant-fricative velar voiced"],
     "explanation": "Common in Swahili and Portuguese! Raise the back of your tongue to the soft part of the roof of your mouth (as if you may swallow your tongue) and blow air out while using your vocal cords to create a sound. Now, in addition to vibrating your vocal chords it should feel like you are gargling water. It's like a soft 'h' sound from the back of your mouth but with buzzing.",
     "examples": [],
-    "phonetic spelling": "GGHH",
+    "phonetic_spelling": "GGHH",
     "video": "https://www.youtube.com/watch?v=MmGjJNGTuIs"
   },
   {
@@ -886,7 +844,7 @@
     "description": ["consonant glottal non-sibilant-fricative voiced"],
     "explanation": "Open your mouth slightly and exhale gently, like a soft sigh. Now, use your vocal cords to create a sound while exhaling. It's like a breathy 'h' sound but with buzzing from your vocal cords.",
     "examples": [],
-    "phonetic spelling": "UHH",
+    "phonetic_spelling": "UHH",
     "video": "https://www.youtube.com/watch?v=aphMxPtvb4k"
   },
   {
@@ -895,11 +853,11 @@
     "explanation": "Common in British English! Close your vocal cords tightly and then release them suddenly to create a sharp sound, like a small explosion from your throat. It's like the sound you make when you say 'uh-oh' or 'button' in British English.",
     "examples": [
       {
-        "word": "uh-oh",
-        "position": 0
+        "word": "uh*-*oh",
+        "phonetic_spelling": "UH-OH"
       }
     ],
-    "phonetic spelling": "UH",
+    "phonetic_spelling": "UH",
     "video": "https://www.youtube.com/watch?v=b4Aj3k65HSo&t=15s"
   },
   {
@@ -907,7 +865,7 @@
     "description": ["bilabial consonant non-sibilant-fricative voiced"],
     "explanation": "This is common in Portuguese and Turkmen! Press your lips together and blow air out while using your vocal cords to create a sound. Your vocal cords should vibrate, creating a buzzing sound. It's like a soft 'b' sound but with continuous airflow.",
     "examples": [],
-    "phonetic spelling": "BVUH",
+    "phonetic_spelling": "BVUH",
     "video": "https://www.youtube.com/watch?v=1tTKGmipFFQ"
   },
   {
@@ -917,36 +875,27 @@
     "examples": [
       {
         "word": "*b*ach",
-        "phonetic spelling": "B-AH-CH"
+        "phonetic_spelling": "B-AH-CH"
       }
     ],
-    "phonetic spelling": "HHG",
+    "phonetic_spelling": "HHG",
     "video": "https://www.youtube.com/watch?v=euRbmOchIXE"
   },
   {
     "phoneme": "θʰ",
-    "description": ["consonant dental non-sibilant-fricative voiceless", "aspirated "],
+    "description": ["consonant dental non-sibilant-fricative voiceless", "aspirated"],
     "explanation": "Place your tongue between your teeth and blow air out without using your vocal cords. Your tongue should be relaxed and not tense, allowing the air to flow freely around it. Now add a puff of air after the 'th' sound, like a small burst of breath.",
     "examples": [],
-    "phonetic spelling": "THH",
+    "phonetic_spelling": "THH",
     "video": "https://www.youtube.com/watch?v=fp3koTl84_M&t=314s"
   },
   {
     "phoneme": "pʰ",
-    "description": ["bilabial consonant plosive voiceless", "aspirated "],
+    "description": ["bilabial consonant plosive voiceless", "aspirated"],
     "explanation": "Press your lips together tightly and then release them with a puff of air suddenly without using your vocal cords to create a sound. It's like a small explosion of sound from your lips, but now add a puff of air after the 'p' sound, like a small burst of breath.",
     "examples": [],
-    "phonetic spelling": "PUH",
+    "phonetic_spelling": "PUH",
     "video": "https://www.youtube.com/watch?v=cADJGa12CHs"
-  },
-  {
-    "phoneme": "ĩ",
-    "description": ["close front unrounded vowel", "nasalized"],
-    "explanation": "Start just like saying the 'ee' in 'see', but now try to hum through your nose at the same time! It should feel like the sound is coming from both your mouth and nose. Plugging versus unplugging your nose should change the pitch! ",
-    "confused_phone": "i",
-    "examples": [],
-    "phonetic spelling": "IHN",
-    "video": "https://www.youtube.com/watch?v=fp3koTl84_M&t=314s"
   },
   {
     "phoneme": "ɪ̰",
@@ -954,15 +903,15 @@
     "explanation": "Start just like saying the 'ee' in 'see', but now try to hum through your nose at the same time! It should feel like the sound is coming from both your mouth and nose. Plugging versus unplugging your nose should change the pitch! ",
     "confused_phone": "i",
     "examples": [],
-    "phonetic spelling": "IHN",
+    "phonetic_spelling": "IHN",
     "video": "https://www.youtube.com/watch?v=fp3koTl84_M&t=314s"
   },
   {
     "phoneme": "ɑ̃",
-    "description": ["back open unrounded vowel", " nasalized"],
+    "description": ["back open unrounded vowel", "nasalized"],
     "explanation": "As if you realized something say the 'ah' in 'ah ha!'. relax your mouth! Drop your jaw enough to place an index finger of space between your teeth. Your lips should be relaxed so that your lips form a round oval. Almost like you are about to yawn. Your tongue should be to the floor of your mouth. Now make this nasalized by pushing the back of your tongue towards the back of your throat. This means you are pushing air through your nose. If you hum a song you will feel air in your nose (plugging your nose should change the pitch!). Keep that air in your nose while saying ahhh '",
     "examples": [],
-    "phonetic spelling": "UHN",
+    "phonetic_spelling": "UHN",
     "video": "https://www.youtube.com/watch?v=8zBnLR6zH1c&t=77s"
   },
   {
@@ -970,27 +919,27 @@
     "description": [
       "front open unrounded vowel",
       "near-close near-front unrounded vowel",
-      " nasalized"
+      "nasalized"
     ],
     "explanation": "Say the 'I' in 'I am happy!'. You start with the 'AH' sound and move to an 'eee' sound. BUT you must make the 'eee' sound nasalized. This means your tongue moves further back in your mouth to stop airflow from going to your nose. If done correctly, plugging versus unplugging your nose changes the pitch! Start with your jaw dropped with your tongue at the floor of your mouth with the tip of your tongue behind your bottom teeth  to get the 'AH' sound. Then, close your mouth while bringing your tongue to the BACK roof of your mouth to get the nasalized 'eee' sound. ",
     "examples": [],
-    "phonetic spelling": "AYN",
+    "phonetic_spelling": "AYN",
     "video": "https://www.youtube.com/watch?v=fp3koTl84_M&t=5s"
   },
   {
     "phoneme": "æ̃",
-    "description": ["front near-open unrounded vowel", " nasalized"],
+    "description": ["front near-open unrounded vowel", "nasalized"],
     "explanation": "Try a small smile but with your mouth open! Your mouth should be wide enough to fit more than two fingers between your teeth! It feels weird but your lips should be tense (think of when you are apply chapstick!) and your tongue is flat on the floor of your mouth with the very tip of your tongue at the front of your mouth. Now make this nasalized by pushing air to your nose. It helps to push the back of your tongue towards the back of your throat. Nasalization just means that your nose helps make the sound. If you hum a song you will feel air in your nose (plugging your nose should change the pitch!). Keep that air in your nose while saying ehhhh '",
     "examples": [],
-    "phonetic spelling": "EHN",
+    "phonetic_spelling": "EHN",
     "video": "https://www.youtube.com/watch?v=N8hOrYsTORI&t=122s"
   },
   {
     "phoneme": "ɾ̃",
-    "description": ["alveolar consonant flap voiced", " nasalized"],
+    "description": ["alveolar consonant flap voiced", "nasalized"],
     "explanation": "A lighter 'n' sound that is quick! Place the tip of your tongue against the gums just behind your upper front teeth and quickly tap it once while using your vocal cords to create a sound. It's like a quick 'd' sound but softer, like in 'butter' in American English. Now make this nasalized by pushing the back of your tongue towards the back of your throat. This sound can stand alone as a syllable.",
     "examples": [],
-    "phonetic spelling": "RHN",
+    "phonetic_spelling": "RHN",
     "video": "https://www.youtube.com/watch?v=jC9_SLsYlJ4"
   },
   {
@@ -998,15 +947,15 @@
     "description": ["alveolar consonant trill voiced"],
     "explanation": "The infamous Spanish'r' sound! Place the tip of your tongue against the gums just behind your upper front teeth and let it vibrate quickly as you use your vocal cords to create a sound. Your vocal cords should vibrate like you are gargling water or trying to growl from your throat. It's like a rapid 'd' sound but with a rolling effect.",
     "examples": [],
-    "phonetic spelling": "rrrr",
+    "phonetic_spelling": "RRRR",
     "video": "https://www.youtube.com/watch?v=WfMadRajLPg"
   },
   {
     "phoneme": "sʰ",
-    "description": ["alveolar consonant sibilant-fricative voiceless", "aspirated "],
+    "description": ["alveolar consonant sibilant-fricative voiceless", "aspirated"],
     "explanation": "Put your teeth together but create a small gap to push air between. Place the tip of your tongue close to the roof of your mouth, just behind your upper front teeth, and blow air out without using your vocal cords. Now add a puff of air after the 's' sound, like a small burst of breath.",
     "examples": [],
-    "phonetic spelling": "SUH",
+    "phonetic_spelling": "SUH",
     "video": "https://www.youtube.com/watch?v=W3VO9ZCu4HY"
   },
   {
@@ -1014,7 +963,7 @@
     "description": ["front open-mid unrounded vowel", "nasalized"],
     "explanation": "Classic French sound! Say the vowel in 'bed' but with nasal airflow—like you're slightly congested or speaking through your nose. You should feel vibration in your nose.",
     "examples": [],
-    "phonetic spelling": "AHN",
+    "phonetic_spelling": "AHN",
     "video": "https://www.youtube.com/watch?v=uEr2mbum3Oc"
   },
   {
@@ -1023,11 +972,15 @@
     "explanation": "Relax your lips and tongue completely. Your mouth should be open, and your tongue sits flat in the center of your mouth. It's like a pure version of the 'er' in British 'bird'—but without the 'r' sound.",
     "examples": [
       {
-        "word": "(british) bird",
-        "position": 1
+        "word": "n*u*rse",
+        "phonetic_spelling": "N-UR-S"
+      },
+      {
+        "word": "g*i*rl",
+        "phonetic_spelling": "G-UR-L"
       }
     ],
-    "phonetic spelling": "EH",
+    "phonetic_spelling": "EH",
     "video": "https://www.youtube.com/watch?v=bvDhBypGycM"
   },
   {
@@ -1037,11 +990,11 @@
     "confused_phone": "i",
     "examples": [
       {
-        "word": "mean",
-        "position": 1
+        "word": "m*ean*",
+        "phonetic_spelling": "M-EEN"
       }
     ],
-    "phonetic spelling": "EEN",
+    "phonetic_spelling": "EEN",
     "video": "https://www.youtube.com/watch?v=vEbLmuF16Us"
   },
   {
@@ -1050,7 +1003,7 @@
     "explanation": "A used in Paraguay! Make the 'ee' sound in 'see', but pull your tongue slightly back so it's not touching the roof of your mouth and not fully front. Keep your lips relaxed and not smiling. It's like a mix between 'ee' and 'uh'.",
     "confused_phone": "i",
     "examples": [],
-    "phonetic spelling": "eeh",
+    "phonetic_spelling": "eeh",
     "video": "https://www.youtube.com/watch?v=-kf38DDGB_g"
   },
   {
@@ -1058,7 +1011,7 @@
     "description": ["back close-mid rounded vowel"],
     "explanation": "Round your lips and blow warm air from your mouth instead. Now with your tongue flat and lips rounded, say 'oh' as if you are surprised. ",
     "examples": [],
-    "phonetic spelling": "oh",
+    "phonetic_spelling": "oh",
     "video": "https://www.youtube.com/watch?v=z6oXG9vNEfM"
   },
   {
@@ -1066,7 +1019,7 @@
     "description": ["central mid unrounded vowel", "near-back near-close rounded vowel"],
     "explanation": "Typically in British English, start like the relaxed 'uh' then  quickly make the hole your mouth forms slightly smaller, almost like a wolf howling! Common in British English for words like 'go'.",
     "examples": [],
-    "phonetic spelling": "OWW",
+    "phonetic_spelling": "OWW",
     "video": "https://www.youtube.com/watch?v=Z7wMAbDO8Rs&t=111s"
   },
   {
@@ -1074,7 +1027,7 @@
     "description": ["central mid unrounded vowel", "nasalized"],
     "explanation": "Typical French sound! Like you are feeling unsure, say the 'UH' in 'ummm'. Your lips should be relaxed and your jaw is dropped slightly, mouth open. BUT you must make the 'eee' sound nasalized. This means your tongue moves further back in your mouth to stop airflow from going to your nose. If done correctly, plugging versus unplugging your nose changes the pitch!",
     "examples": [],
-    "phonetic spelling": "UHN",
+    "phonetic_spelling": "UHN",
     "video": "https://www.youtube.com/watch?v=t5pFy_pu-Tw"
   },
   {
@@ -1082,7 +1035,7 @@
     "description": ["near-back near-close rounded vowel", "nasalized"],
     "explanation": "Say the 'oo' in 'good', but let some air out through your nose at the same time. You should feel a nasal buzz along with the vowel.",
     "examples": [],
-    "phonetic spelling": "OON",
+    "phonetic_spelling": "OON",
     "video": "https://www.youtube.com/watch?v=81_IUit_LLA"
   },
   {
@@ -1094,7 +1047,7 @@
     ],
     "explanation": "Round your lips and blow warm air from your mouth instead. Start with saying 'oh' but quickly make the hole your mouth forms slightly smaller, almost like a wolf howling! Now make this nasalized by putting air through your nose. This sound is used by southern American speakers for 'o' in 'Don' be talkin' like that!'",
     "examples": [],
-    "phonetic spelling": "OWN",
+    "phonetic_spelling": "OWN",
     "video": "https://www.youtube.com/watch?v=A9P0DbeRoAo&t=1s"
   },
   {
@@ -1102,15 +1055,15 @@
     "description": ["central mid unrounded vowel", "voiceless"],
     "explanation": "As if you took a drink of soda and say 'ah' after. It has no vocal cord vibration—just airflow. Imagine sighing the 'uh' sound softly without voice.",
     "examples": [],
-    "phonetic spelling": "UH",
-    "video": "none"
+    "phonetic_spelling": "UH",
+    "video": null
   },
   {
     "phoneme": "ʉ",
     "description": ["central close rounded vowel"],
     "explanation": "as if you spitting out something with force, make the 'puh!' sound. the 'ooh' sound is formed with rounded lips and the back of your tongue raised high.",
     "examples": [],
-    "phonetic spelling": "UH-",
+    "phonetic_spelling": "UH-",
     "video": "https://www.youtube.com/watch?v=2Ln9t_Ej8UA&t=53s"
   }
 ]

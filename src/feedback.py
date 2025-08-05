@@ -202,7 +202,7 @@ def score_words_wfed(word_phone_pairings):
 
 def phoneme_written_feedback(word_phone_pairings):
     """This function takes in the target and speech and returns a dictionary
-    of phoneme: {explanation, phonetic spelling} for ALL phonemes in the target
+    of phoneme: {explanation, phonetic_spelling} for ALL phonemes in the target
     and speech.
     """
     all_phoneme_feedback = {}
@@ -214,13 +214,7 @@ def phoneme_written_feedback(word_phone_pairings):
             (item for item in VOCAB_CONTENT if item["phoneme"] == phoneme), None
         )
         if phoneme_feedback:
-            all_phoneme_feedback[phoneme] = {
-                "explanation": phoneme_feedback["explanation"],
-                "phonetic spelling": phoneme_feedback["phonetic spelling"],
-                "video": phoneme_feedback["video"],
-                "description": phoneme_feedback["description"],
-                "examples": phoneme_feedback["examples"],
-            }
+            all_phoneme_feedback[phoneme] = phoneme_feedback
         else:
             raise ValueError(f"Phoneme {phoneme} not found in model vocabulary")
     return all_phoneme_feedback

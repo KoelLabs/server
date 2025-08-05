@@ -40,11 +40,10 @@ def test_score_words_cer(client):
     response = client.get(
         f"/score_words_cer?word_phone_pairings={word_phone_pairings_param}"
     )
-    print("response", response)
     assert response.status_code == 200
     data = json.loads(response.data)
+
     words, overall_score = data
-    print("words", words)
     assert round(overall_score, 2) == 0.97
 
     # test that all words except the last one are perfect matches
