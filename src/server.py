@@ -1,8 +1,6 @@
 import json
 
-import torch
 import numpy as np
-from transformers import AutoProcessor, AutoModelForCTC
 
 from flask import Flask, send_from_directory, request, jsonify
 from flask_cors import CORS, cross_origin
@@ -11,15 +9,15 @@ from flask.json.provider import _default as _json_default
 
 from feedback import (
     score_words_cer,
-    score_words_wfed,
-    user_phonetic_errors,
+    top_phonetic_errors,
     pair_by_words,
 )
+from transcription import transcribe_timestamped, SAMPLE_RATE
+from phoneme_utils import TIMESTAMPED_PHONES_T, TIMESTAMPED_PHONES_BY_WORD_T
 
 # Constants
 DEBUG = False
-SAMPLE_RATE = 16_000
-NUM_SECONDS_PER_CHUNK = 2
+NUM_SECONDS_PER_CHUNK = 0.5
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -37,62 +35,6 @@ def json_default(obj):
 
 app.json.default = json_default  # type: ignore
 
-# Load Wav2Vec2 model
-model_id = "KoelLabs/xlsr-english-01"
-processor = AutoProcessor.from_pretrained(model_id)
-model = AutoModelForCTC.from_pretrained(model_id)
-assert processor.feature_extractor.sampling_rate == SAMPLE_RATE
-
-
-def transcribe_timestamped(audio: np.ndarray):
-    transcription, duration_sec, predicted_ids = _run_inference(audio, model, processor)
-
-    ids_w_time = [
-        (i / len(predicted_ids) * duration_sec, _id)
-        for i, _id in enumerate(predicted_ids)
-    ]
-
-    current_phoneme_id = processor.tokenizer.pad_token_id
-    current_start_time = 0
-    phonemes_with_time = []
-    for time, _id in ids_w_time:
-        if current_phoneme_id != _id:
-            if current_phoneme_id != processor.tokenizer.pad_token_id:
-                phonemes_with_time.append(
-                    (
-                        processor.decode(current_phoneme_id),
-                        current_start_time,
-                        time,
-                    )
-                )
-            current_start_time = time
-            current_phoneme_id = _id
-
-    return transcription, phonemes_with_time
-
-
-def _run_inference(audio, model, processor):
-    input_values = (
-        processor(
-            audio,
-            sampling_rate=processor.feature_extractor.sampling_rate,
-            return_tensors="pt",
-            padding=True,
-        )
-        .input_values.type(torch.float32)
-        .to(model.device)
-    )
-    with torch.no_grad():
-        logits = model(input_values).logits
-
-    predicted_ids = torch.argmax(logits, dim=-1)[0].tolist()
-    tokens = processor.tokenizer.convert_ids_to_tokens(predicted_ids)
-    transcription = [
-        t for t in tokens if t not in processor.tokenizer.all_special_tokens
-    ]
-    duration_sec = input_values.shape[1] / processor.feature_extractor.sampling_rate
-    return transcription, duration_sec, predicted_ids
-
 
 # server /
 @app.route("/")
@@ -108,102 +50,74 @@ def send_static(path):
     return send_from_directory("static", path)
 
 
-@app.route("/pair_by_words", methods=["GET"])
+@app.route("/top_phonetic_errors", methods=["GET"])
 @cross_origin()
-def get_pair_by_words():
+def get_top_phonetic_errors():
     try:
-        speech_timestamped = json.loads(request.args.get("speech_timestamped", "[]"))
-        target_timestamped = json.loads(request.args.get("target_timestamped", "[]"))
-        target_by_words = json.loads(request.args.get("target_by_words", "[]"))
-    except Exception as e:
-        return jsonify({"client called get_pair_by_words incorrectly": str(e)}), 400
-
-    return jsonify(
-        pair_by_words(target_timestamped, target_by_words, speech_timestamped)
-    )
-
-
-@app.route("/user_phonetic_errors", methods=["GET"])
-@cross_origin()
-def get_user_phonetic_errors():
-    try:
-        word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
-    except Exception as e:
-        return (
-            jsonify({"client called get_user_phonetic_errors incorrectly": str(e)}),
-            400,
+        speech: TIMESTAMPED_PHONES_T = json.loads(request.args.get("speech", "[]"))
+        target_by_words: TIMESTAMPED_PHONES_BY_WORD_T = json.loads(
+            request.args.get("target_by_words", "[]")
         )
-    return jsonify(user_phonetic_errors(word_phone_pairings))
+        topk = int(json.loads(request.args.get("topk", "3")))
+    except Exception as e:
+        return jsonify({"Malformatted arguments": str(e)}), 400
+
+    phone_pairings_by_word = pair_by_words(target_by_words, speech)
+    return jsonify(top_phonetic_errors(phone_pairings_by_word, topk=topk))
 
 
 @app.route("/score_words_cer", methods=["GET"])
 @cross_origin()
 def get_score_words_cer():
     try:
-        word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
+        speech: TIMESTAMPED_PHONES_T = json.loads(request.args.get("speech", "[]"))
+        target_by_words: TIMESTAMPED_PHONES_BY_WORD_T = json.loads(
+            request.args.get("target_by_words", "[]")
+        )
     except Exception as e:
-        return jsonify({"client called get_score_words_cer incorrectly": str(e)}), 400
-    word_scores = score_words_cer(word_phone_pairings)
-    return jsonify(word_scores)
+        return jsonify({"Malformatted arguments": str(e)}), 400
 
-
-@app.route("/score_words_wfed", methods=["GET"])
-@cross_origin()
-def get_score_words_wfed():
-    try:
-        word_phone_pairings = json.loads(request.args.get("word_phone_pairings", "[]"))
-    except Exception as e:
-        return jsonify({"client called get_score_words_wfed incorrectly": str(e)}), 400
-    word_scores = score_words_wfed(word_phone_pairings)
-    return jsonify(word_scores)
+    phone_pairings_by_word = pair_by_words(target_by_words, speech)
+    return jsonify(score_words_cer(phone_pairings_by_word))
 
 
 @sock.route("/stream")
 def stream(ws):
     buffer = b""  # Buffer to hold audio chunks
 
-    full_transcription = []
-    full_timestamps = []
+    full_transcription: TIMESTAMPED_PHONES_T = []
+    accumulated_duration = 0
     combined = np.array([], dtype=np.float32)
     while True:
         try:
             # Receive audio data from the client
             data = ws.receive()
-            if data == "stop":
-                # TODO: should still process anything left over in the buffer
-                break
-
-            if data:
+            if data and data != "stop":
                 buffer += data
-                # Process when buffer has at least one chunk in it
-                if (
-                    len(buffer)
-                    > SAMPLE_RATE
-                    * NUM_SECONDS_PER_CHUNK
-                    * np.dtype(np.float32).itemsize
-                ):
-                    audio = np.frombuffer(buffer, dtype=np.float32)
 
-                    new_transcription, new_timestamps = transcribe_timestamped(audio)
-                    full_transcription.extend(new_transcription)
-                    full_timestamps.extend(new_timestamps)
-                    ws.send(
-                        json.dumps(
-                            {
-                                "speech_transcript": full_transcription,
-                                "speech_timestamps": full_timestamps,
-                            }
-                        )
-                    )
+            # Process when buffer has at least one chunk in it or when we are done
+            if (
+                data == "stop"
+                or len(buffer)
+                >= SAMPLE_RATE * NUM_SECONDS_PER_CHUNK * np.dtype(np.float32).itemsize
+            ):
+                audio = np.frombuffer(buffer, dtype=np.float32)
+                transcription = transcribe_timestamped(audio, accumulated_duration)
+                accumulated_duration += len(audio) / SAMPLE_RATE
+                full_transcription.extend(transcription)
+                ws.send(json.dumps(full_transcription))
 
-                    if DEBUG:
-                        from scipy.io import wavfile
+                if DEBUG:
+                    from scipy.io import wavfile
 
-                        wavfile.write("audio.wav", SAMPLE_RATE, audio)
-                        combined = np.concatenate([combined, audio])
-                        wavfile.write("combined.wav", SAMPLE_RATE, combined)
+                    wavfile.write("src/audio.wav", SAMPLE_RATE, audio)
+                    combined = np.concatenate([combined, audio])
+                    wavfile.write("src/combined.wav", SAMPLE_RATE, combined)
 
-                    buffer = b""  # Clear the buffer
+                if data == "stop":
+                    break
+
+                buffer = b""  # Clear the buffer
         except Exception as e:
             print(f"Error: {e}")
             print(f"Line: {e.__traceback__.tb_lineno if e.__traceback__ else -1}")

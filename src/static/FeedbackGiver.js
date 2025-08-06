@@ -1,3 +1,47 @@
+/** @typedef {string} Phone */
+/** @typedef {string} Word */
+/** @typedef {[Phone, number, number]} TimestampedPhone */
+/** @typedef {Array<[Word, TimestampedPhone[]]>} TimestampedPhonesByWord */
+/** @typedef {Array<[TimestampedPhone, TimestampedPhone]>} TimestampedPhonePairings */
+
+/**
+ * @typedef {object} ExampleWord
+ * @property {string} word the word with one or more sections surrounded by * that exemplify the phoneme, e.g., "l*aa*"
+ * @property {string} phonetic_spelling an American English "spelling" of the word, e.g., "L-AA"
+ */
+/**
+ * @typedef {object} PhoneDescription
+ * @property {string} phoneme the IPA representation of the phoneme
+ * @property {string[]} description e.g., ["front open unrounded vowel"]
+ * @property {string} explanation a written explanation of how to pronounce this phoneme
+ * @property {ExampleWord[]} examples a possibly empty list of example words with this phoneme
+ * @property {string} phonetic_spelling an American English "spelling" of the phoneme
+ * @property {string} video a source video that explains the phoneme
+ */
+/**
+ * @typedef {object} Mistake represents a target phoneme being mispronounced as one of a collection of phonemes
+ * @property {Phone} target the target phoneme being mispronounced ("-" if this is an insertion error)
+ * @property {Phone[]} speech the phonemes it is mispronounced as ("-" for the deletion error)
+ * @property {Word[]} words the words where this mispronunciation occurs
+ * @property {Array<[Word, TimestampedPhonePairings, number[]]>} occurences_by_word for each word, a tuple of (word, paired target vs speech phonemes, severities)
+ * @property {PhoneDescription | null} target_description description of the target phoneme (or null iff this is an insertion error)
+ * @property {Array<PhoneDescription | null>} speech_description description(s) of the phonemes the target is mispronounced as (a null represent the deletion error)
+ * @property {number} frequency count of occurences
+ * @property {number} total_severity sum of severities (each between 0 and 1)
+ */
+/**
+ * @typedef {object} Feedback
+ * @property {Mistake[]} topk_mistakes_by_target
+ * @property {Mistake[]} topk_insertion_mistakes
+ * @property {Mistake[]} topk_deletion_mistakes
+ * @property {Mistake[]} topk_substitution_mistakes
+ * @property {Array<[Word, number, number]>} spoken_word_timestamps
+ */
+/** @typedef {[Array<[Word, number]>, number]} WordScores scores for each word and the average score */
+
+/** @typedef {(transcription: TimestampedPhone[]) => void} TranscriptionCallback */
+/** @typedef {(words: Word[], are_words_correct: boolean[], next_word_ix: number, percentage_correct: number, is_done: boolean) => void} WordSpokenCallback */
+
 const SAMPLE_RATE = 16_000;
 
 function combineAudioChunks(audio_chunks) {
@@ -21,8 +65,8 @@ function combineAudioChunks(audio_chunks) {
 }
 
 export class FeedbackGiver {
+  /** @param {TimestampedPhonesByWord} target_by_word @param {TranscriptionCallback} on_transcription @param {WordSpokenCallback} on_word_spoken */
   constructor(
-    target,
     target_by_word,
     on_transcription,
     on_word_spoken,
@@ -32,13 +76,12 @@ export class FeedbackGiver {
     this.serverorigin = serverorigin;
     this.serverhost = serverhost;
 
-    this.target = target;
+    /** @type {TimestampedPhonesByWord} */
     this.target_by_word = target_by_word;
-    this.target_timestamped = target;
-    this.speech_timestamped = [];
-    this.speech_transcript = [];
+    /** @type {TimestampedPhone[]} */
+    this.transcription = [];
+    /** @type {TranscriptionCallback} */
     this.on_transcription = on_transcription;
-    this.word_phone_pairings = null;
 
     this.socket = null;
     this.audioContext = null;
@@ -49,6 +92,7 @@ export class FeedbackGiver {
     this.userAudioBuffer = null;
     this.store_audio_chunks = [];
 
+    /** @type {WordSpokenCallback} */
     this.on_word_spoken = on_word_spoken;
     this.words = [];
     this.are_words_correct = [];
@@ -60,60 +104,26 @@ export class FeedbackGiver {
     this.recognition = null;
   }
 
+  /** @param {TimestampedPhone[]} transcription */
   #setTranscription(transcription) {
-    const parsed = JSON.parse(transcription);
-    this.speech_transcript = parsed.speech_transcript || [];
-    this.speech_timestamped = parsed.speech_timestamps || [];
-    this.on_transcription(this.speech_transcript);
+    this.transcription = transcription;
+    this.on_transcription(transcription);
   }
 
-  async getWordPhonePairings() {
-    // Only make the request if we have valid speech data
-    if (!this.speech_timestamped || this.speech_timestamped.length === 0) {
-      return [];
-    }
-
-    const res = await fetch(
-      `${this.serverorigin}/pair_by_words?target_timestamped=${encodeURIComponent(JSON.stringify(this.target_timestamped))}&target_by_words=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech_timestamped=${encodeURIComponent(JSON.stringify(this.speech_timestamped))}`,
-    );
-    this.word_phone_pairings = await res.json();
-    return this.word_phone_pairings;
-  }
-
-  async computeWordPhonePairings() {
-    // If we already have the pairings, return them
-    if (this.word_phone_pairings) {
-      return this.word_phone_pairings;
-    }
-
-    // Only compute if we have speech data
-    if (!this.speech_timestamped || this.speech_timestamped.length === 0) {
-      return [];
-    }
-
-    // Otherwise compute them
-    return await this.getWordPhonePairings();
-  }
-
-  /** @returns {[number[], number]} res[0] = scores for each word, res[1] = average score */
+  /** @returns {Promise<WordScores>} */
   async getCER() {
+    if (this.transcription.length === 0) throw new Error('No transcription');
     const res = await fetch(
-      `${this.serverorigin}/score_words_cer?word_phone_pairings=${encodeURIComponent(JSON.stringify(await this.computeWordPhonePairings()))}`,
+      `${this.serverorigin}/score_words_cer?target_by_words=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
     );
     return await res.json();
   }
 
-  /** @returns {[number[], number]} res[0] = scores for each word, res[1] = average score */
-  async getWFED() {
-    const res = await fetch(
-      `${this.serverorigin}/score_words_wfed?word_phone_pairings=${encodeURIComponent(JSON.stringify(await this.computeWordPhonePairings()))}`,
-    );
-    return await res.json();
-  }
-
+  /** @returns {Promise<Feedback>} */
   async getFeedback() {
+    if (this.transcription.length === 0) throw new Error('No transcription');
     const res = await fetch(
-      `${this.serverorigin}/user_phonetic_errors?word_phone_pairings=${encodeURIComponent(JSON.stringify(await this.computeWordPhonePairings()))}`,
+      `${this.serverorigin}/top_phonetic_errors?target_by_words=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
     );
     return await res.json();
   }
@@ -182,9 +192,7 @@ export class FeedbackGiver {
     await this.#cleanupRecording();
     this.store_audio_chunks = [];
     this.userAudioBuffer = null;
-    this.speech_transcript = [];
-    this.speech_timestamped = [];
-    this.word_phone_pairings = null;
+    this.transcription = [];
 
     // Open WebSocket connection
     this.socket = new WebSocket(
@@ -194,7 +202,7 @@ export class FeedbackGiver {
     // Handle incoming transcriptions
     this.socket.onmessage = async event => {
       // Immediately process each transcription update so consumers can react (e.g. update word coloring)
-      this.#setTranscription(event.data);
+      this.#setTranscription(JSON.parse(event.data));
     };
 
     // Start capturing audio (microphone)
@@ -227,8 +235,8 @@ export class FeedbackGiver {
     // Connect AudioWorkletNode to process audio and send to WebSocket
     this.audioWorkletNode.port.onmessage = event => {
       const chunk = event.data;
-      this.store_audio_chunks.push(chunk); // continuously store the audio chunks
-      if (this.socket.readyState === WebSocket.OPEN) {
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        this.store_audio_chunks.push(chunk);
         this.socket.send(chunk);
       }
     };
@@ -280,6 +288,7 @@ export class FeedbackGiver {
       for (let i = 0; i < allWords.length; i++) {
         const word = allWords[i];
         const target = this.words[i];
+        if (!target) continue;
 
         if (
           word.toLowerCase().replace(/[^a-z]/g, '') === target.toLowerCase().replace(/[^a-z]/g, '')
@@ -299,8 +308,10 @@ export class FeedbackGiver {
             false,
           );
         } else {
-          this.recognition.onend = null;
-          this.recognition.stop();
+          if (this.recognition) {
+            this.recognition.onend = null;
+            this.recognition.stop();
+          }
           this.on_word_spoken(
             this.words,
             this.are_words_correct,

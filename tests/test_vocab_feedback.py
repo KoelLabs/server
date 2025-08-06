@@ -3,18 +3,18 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from src.phoneme_utils import _ALL_MAPPINGS, _PHONEMES_TO_MASK
-from src.feedback import VOCAB_CONTENT
-from src.server import processor
+from src.feedback import _PHONEME_DESCRIPTIONS
+from src.transcription import processor
 
 
 def test_vocab_feedback_no_duplicates():
-    assert len(set(p["phoneme"] for p in VOCAB_CONTENT)) == len(
-        list(p["phoneme"] for p in VOCAB_CONTENT)
+    assert len(set(p["phoneme"] for p in _PHONEME_DESCRIPTIONS)) == len(
+        list(p["phoneme"] for p in _PHONEME_DESCRIPTIONS)
     )
 
 
 def test_vocab_feedback_format():
-    for feedback in VOCAB_CONTENT:
+    for feedback in _PHONEME_DESCRIPTIONS:
         assert "phoneme" in feedback.keys() and type(feedback["phoneme"]) == str
         assert "explanation" in feedback.keys() and type(feedback["explanation"]) == str
         assert (
@@ -42,7 +42,7 @@ def test_vocab_feedback_format():
 def test_vocab_feedback_coverage():
     """Make sure the feedback covers exactly the vocab tokens of the model while taking into account that the model vocab will be mapped"""
 
-    feedback_phonemes = set(p["phoneme"] for p in VOCAB_CONTENT)
+    feedback_phonemes = set(p["phoneme"] for p in _PHONEME_DESCRIPTIONS)
     model_phonemes = set(
         _ALL_MAPPINGS.get(p, p) for p in processor.tokenizer.get_vocab().keys()
     ) - set(processor.tokenizer.all_special_tokens)

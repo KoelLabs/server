@@ -1,44 +1,41 @@
 import json
 import urllib.parse
 
+# fmt: off
 TARGET_BY_WORDS = [
-    ("calling", ["kʰ", "ɔ", "l", "ɪ", "ŋ"]),
-    ("cards", ["kʰ", "ɑ", "ɹ", "d", "z"]),
-    ("are", ["ɑ", "ɹ"]),
-    ("the", ["ð", "ə"]),
-    ("wave", ["w", "eɪ", "v"]),
-    ("of", ["ə", "v"]),
-    ("the", ["ð", "ə"]),
-    ("future", ["f", "j", "u", "tʃ", "ɜ˞"]),
+    ("calling", [("kʰ", 0, 1), ("ɔ", 1, 2), ("l", 2, 3), ("ɪ", 3, 4), ("ŋ", 4, 5)]),
+    ("cards", [("kʰ", 5, 6), ("ɑ", 6, 7), ("ɹ", 7, 8), ("d", 8, 9), ("z", 9, 10)]),
+    ("are", [("ɑ", 10, 11), ("ɹ", 11, 12)]),
+    ("the", [("ð", 12, 13), ("ə", 13, 14)]),
+    ("wave", [("w", 14, 15), ("eɪ", 15, 16), ("v", 16, 17)]),
+    ("of", [("ə", 17, 18), ("v", 18, 19)]),
+    ("the", [("ð", 19, 20), ("ə", 20, 21)]),
+    ("future", [("f", 21, 22), ("j", 22, 23), ("u", 23, 24), ("tʃ", 24, 25), ("ɜ˞", 25, 26)]),
 ]
-_timestamp = 0
-TARGET_TIMESTAMPED = [
-    (phone, _timestamp, _timestamp := _timestamp + 1)
-    for _, phones in TARGET_BY_WORDS
-    for phone in phones
-]
+# fmt: on
 
 
 def test_score_words_cer(client):
     # test perfect match except the last word
-    speech_timestamped = TARGET_TIMESTAMPED.copy()
-    speech_timestamped[-1] = ("ə˞", 0, 0)
+    speech = [p for _, phones in TARGET_BY_WORDS for p in phones]
+    speech[-1] = ("ə˞", 0, 0)
 
-    # First, get word phone pairings
-    target_timestamped_param = urllib.parse.quote(json.dumps(TARGET_TIMESTAMPED))
+    # First, get phone pairings by word
     target_by_words_param = urllib.parse.quote(json.dumps(TARGET_BY_WORDS))
-    speech_timestamped_param = urllib.parse.quote(json.dumps(speech_timestamped))
+    speech_param = urllib.parse.quote(json.dumps(speech))
 
     pair_response = client.get(
-        f"/pair_by_words?target_timestamped={target_timestamped_param}&target_by_words={target_by_words_param}&speech_timestamped={speech_timestamped_param}"
+        f"/pair_by_words?target_by_words={target_by_words_param}&speech={speech_param}"
     )
     assert pair_response.status_code == 200
-    word_phone_pairings = json.loads(pair_response.data)
+    phone_pairings_by_word = json.loads(pair_response.data)
 
-    # Now call score_words_cer with the word phone pairings
-    word_phone_pairings_param = urllib.parse.quote(json.dumps(word_phone_pairings))
+    # Now call score the phone pairings by word
+    phone_pairings_by_word_param = urllib.parse.quote(
+        json.dumps(phone_pairings_by_word)
+    )
     response = client.get(
-        f"/score_words_cer?word_phone_pairings={word_phone_pairings_param}"
+        f"/score_words_cer?phone_pairings_by_word={phone_pairings_by_word_param}"
     )
     assert response.status_code == 200
     data = json.loads(response.data)
@@ -47,6 +44,6 @@ def test_score_words_cer(client):
     assert round(overall_score, 2) == 0.97
 
     # test that all words except the last one are perfect matches
-    for _, _, _, score in words[:-1]:
+    for _, score in words[:-1]:
         assert score == 1.0
-    assert words[-1][3] == 0.8
+    assert words[-1][1] == 0.8
