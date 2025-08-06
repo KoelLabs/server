@@ -1,156 +1,194 @@
-import panphon
-import panphon.distance
-from panphon.distance import Distance
-import numpy as np
-import json
 import os
-from phoneme_utils import get_fastdtw_aligned_phoneme_lists, fer
+import json
+from typing import TypedDict
 
-# Create a panphon feature table
-ft = panphon.FeatureTable()
-# Create a distance object for reuse
-dist = Distance()
+from phoneme_utils import (
+    fer,
+    grouped_weighted_needleman_wunsch,
+    map_timestamped_phonemes,
+    map_phones_by_word,
+    TIMESTAMPED_PHONE_PAIRINGS_BY_WORD_T,
+    TIMESTAMPED_PHONE_PAIRINGS_T,
+    TIMESTAMPED_PHONES_BY_WORD_T,
+    TIMESTAMPED_PHONES_T,
+    WORD_T,
+    PHONE_T,
+)
 
-model_vocab_json = os.path.join(os.path.dirname(__file__), "model_vocab_feedback.json")
+_PHONEME_DESCRIPTIONS_PATH = os.path.join(
+    os.path.dirname(__file__), "phoneme_descriptions.json"
+)
+with open(_PHONEME_DESCRIPTIONS_PATH, "r", encoding="utf-8") as f:
+    _PHONEME_DESCRIPTIONS = json.load(f)
+_DESCRIPTIONS_BY_PHONEME = dict(
+    (desc["phoneme"], desc) for desc in _PHONEME_DESCRIPTIONS
+)
 
 
-def user_phonetic_errors(target, target_by_words, speech, topk=3):
+class Mistake(TypedDict):
+    target: PHONE_T
+    speech: set[PHONE_T]
+    words: set[WORD_T]
+    occurences_by_word: list[
+        tuple[WORD_T, TIMESTAMPED_PHONE_PAIRINGS_T, list[float]]
+    ]  # list of (word, paired_mistakes, severities)
+    target_description: dict | None
+    speech_description: list[dict | None]
+    frequency: int
+    total_severity: float
+
+
+def top_phonetic_errors(
+    phone_pairings_by_word: TIMESTAMPED_PHONE_PAIRINGS_BY_WORD_T, topk=3
+):
     """
-    Build a frequency dictionary of phoneme mistakes AND sorts by score
-    Returns {target_phoneme: (mistake_frequency, words_with_mistake, mistake_severities, phoneme_spoken_as)}
-    example: {'k': (3, {1, 2}, 4.8, {'l', 'i'}, 8.4), 'o': (1, {5}, .9, {'i', 'e'})}
+    Identify the topk mistakes grouped by type (insertion, deletion, substitution) and target phoneme.
     """
-    if len(speech) == 0:
-        return {}
-
-    word_phone_pairings = pair_by_words(target, target_by_words, speech)
-    phoneme_mistake_freq = {}
-
-    for word_idx, (word, pairs) in enumerate(word_phone_pairings):
-        for target_phoneme, speech_phoneme in pairs:
-            if target_phoneme != speech_phoneme:
-                if target_phoneme not in phoneme_mistake_freq:
-                    phoneme_mistake_freq[target_phoneme] = (0, set(), 0.0, set(), 0.0)
-
-                # update mistake count and word set and mistake severity and phoneme spoken as
-                (
-                    mistake_count,
-                    word_set,
-                    mistake_severities,
-                    phoneme_spoken_as,
-                    score,
-                ) = phoneme_mistake_freq[target_phoneme]
-                word_set.add(word_idx)
-                mistake_count += 1
-                mistake_severities += dist.feature_error_rate(
-                    target_phoneme, speech_phoneme
-                ) / (mistake_count)
-                phoneme_spoken_as.add(speech_phoneme)
-                score += mistake_severities + mistake_count
-
-                phoneme_mistake_freq[target_phoneme] = (
-                    mistake_count,
-                    word_set,
-                    mistake_severities,
-                    phoneme_spoken_as,
-                    score,
-                )
-
-    sorted_phoneme_mistake_freq = sorted(
-        phoneme_mistake_freq.items(), key=lambda x: x[1][4], reverse=True
+    insertion_mistakes, deletion_mistakes, substitution_mistakes, mistakes_by_target = (
+        phonetic_errors(phone_pairings_by_word)
     )
-    topk_phoneme_mistake_freq = dict(sorted_phoneme_mistake_freq[:topk])
-    return topk_phoneme_mistake_freq
-
-
-def pair_by_words(target, target_by_words, speech):
-    """this function pairs the target and speech by words
-    Returns an array of tuples of words where the index represents the word: (target_phoneme, speech_phoneme) tuples.
-    example: [calling: [('ɔ', 'o'), ('l', 'i'), ('i', 'i'), ('ŋ', 'ŋ')], ...]
-    """
-    # Retrieve aligned sequences along with the speech-side indices so that we can
-    # later map any phoneme back to its timestamp without extra scans.
-    aligned_target, aligned_speech = get_fastdtw_aligned_phoneme_lists(target, speech)
-
-    paired = zip(aligned_target, aligned_speech)
-
-    pair_by_words = []
-    pairs = iter(paired)
-    cur_pair = next(pairs)
-    start = []
-    for word, phons in target_by_words:
-        phons = list(phons)
-        ps = start
-        while len(phons) > 0:
-            t, s = cur_pair
-            if t != phons[0]:
-                phons.pop(0)
-            ps.append(cur_pair)
-            try:
-                cur_pair = next(pairs)
-            except StopIteration:
-                break
-        pair_by_words.append((word, ps[:-1]))
-        start = [ps[-1]]
-
-    return pair_by_words
-
-
-def score_words_cer(target, target_by_words, speech):
-    if len(speech) == 0:
-        return [[word, seq, "", 0] for word, seq in target_by_words], 0
-
-    pbw = pair_by_words(target, target_by_words, speech)
-    word_scores = []
-    average_score = 0
-    for word, pairs in pbw:
-        cer = sum(1 for t, s in pairs if t != s) / len(pairs)
-        seq1 = "".join([t for t, _ in pairs])
-        seq2 = "".join([s for _, s in pairs])
-        word_scores.append((word, seq1, seq2, (1 - cer / 2)))
-        average_score += 1 - cer / 2
-    average_score /= len(pbw)
-    return word_scores, average_score
-
-
-def score_words_wfed(target, target_by_words, speech):
-    if len(speech) == 0:
-        return [[word, seq, "", 0] for word, seq in target_by_words], 0
-
-    pbw = pair_by_words(target, target_by_words, speech)
-    word_scores = []
-    average_score = 0
-    for word, pairs in pbw:
-        seq1 = "".join([t for t, _ in pairs])
-        seq2 = "".join([s for _, s in pairs])
-        norm_score = (22 - fer(seq1, seq2)) / 22
-        word_scores.append((word, seq1, seq2, norm_score**2))
-        average_score += norm_score**2
-    average_score /= len(pbw)
-    return word_scores, average_score
-
-
-def phoneme_written_feedback(target, speech):
-    """This function takes in the target and speech and returns a dictionary
-    of phoneme: {explanation, phonetic spelling} for ALL phonemes in the target
-    and speech.
-    """
-    all_phoneme_feedback = {}
-    all_speech_phonemes = set(target + speech)
-    with open(model_vocab_json, "r", encoding="utf-8") as f:
-        content = json.load(f)
-    for phoneme in all_speech_phonemes:
-        phoneme_feedback = next(
-            (item for item in content if item["phoneme"] == phoneme), None
+    combined_mistakes_by_target: list[Mistake] = []
+    for mistakes in mistakes_by_target.values():
+        if mistakes[0]["target"] == "-":
+            continue
+        combined_mistakes_by_target.append(
+            Mistake(
+                target=mistakes[0]["target"],
+                speech=set().union(*(m["speech"] for m in mistakes)),
+                words=set().union(*(m["words"] for m in mistakes)),
+                occurences_by_word=[
+                    (
+                        word,
+                        [o for m in mistakes for o in m["occurences_by_word"][i][1]],
+                        [o for m in mistakes for o in m["occurences_by_word"][i][2]],
+                    )
+                    for i, (word, _) in enumerate(phone_pairings_by_word)
+                ],
+                target_description=mistakes[0]["target_description"],
+                speech_description=[
+                    d for m in mistakes for d in m["speech_description"]
+                ],
+                frequency=sum(m["frequency"] for m in mistakes),
+                total_severity=sum(m["total_severity"] for m in mistakes),
+            )
         )
-        if phoneme_feedback:
-            all_phoneme_feedback[phoneme] = {
-                "explanation": phoneme_feedback["explanation"],
-                "phonetic spelling": phoneme_feedback["phonetic spelling"],
-                "video": phoneme_feedback["video"],
-                "description": phoneme_feedback["description"],
-                "examples": phoneme_feedback["examples"],
-            }
-        else:
-            raise ValueError(f"Phoneme {phoneme} not found in model vocabulary")
-    return all_phoneme_feedback
+
+    def sortByFrequencyAndSeverity(mistake: Mistake):
+        return -mistake["frequency"] - mistake["total_severity"]
+
+    return {
+        "topk_mistakes_by_target": sorted(
+            combined_mistakes_by_target, key=sortByFrequencyAndSeverity
+        )[:topk],
+        "topk_insertion_mistakes": sorted(
+            insertion_mistakes, key=sortByFrequencyAndSeverity
+        )[:topk],
+        "topk_deletion_mistakes": sorted(
+            deletion_mistakes, key=sortByFrequencyAndSeverity
+        )[:topk],
+        "topk_substitution_mistakes": sorted(
+            substitution_mistakes, key=sortByFrequencyAndSeverity
+        )[:topk],
+        "spoken_word_timestamps": [
+            (word, paired[0][1][1], paired[-1][1][2])
+            for word, paired in phone_pairings_by_word
+        ],
+    }
+
+
+def phonetic_errors(
+    phone_pairings_by_word: TIMESTAMPED_PHONE_PAIRINGS_BY_WORD_T,
+) -> tuple[list[Mistake], list[Mistake], list[Mistake], dict[str, list[Mistake]]]:
+    """Categorize errors into insertion, deletion, and substitution mistakes (return a list for each) and group by target phoneme (return a dictionary mapping target phoneme to matching mistakes)"""
+
+    insertion_mistakes = []
+    deletion_mistakes = []
+    substitution_mistakes = []
+    mistakes_by_target = {}
+
+    mistakes: dict[str, Mistake] = {}
+    for word_ix, (word, pairs) in enumerate(phone_pairings_by_word):
+        for target, speech in pairs:
+            target_phone, speech_phone = target[0], speech[0]
+            if target_phone == speech_phone:
+                continue
+
+            key = f"{target_phone}-{speech_phone}"
+            if key not in mistakes:
+                mistakes[key] = mistake = Mistake(
+                    target=target_phone,
+                    speech=set([speech_phone]),
+                    words=set(),
+                    occurences_by_word=[
+                        (word, [], []) for word, _ in phone_pairings_by_word
+                    ],
+                    target_description=_DESCRIPTIONS_BY_PHONEME.get(target_phone),
+                    speech_description=[_DESCRIPTIONS_BY_PHONEME.get(speech_phone)],
+                    frequency=0,
+                    total_severity=0,
+                )
+                if target_phone == "-":
+                    insertion_mistakes.append(mistake)
+                elif speech_phone == "-":
+                    deletion_mistakes.append(mistake)
+                else:
+                    substitution_mistakes.append(mistake)
+                mistakes_by_target[target_phone] = mistakes_by_target.get(
+                    target_phone, []
+                ) + [mistake]
+            mistakes[key]["frequency"] += 1
+            severity = fer(speech_phone, target_phone)
+            mistakes[key]["total_severity"] += severity
+            mistakes[key]["words"].add(word)
+            _, paired, severities = mistakes[key]["occurences_by_word"][word_ix]
+            paired.append((target, speech))
+            severities.append(severity)
+
+    return (
+        insertion_mistakes,
+        deletion_mistakes,
+        substitution_mistakes,
+        mistakes_by_target,
+    )
+
+
+def pair_by_words(
+    target_by_words: TIMESTAMPED_PHONES_BY_WORD_T, speech: TIMESTAMPED_PHONES_T
+) -> TIMESTAMPED_PHONE_PAIRINGS_BY_WORD_T:
+    """
+    Pairs the target and speech by words.
+    Returns an array of tuples with the (word, [(target_phoneme_timestamped, speech_phoneme_timestamped), ...])
+    target_phoneme_timestamped = (phoneme, start_time, end_time)
+    speech_phoneme_timestamped = (phoneme, start_time, end_time)
+    """
+    speech = map_timestamped_phonemes(speech)
+    target_by_words = map_phones_by_word(target_by_words)
+
+    return grouped_weighted_needleman_wunsch(target_by_words, speech)
+
+
+def score_words_cer(
+    phone_pairings_by_word: TIMESTAMPED_PHONE_PAIRINGS_BY_WORD_T,
+) -> tuple[list[tuple[WORD_T, float]], float]:
+    """
+    This function scores the words based on the character error rate
+    Returns a list of tuples with the (word, score) and an average score
+    """
+    word_scores = [
+        (word, 1 - sum(1 for t, s in pairs if t[0] != s[0]) / len(pairs))
+        for word, pairs in phone_pairings_by_word
+    ]
+    average_score = sum(score for _, score in word_scores) / len(phone_pairings_by_word)
+    return word_scores, average_score
+
+
+def get_unique_phonemes(
+    phone_pairings_by_word: TIMESTAMPED_PHONE_PAIRINGS_BY_WORD_T,
+) -> set[PHONE_T]:
+    """Get the set of all phonemes in the phone_pairings_by_word"""
+    return set(
+        phone[0]
+        for _, pairs in phone_pairings_by_word
+        for target_phone, source_phone in pairs
+        for phone in [target_phone, source_phone]
+    )

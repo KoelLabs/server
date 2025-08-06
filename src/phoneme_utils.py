@@ -1,37 +1,53 @@
-# Conversion between different phonetic codes
-# Modified from https://github.com/jhasegaw/phonecodes/blob/master/src/phonecodes.py
+from typing import TypeVar
+from collections.abc import Sequence
 
-import sys
+import numpy as np
 
 import panphon
 import panphon.distance
-import numpy as np
-from fastdtw import fastdtw
-from scipy.spatial.distance import euclidean
 
 # Create a panphon feature table
-ft = panphon.FeatureTable()
-panphon_dist = panphon.distance.Distance()
-inverse_double_weight_sum = 1 / (sum(ft.weights) * 2)
+_ft = panphon.FeatureTable()
+_panphon_dist = panphon.distance.Distance()
+_inverse_double_weight_sum = 1 / (sum(_ft.weights) * 2)
 
-IPA_SYMBOLS = [ipa for ipa, *_ in ft.segments]
+# Types
+PHONE_T = str
+WORD_T = str
+TIMESTAMPED_PHONE_T = tuple[PHONE_T, float, float]
+TIMESTAMPED_PHONES_T = list[TIMESTAMPED_PHONE_T]
+TIMESTAMPED_PHONES_BY_WORD_T = list[tuple[WORD_T, TIMESTAMPED_PHONES_T]]
+TIMESTAMPED_PHONE_PAIRINGS_T = list[tuple[TIMESTAMPED_PHONE_T, TIMESTAMPED_PHONE_T]]
+TIMESTAMPED_PHONE_PAIRINGS_BY_WORD_T = list[tuple[WORD_T, TIMESTAMPED_PHONE_PAIRINGS_T]]
 
 # Phoneme mapping for panphon compatibility
-# Some IPA phonemes have multiple Unicode representations.
-PANPHONE_MAPPINGS = {
-    "ɝ": "ɜ˞",  # r-colored schwa (U+025D) -> schwa + r-coloring diacritic (U+025C + U+02DE)
+_PANPHONE_MAPPINGS = {
+    "ɝ": "ɜ˞",
     "ɚ": "ə˞",
-    "g": "ɡ",  # model vocab has correct ɡ but we add this since its hard to distinguish
+    "ŋ̍": "ŋ̩",
+    "ĩ": "ɪ̰",
 }
-# just a few phonemes that are hard to distinguish, we mask them to the closest phoneme to improve scores and omitt unecessary feedback
-PHONEMES_TO_MASK = {
+# Temporary simplification of similar phonemes
+_PHONEMES_TO_MASK = {
     "ʌ": "ə",
     "ɔ": "ɑ",
     "kʰ": "k",
     "sʰ": "s",
 }
+_ALL_MAPPINGS = {**_PANPHONE_MAPPINGS, **_PHONEMES_TO_MASK}
 
-ALL_MAPPINGS = {**PANPHONE_MAPPINGS, **PHONEMES_TO_MASK}
+
+def map_timestamped_phonemes(timestamped: TIMESTAMPED_PHONES_T) -> TIMESTAMPED_PHONES_T:
+    return [(_ALL_MAPPINGS.get(p, p), s, e) for p, s, e in timestamped]
+
+
+def map_phones_by_word(
+    phones_by_words: TIMESTAMPED_PHONES_BY_WORD_T,
+) -> TIMESTAMPED_PHONES_BY_WORD_T:
+    return [
+        (w, [(_ALL_MAPPINGS.get(p, p), s, e) for p, s, e in phs])
+        for w, phs in phones_by_words
+    ]
 
 
 def fer(prediction, ground_truth):
@@ -39,120 +55,61 @@ def fer(prediction, ground_truth):
     Feature Error Rate: the edits weighted by their acoustic features summed up and divided by the length of the ground truth.
     """
     return (
-        inverse_double_weight_sum
-        * panphon_dist.weighted_feature_edit_distance(ground_truth, prediction)
+        _inverse_double_weight_sum
+        * _panphon_dist.weighted_feature_edit_distance(ground_truth, prediction)
         / len(ground_truth)
     )
 
 
-def map_phoneme_for_panphon(phoneme_string):
-    """Map phonemes (or lists of phonemes) to their panphon-compatible forms.
-
-    The original implementation returned a *list* of characters for an input
-    string.  That made downstream code think a *single* phoneme was a list and
-    therefore unhashable (e.g. when used as dict keys).  We now:
-
-    1. If the input is a *string* representing one phoneme, replace any
-       characters using `PHONEME_MAPPINGS` and return the *string*.
-    2. If the input is a *list* (e.g. an existing list of phoneme strings), we
-       map each element individually and return a *list* of strings – keeping
-       the original container type intact.
-    """
-
-    return [PANPHONE_MAPPINGS.get(ch, ch) for ch in phoneme_string]
-
-
-# Convert a phoneme to a numerical feature vector
-def phoneme_to_vector(phoneme):
-    vectors = ft.word_to_vector_list(phoneme, numeric=True)
+def _phoneme_to_vector(phoneme):
+    """Convert a phoneme to a numerical feature vector"""
+    vectors = _ft.word_to_vector_list(phoneme, numeric=True)
     if vectors:
         return np.array(vectors[0])  # Take the first vector if multiple exist
     else:
         raise ValueError(f"vector not found for phoneme: {phoneme}")
 
 
-# Convert sequences of phonemes to sequences of vectors
-def sequence_to_vectors(seq):
-    vectors = []
-    for p in seq:
-        vec = phoneme_to_vector(p)
-        vectors.append(vec)
-    return vectors
+def _weighted_substitution_cost(x, y):
+    return -abs(_panphon_dist.weighted_substitution_cost(x, y))
 
 
-def weighted_substitution_cost(x, y):
-    return -abs(panphon_dist.weighted_substitution_cost(x, y))
+def _weighted_insertion_cost(x):
+    return -abs(_panphon_dist.weighted_insertion_cost(x))
 
 
-def weighted_insertion_cost(x):
-    return -abs(panphon_dist.weighted_insertion_cost(x))
-
-
-def weighted_deletion_cost(x):
-    return -abs(panphon_dist.weighted_deletion_cost(x))
+def _weighted_deletion_cost(x):
+    return -abs(_panphon_dist.weighted_deletion_cost(x))
 
 
 # ---- alignment functions ----
+T = TypeVar("T")
+L = TypeVar("L")
 
 
-def phrase_bounds(word_phone_pairings, timestamps, word_idx):
-    """Return (start_time, end_time) for the three-word window around idx_word."""
-    left_pairs = word_phone_pairings[max(0, word_idx - 1)][1]
-    right_pairs = word_phone_pairings[min(len(word_phone_pairings) - 1, word_idx + 1)][
-        1
-    ]
-
-    first_idx = left_pairs[0][2]  # speech index of first phoneme
-    last_idx = right_pairs[-1][2]  # speech index of last phoneme
-    start_time = timestamps[first_idx][1]  # timestamps = (phoneme, start, end)
-    end_time = timestamps[last_idx][2]
-    return start_time, end_time
-
-
-def get_fastdtw_aligned_phoneme_lists(target, speech):
-    """Get aligned phoneme lists for target and speech phonemes (even for grouped phones like kʰ)
-    example:
-        target = ['l', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r']
-        speech = ['s', 'h', 'o', 'r', 'r', 't']
-    Example:
-        target ['l', 'o', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r', 'r', 'r']
-        speech ['s', 'h', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o', 'r', 'r', 't']
-    """
-
-    seq1_vectors = sequence_to_vectors(target)
-    seq2_vectors = sequence_to_vectors(speech)
-
-    if not seq1_vectors or not seq2_vectors:
-        raise ValueError(
-            "One or both sequences could not be converted to feature vectors."
-        )
-
-    # Use FastDTW with Euclidean distance on the vectors
-    distance, path = fastdtw(seq1_vectors, seq2_vectors, dist=euclidean)
-
-    # Align the original phoneme sequences based on the path
-    aligned_seq1 = []
-    aligned_seq2 = []
-    for i, j in path:
-        aligned_seq1.append(target[i] if i < len(target) else "-")
-        aligned_seq2.append(speech[j] if j < len(speech) else "-")
-
-    return aligned_seq1, aligned_seq2
-
-
-def needleman_wunsch(
-    seq1,
-    seq2,
+def _needleman_wunsch(
+    seq1: Sequence[T],
+    seq2: Sequence[L],
     substitution_func=lambda x, y: 0 if x == y else -1,
-    deletetion_func=lambda _: -1,
+    deletion_func=lambda _: -1,
     insertion_func=lambda _: -1,
-):
+) -> tuple[Sequence[T], Sequence[L]]:
+    """
+    Get aligned sequences using the Needleman-Wunsch algorithm
+    Example:
+        seq1 = ['l', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r']
+        seq2 = ['s', 'h', 'o', 'r', 'r', 't']
+        aligned_seq1, aligned_seq2 = needleman_wunsch(seq1, seq2)
+      Outputs:
+        aligned_seq1: ['l', 'o', 'o', 'o', 'o', 'o', 'n', 'ɡ', 'e', 'e', 'r']
+        aligned_seq2: ['-', '-', '-', 's', 'h', 'o', '-', '-', 'r', 'r', 't']
+    """
     n, m = len(seq1), len(seq2)
     dp = np.zeros((n + 1, m + 1))
 
     # Initialize DP table
     for i in range(n + 1):
-        dp[i][0] = i * deletetion_func(seq1[i - 1]) if i > 0 else 0
+        dp[i][0] = i * deletion_func(seq1[i - 1]) if i > 0 else 0
     for j in range(m + 1):
         dp[0][j] = j * insertion_func(seq2[j - 1]) if j > 0 else 0
 
@@ -160,7 +117,7 @@ def needleman_wunsch(
     for i in range(1, n + 1):
         for j in range(1, m + 1):
             match = dp[i - 1][j - 1] + substitution_func(seq1[i - 1], seq2[j - 1])
-            delete = dp[i - 1][j] + deletetion_func(seq1[i - 1])
+            delete = dp[i - 1][j] + deletion_func(seq1[i - 1])
             insert = dp[i][j - 1] + insertion_func(seq2[j - 1])
             dp[i][j] = max(match, delete, insert)
 
@@ -192,39 +149,39 @@ def needleman_wunsch(
     return list(reversed(aligned_seq1)), list(reversed(aligned_seq2))
 
 
-def weighted_needleman_wunsch(seq1, seq2):
-    vector_seq1 = sequence_to_vectors(seq1)
-    vector_seq2 = sequence_to_vectors(seq2)
-    aligned_seq1, aligned_seq2 = needleman_wunsch(
-        [(s, v) for s, v in zip(seq1, vector_seq1)],
-        [(s, v) for s, v in zip(seq2, vector_seq2)],
-        lambda x, y: weighted_substitution_cost(list(x[1]), list(y[1])),
-        lambda x: weighted_deletion_cost(list(x[1])),
-        lambda x: weighted_insertion_cost(list(x[1])),
-    )
-    return [s if s == "-" else s[0] for s in aligned_seq1], [
-        s if s == "-" else s[0] for s in aligned_seq2
+def grouped_weighted_needleman_wunsch(
+    grouped_seq: TIMESTAMPED_PHONES_BY_WORD_T, other_seq: TIMESTAMPED_PHONES_T
+) -> TIMESTAMPED_PHONE_PAIRINGS_BY_WORD_T:
+    """
+    :func:`needleman_wunsch` weighted by feature error rate applied to grouped sequences
+    """
+
+    flattened_seq = [
+        (_phoneme_to_vector(phone[0]), phone, word_ix)
+        for word_ix, (_, phones) in enumerate(grouped_seq)
+        for phone in phones
     ]
+    other = [(_phoneme_to_vector(phone[0]), phone) for phone in other_seq]
 
+    aligned, other_aligned = _needleman_wunsch(
+        flattened_seq,
+        other,
+        lambda x, y: _weighted_substitution_cost(list(x[0]), list(y[0])),
+        lambda x: _weighted_deletion_cost(list(x[0])),
+        lambda x: _weighted_insertion_cost(list(x[0])),
+    )
 
-def main(args):
-    if len(args) < 3:
-        print(
-            "Usage: python ./scripts/forced_alignment/needleman_wunsch.py <weighted|unweighted> <seq1> <seq2>"
-        )
-        return
-    weighted = args[0] == "weighted"
-    seq1 = args[1]
-    seq2 = args[2]
-    if weighted:
-        aligned_seq1, aligned_seq2 = weighted_needleman_wunsch(seq1, seq2)
-    else:
-        aligned_seq1, aligned_seq2 = needleman_wunsch(seq1, seq2)
-    aligned_seq1 = "".join(aligned_seq1)
-    aligned_seq2 = "".join(aligned_seq2)
-    print(aligned_seq1)
-    print(aligned_seq2)
+    grouped: TIMESTAMPED_PHONE_PAIRINGS_BY_WORD_T = [
+        (word, []) for word, _ in grouped_seq
+    ]
+    prev, other_prev = ("-", 0.0, 0.0), ("-", 0.0, 0.0)
+    prev_word_ix = 0
+    for val, other_val in zip(aligned, other_aligned):
+        phone, word_ix = (val[1], val[2]) if val != "-" else (prev, prev_word_ix)
+        other_phone = other_val[1] if other_val != "-" else other_prev
+        grouped[word_ix][1].append((phone, other_phone))
+        prev = ("-", phone[1], phone[2])
+        other_prev = ("-", other_phone[1], other_phone[2])
+        prev_word_ix = word_ix
 
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
+    return grouped

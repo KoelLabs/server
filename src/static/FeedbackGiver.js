@@ -1,6 +1,72 @@
+/** @typedef {string} Phone */
+/** @typedef {string} Word */
+/** @typedef {[Phone, number, number]} TimestampedPhone */
+/** @typedef {Array<[Word, TimestampedPhone[]]>} TimestampedPhonesByWord */
+/** @typedef {Array<[TimestampedPhone, TimestampedPhone]>} TimestampedPhonePairings */
+
+/**
+ * @typedef {object} ExampleWord
+ * @property {string} word the word with one or more sections surrounded by * that exemplify the phoneme, e.g., "l*aa*"
+ * @property {string} phonetic_spelling an American English "spelling" of the word, e.g., "L-AA"
+ */
+/**
+ * @typedef {object} PhoneDescription
+ * @property {string} phoneme the IPA representation of the phoneme
+ * @property {string[]} description e.g., ["front open unrounded vowel"]
+ * @property {string} explanation a written explanation of how to pronounce this phoneme
+ * @property {ExampleWord[]} examples a possibly empty list of example words with this phoneme
+ * @property {string} phonetic_spelling an American English "spelling" of the phoneme
+ * @property {string} video a source video that explains the phoneme
+ */
+/**
+ * @typedef {object} Mistake represents a target phoneme being mispronounced as one of a collection of phonemes
+ * @property {Phone} target the target phoneme being mispronounced ("-" if this is an insertion error)
+ * @property {Phone[]} speech the phonemes it is mispronounced as ("-" for the deletion error)
+ * @property {Word[]} words the words where this mispronunciation occurs
+ * @property {Array<[Word, TimestampedPhonePairings, number[]]>} occurences_by_word for each word, a tuple of (word, paired target vs speech phonemes, severities)
+ * @property {PhoneDescription | null} target_description description of the target phoneme (or null iff this is an insertion error)
+ * @property {Array<PhoneDescription | null>} speech_description description(s) of the phonemes the target is mispronounced as (a null represent the deletion error)
+ * @property {number} frequency count of occurences
+ * @property {number} total_severity sum of severities (each between 0 and 1)
+ */
+/**
+ * @typedef {object} Feedback
+ * @property {Mistake[]} topk_mistakes_by_target
+ * @property {Mistake[]} topk_insertion_mistakes
+ * @property {Mistake[]} topk_deletion_mistakes
+ * @property {Mistake[]} topk_substitution_mistakes
+ * @property {Array<[Word, number, number]>} spoken_word_timestamps
+ */
+/** @typedef {[Array<[Word, number]>, number]} WordScores scores for each word and the average score */
+
+/** @typedef {(transcription: TimestampedPhone[]) => void} TranscriptionCallback */
+/** @typedef {(words: Word[], are_words_correct: boolean[], next_word_ix: number, percentage_correct: number, is_done: boolean) => void} WordSpokenCallback */
+
+const SAMPLE_RATE = 16_000;
+
+function combineAudioChunks(audio_chunks) {
+  if (audio_chunks.length === 0) {
+    return null;
+  }
+
+  const totalLength = audio_chunks.reduce((sum, arr) => sum + arr.length, 0);
+  const merged = new Float32Array(totalLength);
+
+  let chunkPosition = 0;
+  for (const chunk of audio_chunks) {
+    merged.set(chunk, chunkPosition);
+    chunkPosition += chunk.length;
+  }
+
+  if (merged.length !== totalLength) {
+    throw new Error('merged length does not match total length');
+  }
+  return merged;
+}
+
 export class FeedbackGiver {
+  /** @param {TimestampedPhonesByWord} target_by_word @param {TranscriptionCallback} on_transcription @param {WordSpokenCallback} on_word_spoken */
   constructor(
-    target,
     target_by_word,
     on_transcription,
     on_word_spoken,
@@ -10,16 +76,23 @@ export class FeedbackGiver {
     this.serverorigin = serverorigin;
     this.serverhost = serverhost;
 
-    this.target = target;
+    /** @type {TimestampedPhonesByWord} */
     this.target_by_word = target_by_word;
+    /** @type {TimestampedPhone[]} */
     this.transcription = [];
+    /** @type {TranscriptionCallback} */
     this.on_transcription = on_transcription;
+
     this.socket = null;
     this.audioContext = null;
     this.audioWorkletNode = null;
-    this.store_audio_chunks = [];
-    this.userAudioBuffer = null;
+    this.audioInput = null;
+    this.mediaStream = null;
 
+    this.userAudioBuffer = null;
+    this.store_audio_chunks = [];
+
+    /** @type {WordSpokenCallback} */
     this.on_word_spoken = on_word_spoken;
     this.words = [];
     this.are_words_correct = [];
@@ -31,120 +104,95 @@ export class FeedbackGiver {
     this.recognition = null;
   }
 
+  /** @param {TimestampedPhone[]} transcription */
   #setTranscription(transcription) {
-    // Server should send JSON arrays directly
-    try {
-      this.transcription = JSON.parse(transcription);
-    } catch (error) {
-      console.error('Failed to parse transcription JSON:', error);
-      this.transcription = []; // Fallback to empty array
-    }
-    this.on_transcription(this.transcription);
+    this.transcription = transcription;
+    this.on_transcription(transcription);
   }
 
-  #combineAudioChunks() {
-    if (!this.store_audio_chunks || this.store_audio_chunks.length === 0) {
-      console.log('no audio chunks to merge');
-      return null;
-    }
-    const totalLength = this.store_audio_chunks.reduce((sum, arr) => sum + arr.length, 0); // grabs all samples across all the chunks
-    const merged = new Float32Array(totalLength); // allocate the float
-    let chunkPosition = 0;
-    for (const chunk of this.store_audio_chunks) {
-      merged.set(chunk, chunkPosition);
-      chunkPosition += chunk.length;
-    }
-    if (merged.length !== totalLength) {
-      throw new Error('merged length does not match total length');
-    }
-    return merged;
-  }
-
+  /** @returns {Promise<WordScores>} */
   async getCER() {
-    try {
-      const res = await fetch(
-        `${this.serverorigin}/score_words_cer?target=${encodeURIComponent(
-          JSON.stringify(this.target),
-        )}&tbw=${encodeURIComponent(
-          JSON.stringify(this.target_by_word),
-        )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
-      );
-      const data = await res.json();
-      console.log('data', data);
-      const [scoredWords, overall] = data;
-      return [scoredWords, overall];
-    } catch (error) {
-      console.error('Error in getCER:', error);
-      return [[], 0];
-    }
+    if (this.transcription.length === 0) throw new Error('No transcription');
+    const res = await fetch(
+      `${this.serverorigin}/score_words_cer?target_by_words=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
+    );
+    return await res.json();
   }
 
-  async getWFED() {
-    try {
-      const res = await fetch(
-        `${this.serverorigin}/score_words_wfed?target=${encodeURIComponent(
-          JSON.stringify(this.target),
-        )}&tbw=${encodeURIComponent(
-          JSON.stringify(this.target_by_word),
-        )}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
-      );
-      const data = await res.json();
-      const [scoredWords, overall] = data;
-      return [scoredWords, overall];
-    } catch (error) {
-      console.error('Error in getWFED:', error);
-      return [[], 0];
-    }
-  }
-  async getAllPhonemeWrittenFeedback() {
-    //  this will grab all phonemes and their respective descriptions and information
-    try {
-      const res = await fetch(
-        `${this.serverorigin}/phoneme_written_feedback?target=${encodeURIComponent(JSON.stringify(this.target))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
-      );
-
-      return await res.json();
-    } catch (error) {
-      console.error('Error in getPhonemeNaturalLanguageFeedback:', error);
-      return {};
-    }
+  /** @returns {Promise<Feedback>} */
+  async getFeedback() {
+    if (this.transcription.length === 0) throw new Error('No transcription');
+    const res = await fetch(
+      `${this.serverorigin}/top_phonetic_errors?target_by_words=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
+    );
+    return await res.json();
   }
 
-  async getUserPhoneticErrors() {
-    //  This function is used to get the top 3 errors spoken by the user returns (mistake_count, word_set, mistake_severities, phoneme_spoken_as, score)
-    try {
-      const res = await fetch(
-        `${this.serverorigin}/user_phonetic_errors?target=${encodeURIComponent(JSON.stringify(this.target))}&tbw=${encodeURIComponent(JSON.stringify(this.target_by_word))}&speech=${encodeURIComponent(JSON.stringify(this.transcription))}`,
-      );
-      console.log('res', res);
-      return await res.json();
-    } catch (error) {
-      console.error('Error in json res getUserPhoneticErrors:', error);
-      return [];
-    }
+  #preparePlayback() {
+    const audio = combineAudioChunks(this.store_audio_chunks);
+    this.userAudioBuffer = this.audioContext.createBuffer(1, audio.length, SAMPLE_RATE);
+    this.userAudioBuffer.getChannelData(0).set(audio);
   }
-  preparePlayback(float32Array) {
-    this.userAudioBuffer = this.audioContext.createBuffer(1, float32Array.length, 16000);
-    this.userAudioBuffer.getChannelData(0).set(float32Array);
-    console.log('userAudioBuffer length from prep: ', this.userAudioBuffer.length);
-  }
-  async playUserAudio(onPlaybackEnd = () => {}) {
+
+  async playUserAudio(start_timestamp = 0, end_timestamp = null) {
     const source = this.audioContext.createBufferSource();
     source.buffer = this.userAudioBuffer;
-    console.log('userAudioBuffer length from playing: ', this.userAudioBuffer.length);
     source.connect(this.audioContext.destination);
-    source.start();
-    // close the audio context after we have nicely played back the users audio and wait for buffer to close
-    source.onended = () => {
-      source.disconnect();
-      onPlaybackEnd(); // call UI callback
-    };
+
+    if (end_timestamp === null) {
+      source.start(0, start_timestamp);
+    } else {
+      source.start(0, start_timestamp, end_timestamp - start_timestamp);
+    }
+
+    await new Promise(resolve => {
+      source.onended = resolve;
+    });
+  }
+
+  async #cleanupRecording() {
+    // Stop processing audio
+    if (this.audioWorkletNode) {
+      this.audioWorkletNode.disconnect();
+      this.audioWorkletNode = null;
+    }
+
+    // Stop and clean up audio input
+    if (this.audioInput) {
+      this.audioInput.disconnect();
+      this.audioInput = null;
+    }
+
+    // Stop media stream tracks
+    if (this.mediaStream) {
+      this.mediaStream.getTracks().forEach(track => {
+        track.stop();
+      });
+      this.mediaStream = null;
+    }
+
+    // Stop word recognition
+    if (this.recognition) {
+      this.recognition.onend = null;
+      this.recognition.stop();
+      this.recognition = null;
+    }
+
+    // Ask the server to close the websocket connection when it has finished processing all audio up until the "stop" message
+    if (this.socket) {
+      await new Promise(resolve => {
+        this.socket.onclose = resolve;
+        this.socket.send('stop');
+        this.socket = null;
+      });
+    }
   }
 
   async start() {
+    await this.#cleanupRecording();
     this.store_audio_chunks = [];
-    // Clear previous transcription
-    this.#setTranscription('');
+    this.userAudioBuffer = null;
+    this.transcription = [];
 
     // Open WebSocket connection
     this.socket = new WebSocket(
@@ -153,7 +201,8 @@ export class FeedbackGiver {
 
     // Handle incoming transcriptions
     this.socket.onmessage = async event => {
-      this.#setTranscription(event.data);
+      // Immediately process each transcription update so consumers can react (e.g. update word coloring)
+      this.#setTranscription(JSON.parse(event.data));
     };
 
     // Start capturing audio (microphone)
@@ -161,31 +210,34 @@ export class FeedbackGiver {
       audio: true,
     });
 
-    // Create an AudioContext for usage throughout
-    this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
-      sampleRate: 16000,
-      latencyHint: 'interactive',
-    });
+    // Create AudioContext if it doesn't exist or is closed
+    if (!this.audioContext || this.audioContext.state === 'closed') {
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+        sampleRate: SAMPLE_RATE,
+        latencyHint: 'interactive',
+      });
+    }
+    if (this.audioContext.state === 'suspended') {
+      await this.audioContext.resume();
+    }
 
     // Load the AudioWorkletProcessor (which handles audio processing)
     await this.audioContext.audioWorklet.addModule(`${this.serverorigin}/WavWorklet.js`);
-
-    // Create the AudioWorkletNode
     this.audioWorkletNode = new AudioWorkletNode(this.audioContext, 'wav-worklet');
 
     // Connect the audio input to the AudioWorkletNode
-    const audioInput = this.audioContext.createMediaStreamSource(stream);
-    audioInput.connect(this.audioWorkletNode);
+    this.audioInput = this.audioContext.createMediaStreamSource(stream);
+    this.audioInput.connect(this.audioWorkletNode);
 
     // Connect the AudioWorkletNode to the audio context destination
     this.audioWorkletNode.connect(this.audioContext.destination);
 
     // Connect AudioWorkletNode to process audio and send to WebSocket
     this.audioWorkletNode.port.onmessage = event => {
-      const chunk_to_store = event.data;
-      this.store_audio_chunks.push(chunk_to_store); // continuously store the audio chunks
-      if (this.socket.readyState === WebSocket.OPEN) {
-        this.socket.send(chunk_to_store);
+      const chunk = event.data;
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        this.store_audio_chunks.push(chunk);
+        this.socket.send(chunk);
       }
     };
 
@@ -193,30 +245,8 @@ export class FeedbackGiver {
   }
 
   async stop() {
-    let stored_audio = null;
-    if (this.audioWorkletNode) {
-      this.audioWorkletNode.disconnect();
-    }
-    if (this.socket) {
-      this.socket.close();
-    }
-    if (this.recognition) {
-      this.recognition.onend = null;
-      this.recognition.stop();
-    }
-    // merging logic of audio chunks when user stops recording
-    if (this.store_audio_chunks.length > 0) {
-      stored_audio = this.#combineAudioChunks();
-      console.log('stored_audio! stored audio length: ', stored_audio.length);
-    } else {
-      console.log('no audio chunks to merge');
-    }
-    this.store_audio_chunks = [];
-    if (stored_audio) {
-      this.preparePlayback(stored_audio);
-    } else {
-      console.log('no audio to play back');
-    }
+    await this.#cleanupRecording();
+    this.#preparePlayback();
   }
 
   #startWordTranscription() {
@@ -258,6 +288,7 @@ export class FeedbackGiver {
       for (let i = 0; i < allWords.length; i++) {
         const word = allWords[i];
         const target = this.words[i];
+        if (!target) continue;
 
         if (
           word.toLowerCase().replace(/[^a-z]/g, '') === target.toLowerCase().replace(/[^a-z]/g, '')
@@ -277,8 +308,10 @@ export class FeedbackGiver {
             false,
           );
         } else {
-          this.recognition.onend = null;
-          this.recognition.stop();
+          if (this.recognition) {
+            this.recognition.onend = null;
+            this.recognition.stop();
+          }
           this.on_word_spoken(
             this.words,
             this.are_words_correct,
