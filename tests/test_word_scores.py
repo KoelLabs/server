@@ -20,22 +20,10 @@ def test_score_words_cer(client):
     speech = [p for _, phones in TARGET_BY_WORDS for p in phones]
     speech[-1] = ("ə˞", 0, 0)
 
-    # First, get phone pairings by word
     target_by_words_param = urllib.parse.quote(json.dumps(TARGET_BY_WORDS))
     speech_param = urllib.parse.quote(json.dumps(speech))
-
-    pair_response = client.get(
-        f"/pair_by_words?target_by_words={target_by_words_param}&speech={speech_param}"
-    )
-    assert pair_response.status_code == 200
-    phone_pairings_by_word = json.loads(pair_response.data)
-
-    # Now call score the phone pairings by word
-    phone_pairings_by_word_param = urllib.parse.quote(
-        json.dumps(phone_pairings_by_word)
-    )
     response = client.get(
-        f"/score_words_cer?phone_pairings_by_word={phone_pairings_by_word_param}"
+        f"/score_words_cer?target_by_words={target_by_words_param}&speech={speech_param}"
     )
     assert response.status_code == 200
     data = json.loads(response.data)
