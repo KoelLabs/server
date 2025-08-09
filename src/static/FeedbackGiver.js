@@ -206,7 +206,7 @@ export class FeedbackGiver {
     };
 
     // Start capturing audio (microphone)
-    const stream = await navigator.mediaDevices.getUserMedia({
+    this.mediaStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
     });
 
@@ -226,7 +226,7 @@ export class FeedbackGiver {
     this.audioWorkletNode = new AudioWorkletNode(this.audioContext, 'wav-worklet');
 
     // Connect the audio input to the AudioWorkletNode
-    this.audioInput = this.audioContext.createMediaStreamSource(stream);
+    this.audioInput = this.audioContext.createMediaStreamSource(this.mediaStream);
     this.audioInput.connect(this.audioWorkletNode);
 
     // Connect the AudioWorkletNode to the audio context destination
