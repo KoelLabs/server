@@ -2,6 +2,11 @@ class WavWorklet extends AudioWorkletProcessor {
   constructor() {
     super();
     this.port.onmessage = this.handleMessage.bind(this);
+    this.sourceSampleRate = null;
+    this.targetSampleRate = null;
+    this.needsResampling = false;
+    this.resampleBuffer = [];
+    this.resampleRatio = 1.0;
   }
 
   process(inputs, outputs, parameters) {
@@ -23,8 +28,11 @@ class WavWorklet extends AudioWorkletProcessor {
         mixedData[i] = sum / numChannels; // Average the samples from all channels
       }
 
+      // Resample if needed (for Firefox compatibility)
+      const finalData = this.resample(mixedData);
+      
       // send to main thread
-      this.port.postMessage(mixedData);
+      this.port.postMessage(finalData);
     }
 
     // Return true to keep the processor alive
@@ -32,7 +40,37 @@ class WavWorklet extends AudioWorkletProcessor {
   }
 
   handleMessage(event) {
-    // Handle incoming messages if necessary
+    if (event.data.type === 'init') {
+      this.sourceSampleRate = event.data.sourceSampleRate;
+      this.targetSampleRate = event.data.targetSampleRate;
+      this.needsResampling = this.sourceSampleRate !== this.targetSampleRate;
+      this.resampleRatio = this.sourceSampleRate / this.targetSampleRate;
+    }
+  }
+
+  resample(inputData) {
+    if (!this.needsResampling) {
+      return inputData;
+    }
+
+    const outputLength = Math.floor(inputData.length / this.resampleRatio);
+    const outputData = new Float32Array(outputLength);
+    
+    for (let i = 0; i < outputLength; i++) {
+      const sourceIndex = i * this.resampleRatio;
+      const sourceIndexInt = Math.floor(sourceIndex);
+      const fraction = sourceIndex - sourceIndexInt;
+      
+      if (sourceIndexInt + 1 < inputData.length) {
+        // Linear interpolation
+        outputData[i] = inputData[sourceIndexInt] * (1 - fraction) + 
+                       inputData[sourceIndexInt + 1] * fraction;
+      } else {
+        outputData[i] = inputData[sourceIndexInt];
+      }
+    }
+    
+    return outputData;
   }
 }
 

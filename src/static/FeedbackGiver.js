@@ -188,6 +188,35 @@ export class FeedbackGiver {
     }
   }
 
+  async #supportsMismatchedSampleRates() {
+    let testContext = null;
+    let testStream = null;
+    
+    try {
+      testContext = new (window.AudioContext || window.webkitAudioContext)({
+        sampleRate: SAMPLE_RATE
+      });
+      testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // This line throws NotSupportedError in Firefox for mismatched sample rates
+      const testSource = testContext.createMediaStreamSource(testStream);
+      
+      // If we get here without error, mismatched sample rates are supported
+      return true;
+    } catch (error) {
+      // Firefox throws NotSupportedError for mismatched sample rates
+      return false;
+    } finally {
+      // Cleanup in both success and error cases
+      if (testContext) {
+        testContext.close();
+      }
+      if (testStream) {
+        testStream.getTracks().forEach(track => track.stop());
+      }
+    }
+  }
+
   async start() {
     await this.#cleanupRecording();
     this.store_audio_chunks = [];
@@ -210,12 +239,24 @@ export class FeedbackGiver {
       audio: true,
     });
 
+    // Test if browser supports mismatched sample rates
+    const supportsMismatch = await this.#supportsMismatchedSampleRates();
+    
     // Create AudioContext if it doesn't exist or is closed
     if (!this.audioContext || this.audioContext.state === 'closed') {
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
-        sampleRate: SAMPLE_RATE,
-        latencyHint: 'interactive',
-      });
+      if (supportsMismatch) {
+        // Chrome/Safari - use 16kHz for native resampling
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+          sampleRate: SAMPLE_RATE,
+          latencyHint: 'interactive',
+        });
+      } else {
+        // Firefox - use default sample rate, will resample in worklet
+        console.warn('Browser does not support mismatched sample rates. Using JavaScript resampling fallback for Firefox compatibility.');
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+          latencyHint: 'interactive',
+        });
+      }
     }
     if (this.audioContext.state === 'suspended') {
       await this.audioContext.resume();
@@ -224,6 +265,13 @@ export class FeedbackGiver {
     // Load the AudioWorkletProcessor (which handles audio processing)
     await this.audioContext.audioWorklet.addModule(`${this.serverorigin}/WavWorklet.js`);
     this.audioWorkletNode = new AudioWorkletNode(this.audioContext, 'wav-worklet');
+
+    // Send sample rate info to worklet
+    this.audioWorkletNode.port.postMessage({
+      type: 'init',
+      sourceSampleRate: this.audioContext.sampleRate,
+      targetSampleRate: SAMPLE_RATE
+    });
 
     // Connect the audio input to the AudioWorkletNode
     this.audioInput = this.audioContext.createMediaStreamSource(this.mediaStream);
