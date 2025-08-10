@@ -1,7 +1,6 @@
 import json
-import torch
 import numpy as np
-
+import torch
 
 from flask import Flask, send_from_directory, request, jsonify
 from flask_cors import CORS, cross_origin
@@ -23,7 +22,8 @@ from phoneme_utils import TIMESTAMPED_PHONES_T, TIMESTAMPED_PHONES_BY_WORD_T
 
 # Constants
 DEBUG = False
-NUM_SECONDS_PER_CHUNK = 0.5
+CHUNK_SIZE_SAMPLES = 320  # 20ms at 16kHz
+TRANSFORMER_INTERVAL = 30
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -93,9 +93,6 @@ def stream(ws):
     feature_list = []
     total_samples_processed = 0
 
-    CHUNK_SIZE_SAMPLES = 320  # 20ms at 16kHz
-    TRANSFORMER_INTERVAL = 25  # Every 500ms
-
     while True:
         try:
             data = ws.receive()
@@ -114,7 +111,7 @@ def stream(ws):
                 features, samples = extract_features_only(audio_chunk)
                 feature_list.append(features)
                 total_samples_processed += samples
-                # Every 500ms, send COMPLETE transcription from start
+                # accumulate features for 500ms (25 sets of 20ms), then send COMPLETE transcription from start
                 if len(feature_list) % TRANSFORMER_INTERVAL == 0:
                     all_features = torch.cat(feature_list, dim=1)
                     full_transcription = run_transformer_on_features(
