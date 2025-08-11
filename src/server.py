@@ -16,13 +16,13 @@ from transcription import (
     extract_features_only,
     run_transformer_on_features,
     SAMPLE_RATE,
-    transcribe_timestamped,
+    RECEPTIVE_FIELD_SIZE,
+    STRIDE_SIZE,
 )
 from phoneme_utils import TIMESTAMPED_PHONES_T, TIMESTAMPED_PHONES_BY_WORD_T
 
 # Constants
 DEBUG = False
-CHUNK_SIZE_SAMPLES = 320  # 20ms at 16kHz
 TRANSFORMER_INTERVAL = 30
 
 # Initialize Flask app
@@ -100,11 +100,9 @@ def stream(ws):
                 buffer += data
 
             # Process 20ms chunks
-            while len(buffer) >= CHUNK_SIZE_SAMPLES * np.dtype(np.float32).itemsize:
-                chunk_bytes = buffer[
-                    : CHUNK_SIZE_SAMPLES * np.dtype(np.float32).itemsize
-                ]
-                buffer = buffer[CHUNK_SIZE_SAMPLES * np.dtype(np.float32).itemsize :]
+            while len(buffer) >= STRIDE_SIZE * np.dtype(np.float32).itemsize:
+                chunk_bytes = buffer[: STRIDE_SIZE * np.dtype(np.float32).itemsize]
+                buffer = buffer[STRIDE_SIZE * np.dtype(np.float32).itemsize :]
 
                 audio_chunk = np.frombuffer(chunk_bytes, dtype=np.float32)
 

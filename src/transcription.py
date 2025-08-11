@@ -15,17 +15,31 @@ model_id = "KoelLabs/xlsr-english-01"
 processor: Wav2Vec2Processor = AutoProcessor.from_pretrained(model_id)
 model: Wav2Vec2ForCTC = AutoModelForCTC.from_pretrained(model_id)
 assert processor.feature_extractor.sampling_rate == SAMPLE_RATE
-MIN_LEN_SAMPLES = (
-    400  # computed from model.config.conv_kernel and model.config.conv_stride
-)
+
+
+def _calculate_cnn_window(model: Wav2Vec2ForCTC):
+    receptive_field = 1
+    stride = 1
+    for conv_layer in model.wav2vec2.feature_extractor.conv_layers:
+        assert hasattr(conv_layer, "conv")
+        conv = conv_layer.conv
+        assert isinstance(conv, torch.nn.Conv1d)
+        receptive_field += (conv.kernel_size[0] - 1) * stride
+        stride *= conv.stride[0]
+    return receptive_field, stride
+
+
+RECEPTIVE_FIELD_SIZE, STRIDE_SIZE = _calculate_cnn_window(model)
 
 
 def extract_features_only(audio: np.ndarray):
     """Extract CNN features and project to encoder hidden size (transformer-ready)."""
     # True raw sample count before any padding
     raw_sample_count = int(np.asarray(audio).shape[-1])
-    if raw_sample_count < MIN_LEN_SAMPLES:
-        audio = np.pad(audio, (0, MIN_LEN_SAMPLES - raw_sample_count), mode="constant")
+    if raw_sample_count < RECEPTIVE_FIELD_SIZE:
+        audio = np.pad(
+            audio, (0, RECEPTIVE_FIELD_SIZE - raw_sample_count), mode="constant"
+        )
     inputs = processor(
         audio,
         sampling_rate=SAMPLE_RATE,
@@ -42,7 +56,9 @@ def extract_features_only(audio: np.ndarray):
     return features, raw_sample_count
 
 
-def run_transformer_on_features(features, total_audio_samples, time_offset=0.0):
+def run_transformer_on_features(
+    features: torch.Tensor, total_audio_samples: int, time_offset: float = 0.0
+) -> TIMESTAMPED_PHONES_T:
     """Run transformer and decode"""
     #  slowest step
     with torch.no_grad():
