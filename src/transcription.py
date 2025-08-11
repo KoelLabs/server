@@ -36,15 +36,13 @@ def extract_features_only(audio: np.ndarray):
     """Extract CNN features and project to encoder hidden size (transformer-ready)."""
     # True raw sample count before any padding
     raw_sample_count = int(np.asarray(audio).shape[-1])
-    if raw_sample_count < RECEPTIVE_FIELD_SIZE:
-        audio = np.pad(
-            audio, (0, RECEPTIVE_FIELD_SIZE - raw_sample_count), mode="constant"
-        )
+
     inputs = processor(
         audio,
         sampling_rate=SAMPLE_RATE,
         return_tensors="pt",
-        padding=False,
+        padding="max_length",
+        max_length=RECEPTIVE_FIELD_SIZE,
     )
     input_values = inputs.input_values.type(torch.float32).to(model.device)
     with torch.no_grad():
