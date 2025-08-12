@@ -15,8 +15,6 @@ from feedback import (
 from transcription import (
     extract_features_only,
     run_transformer_on_features,
-    SAMPLE_RATE,
-    RECEPTIVE_FIELD_SIZE,
     STRIDE_SIZE,
 )
 from phoneme_utils import TIMESTAMPED_PHONES_T, TIMESTAMPED_PHONES_BY_WORD_T
