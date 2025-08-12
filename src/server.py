@@ -1,6 +1,6 @@
 import json
-
 import numpy as np
+import torch
 
 from flask import Flask, send_from_directory, request, jsonify
 from flask_cors import CORS, cross_origin
@@ -12,12 +12,16 @@ from feedback import (
     top_phonetic_errors,
     pair_by_words,
 )
-from transcription import transcribe_timestamped, SAMPLE_RATE
+from transcription import (
+    extract_features_only,
+    run_transformer_on_features,
+    STRIDE_SIZE,
+)
 from phoneme_utils import TIMESTAMPED_PHONES_T, TIMESTAMPED_PHONES_BY_WORD_T
 
 # Constants
 DEBUG = False
-NUM_SECONDS_PER_CHUNK = 0.5
+TRANSFORMER_INTERVAL = 30
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -83,44 +87,46 @@ def get_score_words_cer():
 
 @sock.route("/stream")
 def stream(ws):
-    buffer = b""  # Buffer to hold audio chunks
+    buffer = b""
+    feature_list = []
+    total_samples_processed = 0
 
-    full_transcription: TIMESTAMPED_PHONES_T = []
-    accumulated_duration = 0
-    combined = np.array([], dtype=np.float32)
     while True:
         try:
-            # Receive audio data from the client
             data = ws.receive()
             if data and data != "stop":
                 buffer += data
 
-            # Process when buffer has at least one chunk in it or when we are done
-            if (
-                data == "stop"
-                or len(buffer)
-                >= SAMPLE_RATE * NUM_SECONDS_PER_CHUNK * np.dtype(np.float32).itemsize
-            ):
-                audio = np.frombuffer(buffer, dtype=np.float32)
-                transcription = transcribe_timestamped(audio, accumulated_duration)
-                accumulated_duration += len(audio) / SAMPLE_RATE
-                full_transcription.extend(transcription)
-                ws.send(json.dumps(full_transcription))
+            # Process 20ms chunks
+            while len(buffer) >= STRIDE_SIZE * np.dtype(np.float32).itemsize:
+                chunk_bytes = buffer[: STRIDE_SIZE * np.dtype(np.float32).itemsize]
+                buffer = buffer[STRIDE_SIZE * np.dtype(np.float32).itemsize :]
 
-                if DEBUG:
-                    from scipy.io import wavfile
+                audio_chunk = np.frombuffer(chunk_bytes, dtype=np.float32)
 
-                    wavfile.write("src/audio.wav", SAMPLE_RATE, audio)
-                    combined = np.concatenate([combined, audio])
-                    wavfile.write("src/combined.wav", SAMPLE_RATE, combined)
+                features, samples = extract_features_only(audio_chunk)
+                feature_list.append(features)
+                total_samples_processed += samples
+                # accumulate features for 500ms (25 sets of 20ms), then send COMPLETE transcription from start
+                if len(feature_list) % TRANSFORMER_INTERVAL == 0:
+                    all_features = torch.cat(feature_list, dim=1)
+                    full_transcription = run_transformer_on_features(
+                        all_features, total_samples_processed
+                    )
+                    ws.send(json.dumps(full_transcription))
 
-                if data == "stop":
-                    break
+            if data == "stop":
+                # Final update with any remaining features
+                if feature_list:
+                    all_features = torch.cat(feature_list, dim=1)
+                    full_transcription = run_transformer_on_features(
+                        all_features, total_samples_processed
+                    )
+                    ws.send(json.dumps(full_transcription))
+                break
 
-                buffer = b""  # Clear the buffer
         except Exception as e:
             print(f"Error: {e}")
-            print(f"Line: {e.__traceback__.tb_lineno if e.__traceback__ else -1}")
             break
 
 
