@@ -8,12 +8,21 @@ with a short description of your contribution(s) below. For example:
 The Koel Labs Server was developed with contributions from the following individuals:
 
 - [Alexander Metzger](https://www.linkedin.com/in/alexander-le-metzger): Koel Labs co-founder and CEO and lead backend+infrastructure+devops+ML engineer.
+- [Aruna Srivastava](https://www.linkedin.com/in/arunasr): Koel Labs co-founder and CTO and lead linguistics and NLP expert.
+- [Reuben1987AI](https://github.com/Reuben1987AI): Documentation and Firefox audio resampling.
 
 <a href="https://github.com/KoelLabs/server/graphs/contributors">
   <img class="dark-light" src="https://contrib.rocks/image?repo=KoelLabs/server&anon=0&columns=20&max=100&r=true" />
 </a>
 
 # Third-Party Software
+
+## Frontend
+name | license | author | url
+---- | ------- | ------ | ---
+libsamplerate-js | MIT LICENSE | Alexander Olsen | https://www.npmjs.com/package/@alexanderolsen/libsamplerate-js
+
+## Backend
 
 name | license | author | url
 ---- | ------- | ------ | ---
