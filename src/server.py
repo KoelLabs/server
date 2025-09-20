@@ -17,7 +17,7 @@ from phoneme_utils import TIMESTAMPED_PHONES_T, TIMESTAMPED_PHONES_BY_WORD_T
 
 # Constants
 DEBUG = False
-NUM_SECONDS_PER_CHUNK = 0.5
+NUM_SECONDS_PER_CHUNK = 0.25
 
 # Initialize Flask app
 app = Flask(__name__)

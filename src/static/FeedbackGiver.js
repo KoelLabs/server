@@ -105,9 +105,43 @@ export class FeedbackGiver {
   }
 
   /** @param {TimestampedPhone[]} transcription */
-  #setTranscription(transcription) {
+  async #setTranscription(transcription) {
+    if (transcription == this.transcription) return;
     this.transcription = transcription;
     this.on_transcription(transcription);
+
+    if (this.recognition == null && this.transcription.length > 0) {
+      // naive phoneme based word detection fallback
+      const cerByWords = (await this.getCER())[0];
+      const oldNextWordIX = this.next_word_ix;
+      let numCorrect = 0;
+      let numCharacters = 0;
+      for (let i = 0; i < cerByWords.length; i++) {
+        const [word, score] = cerByWords[i];
+        numCharacters += word.length;
+        if (score > 0 && this.transcription.length >= numCharacters * 0.7 - word.length * 0.1) {
+          numCorrect += 1;
+          this.next_word_ix = i + 1;
+          this.are_words_correct[i] = true;
+        } else {
+          this.are_words_correct[i] = false;
+        }
+      }
+      const isDone =
+        numCorrect == this.words.length ||
+        (oldNextWordIX == this.words.length &&
+          this.next_word_ix == this.words.length &&
+          this.transcription.length >= numCharacters * 0.7);
+      if (oldNextWordIX != this.next_word_ix || isDone) {
+        this.on_word_spoken(
+          this.words,
+          this.are_words_correct,
+          this.next_word_ix,
+          Math.round((1000 * numCorrect) / this.next_word_ix) / 10,
+          isDone,
+        );
+      }
+    }
   }
 
   /** @returns {Promise<WordScores>} */
@@ -293,9 +327,16 @@ export class FeedbackGiver {
       this.are_words_correct[i] = false;
     }
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    this.recognition = new SpeechRecognition();
+    try {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      this.recognition = new SpeechRecognition();
+    } catch (error) {
+      console.warn(
+        'Web Speech Recognition not supported, falling back to IPA-based word detection:',
+        error,
+      );
+      return;
+    }
     this.recognition.lang = 'en-US';
     this.recognition.interimResults = true;
     this.recognition.maxAlternatives = 1;
