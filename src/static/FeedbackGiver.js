@@ -193,6 +193,7 @@ export class FeedbackGiver {
     this.store_audio_chunks = [];
     this.userAudioBuffer = null;
     this.transcription = [];
+    let usingLocalResampler = false;
 
     // Open WebSocket connection
     this.socket = new WebSocket(
@@ -207,26 +208,63 @@ export class FeedbackGiver {
 
     // Start capturing audio (microphone)
     this.mediaStream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
+      audio: { sampleRate: SAMPLE_RATE },
     });
 
     // Create AudioContext if it doesn't exist or is closed
     if (!this.audioContext || this.audioContext.state === 'closed') {
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
-        sampleRate: SAMPLE_RATE,
-        latencyHint: 'interactive',
-      });
+      try {
+        // Attempt to create an AudioContext with native resampling (works in Chrome/Safari)
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+          sampleRate: SAMPLE_RATE,
+          latencyHint: 'interactive',
+        });
+        // This will throw a NotSupportedError in Firefox if the sample rates don't match
+        this.audioInput = this.audioContext.createMediaStreamSource(this.mediaStream);
+      } catch (error) {
+        // If the above fails, it's likely Firefox.
+        usingLocalResampler = true;
+
+        if (this.audioContext) {
+          this.audioContext.close();
+        }
+        console.warn(
+          'Native resampling failed, falling back to JavaScript-based resampling.',
+          error,
+        );
+
+        // Fallback: Use the browser's default sample rate and resample in the worklet.
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+          latencyHint: 'interactive',
+        });
+        this.audioInput = this.audioContext.createMediaStreamSource(this.mediaStream);
+      }
     }
+
     if (this.audioContext.state === 'suspended') {
       await this.audioContext.resume();
     }
 
     // Load the AudioWorkletProcessor (which handles audio processing)
     await this.audioContext.audioWorklet.addModule(`${this.serverorigin}/WavWorklet.js`);
+
+    // Load libsamplerate-js AudioWorklet module after the worklet
+    if (usingLocalResampler) {
+      await this.audioContext.audioWorklet.addModule(
+        `${this.serverorigin}/libsamplerate.worklet.js`,
+      );
+    }
+
     this.audioWorkletNode = new AudioWorkletNode(this.audioContext, 'wav-worklet');
 
+    // Send sample rate info to worklet
+    this.audioWorkletNode.port.postMessage({
+      type: 'init',
+      sourceSampleRate: this.audioContext.sampleRate,
+      targetSampleRate: SAMPLE_RATE,
+    });
+
     // Connect the audio input to the AudioWorkletNode
-    this.audioInput = this.audioContext.createMediaStreamSource(this.mediaStream);
     this.audioInput.connect(this.audioWorkletNode);
 
     // Connect the AudioWorkletNode to the audio context destination
