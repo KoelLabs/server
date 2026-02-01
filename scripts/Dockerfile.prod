@@ -4,21 +4,17 @@ FROM python:3.10.12-slim-buster
 # Set the working directory in the container
 WORKDIR /app
 
-# Download and cache the pre-trained model(s)
-ENV HF_HUB_CACHE=/app/.cache/huggingface/hub
-RUN pip install transformers==4.47.0 torch==2.5.1
-RUN --mount=type=secret,id=HF_TOKEN \
-    export HF_TOKEN=$(cat /run/secrets/HF_TOKEN) && \
-    python -c "from transformers import AutoProcessor, AutoModelForCTC; model_id = 'KoelLabs/xlsr-english-01'; AutoProcessor.from_pretrained(model_id); AutoModelForCTC.from_pretrained(model_id)"
-
 # Copy the requirements file into the container
 COPY requirements.txt requirements.txt
 
 # Install the required packages
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt && python -c "import nltk; nltk.download('cmudict'); nltk.download('averaged_perceptron_tagger_eng')"
 
 # Copy the application code into the container
-COPY . .
+COPY ./src ./src
+
+# Set non-secret environment variables
+ENV HF_HUB_CACHE=/app/.cache/huggingface/hub
 
 # Expose the port that the Flask app will run on
 EXPOSE 8080
