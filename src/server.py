@@ -133,13 +133,6 @@ def stream(ws):
 @app.route("/analyze_file", methods=["POST"])
 @cross_origin()
 def analyze_file():
-    """
-    POST multipart/form-data:
-        file: wav file
-
-    Returns:
-        timestamped transcription JSON
-    """
     try:
         target_words: list[str] = json.loads(request.args.get("target_words", "[]"))
         target_by_words: TIMESTAMPED_PHONES_BY_WORD_T = json.loads(
