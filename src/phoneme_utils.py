@@ -3,6 +3,11 @@ from collections.abc import Sequence
 
 import numpy as np
 
+from string import punctuation
+from g2p_en import G2p
+
+g2p = G2p()
+
 import panphon
 import panphon.distance
 
@@ -185,3 +190,45 @@ def grouped_weighted_needleman_wunsch(
         prev_word_ix = word_ix
 
     return grouped
+
+
+def remove_punctuation(text):
+    return "".join([c for c in text if c not in punctuation])
+
+
+def remove_length_diacritics(ipa_string: str):
+    """Remove length diacritics from the IPA string"""
+    return "".join(c for c in ipa_string if c not in {"ː", "ˑ"})
+
+
+def remove_tones_and_stress(ipa_string: str):
+    """Remove tones and stress from the IPA string"""
+    tones_and_stresss = ["˨˩h", "˧ʔ˥", "˧˨ʔ", "ˈ", "ˌ", "˥", "˧", "˨", "˩", "˦"]  # fmt: skip
+    for tone in tones_and_stresss:
+        ipa_string = ipa_string.replace(tone, "")
+    return ipa_string
+
+
+def remove_tie_marker(ipa_string: str):
+    """Remove tie marker from the IPA string"""
+    return "".join({"͡": ""}.get(c, c) for c in ipa_string)
+
+
+ARPABET2IPA = {'AA':'ɑ','AE':'æ','AH':'ʌ','AO':'ɔ','IX':'ɨ','AW':'aʊ','AX':'ə','AXR':'ɚ','AY':'aɪ','EH':'ɛ','ER':'ɝ','EY':'eɪ','IH':'ɪ','IY':'i','OW':'oʊ','OY':'ɔɪ','UH':'ʊ','UW':'u','UX':'ʉ','B':'b','CH':'tʃ','D':'d','DH':'ð','EL':'l̩','EM':'m̩','EN':'n̩','F':'f','G':'ɡ','HH':'h','H':'h','JH':'dʒ','K':'k','L':'l','M':'m','N':'n','NG':'ŋ','NX':'ɾ̃','P':'p','Q':'ʔ','R':'ɹ','S':'s','SH':'ʃ','T':'t','TH':'θ','V':'v','W':'w','WH':'ʍ','Y':'j','Z':'z','ZH':'ʒ','DX':'ɾ'}  # fmt: skip
+def arpabet2ipa(arpabet_symbols: list[str]):
+    return [ARPABET2IPA["".join(i for i in x if i.isalpha())] for x in arpabet_symbols]
+
+
+def english2ipa(text: str):
+    arpa = g2p(text)
+
+    return list(
+        map(
+            lambda phoneme: remove_punctuation(
+                remove_length_diacritics(
+                    remove_tones_and_stress(remove_tie_marker(phoneme))
+                )
+            ),
+            arpabet2ipa(arpa),
+        )
+    )

@@ -13,7 +13,12 @@ from feedback import (
     pair_by_words,
 )
 from transcription import transcribe_timestamped, SAMPLE_RATE
-from phoneme_utils import TIMESTAMPED_PHONES_T, TIMESTAMPED_PHONES_BY_WORD_T
+from phoneme_utils import (
+    TIMESTAMPED_PHONES_T,
+    TIMESTAMPED_PHONES_BY_WORD_T,
+    english2ipa,
+)
+
 
 # Constants
 DEBUG = False
@@ -33,6 +38,7 @@ def json_default(obj):
     return _json_default(obj)
 
 
+app.json.ensure_ascii = False  # type: ignore
 app.json.default = json_default  # type: ignore
 
 
@@ -122,6 +128,72 @@ def stream(ws):
             print(f"Error: {e}")
             print(f"Line: {e.__traceback__.tb_lineno if e.__traceback__ else -1}")
             break
+
+
+@app.route("/analyze_file", methods=["POST"])
+@cross_origin()
+def analyze_file():
+    """
+    POST multipart/form-data:
+        file: wav file
+
+    Returns:
+        timestamped transcription JSON
+    """
+    try:
+        target_words: list[str] = json.loads(request.args.get("target_words", "[]"))
+        target_by_words: TIMESTAMPED_PHONES_BY_WORD_T = json.loads(
+            request.args.get("target_by_words", "[]")
+        )
+        topk = int(json.loads(request.args.get("topk", "3")))
+        assert (
+            len(target_words) > 0 or len(target_by_words) > 0
+        ), "must have some target_words"
+    except Exception as e:
+        return jsonify({"Malformatted arguments": str(e)}), 400
+
+    if "file" not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+
+    if len(target_by_words) == 0:
+        target_by_words: TIMESTAMPED_PHONES_BY_WORD_T = [
+            (word, [(p, 0, 0) for p in english2ipa(word)]) for word in target_words
+        ]
+
+    from scipy.io import wavfile
+    import io
+
+    f = request.files["file"]
+
+    # Decode WAV file
+    sr, audio = wavfile.read(io.BytesIO(f.read()))
+
+    if sr != SAMPLE_RATE:
+        return jsonify({"error": f"Expected {SAMPLE_RATE}Hz, got {sr}Hz"}), 400
+
+    # Normalize to float32
+    if audio.dtype != np.float32:
+        audio = audio.astype(np.float32)
+
+        # if int PCM, scale to [-1, 1]
+        if audio.dtype == np.int16:
+            audio /= 32768.0
+        elif audio.dtype == np.int32:
+            audio /= 2147483648.0
+
+    # mono if stereo
+    if audio.ndim > 1:
+        audio = audio.mean(axis=1)
+
+    transcription = transcribe_timestamped(audio, 0.0)
+    phone_pairings_by_word = pair_by_words(target_by_words, transcription)
+    word_scores = score_words_cer(phone_pairings_by_word)
+    return jsonify(
+        {
+            **top_phonetic_errors(phone_pairings_by_word, topk=topk),
+            "word_scores": word_scores,
+        }
+    )
 
 
 if __name__ == "__main__":
