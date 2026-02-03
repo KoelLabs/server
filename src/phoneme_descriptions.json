@@ -762,14 +762,14 @@
     "examples": [
       {
         "word": "*th*is",
-        "phonetic_spelling": "TH (buzzed)-IH-S"
+        "phonetic_spelling": "buzzed TH-IH-S"
       },
       {
         "word": "*th*at",
-        "phonetic_spelling": "TH (buzzed)-AH-T"
+        "phonetic_spelling": "buzzed TH-AH-T"
       }
     ],
-    "phonetic_spelling": "TH (buzzed)",
+    "phonetic_spelling": "buzzed TH",
     "video": "https://www.youtube.com/watch?v=jFSzhE3Y50c"
   },
   {
