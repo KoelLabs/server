@@ -74,7 +74,10 @@ def top_phonetic_errors(
         )
 
     def sortByFrequencyAndSeverity(mistake: Mistake):
-        return -mistake["frequency"] - mistake["total_severity"]
+        freq_and_serverity = -mistake["frequency"] - mistake["total_severity"]
+        if "-" in mistake["speech"]:  # prioritize substitution mistakes
+            freq_and_serverity += 100_000
+        return freq_and_serverity
 
     return {
         "topk_mistakes_by_target": sorted(
