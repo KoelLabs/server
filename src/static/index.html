@@ -3,18 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Real-Time Transcription</title>
+    <title>Pronunciation Analysis Demo</title>
   </head>
 
   <body>
-    <h1>Real-Time Transcription</h1>
-
-    <div id="scored_words"></div><br>
+    <h1>Pronunciation Analysis Demo</h1>
+    <p>Record the full phrase, then upload it once to <code>/analyze_file</code>.</p>
+    <div id="scored_words"></div>
+    <br />
     <button id="start">Start</button>
     <button id="stop" disabled>Stop</button>
-    <button id="play-button">Play</button>
-    <button id="feedback-button">Get Feedback</button>
-    <p>Transcription: <span id="transcription"></span></p>
+    <button id="play-button" disabled>Play Recording</button>
+    <p>Status: <span id="status">Idle</span></p>
     <p>Accent Similarity: <span id="score"></span>%</p>
     <div id="feedback-area"></div>
 
