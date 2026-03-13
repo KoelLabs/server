@@ -214,7 +214,8 @@ def _build_target_card(mistake: Mistake) -> FeedbackCard:
         )
 
     spoken_labels = [
-        _phone_label(phone, _DESCRIPTIONS_BY_PHONEME.get(phone)) for phone in spoken_phones
+        _phone_label(phone, _DESCRIPTIONS_BY_PHONEME.get(phone))
+        for phone in spoken_phones
     ]
     return FeedbackCard(
         type="mispronunciation",
@@ -309,7 +310,9 @@ def build_analysis_response(
     phone_pairings_by_word: TIMESTAMPED_PHONE_PAIRINGS_BY_WORD_T,
     topk=3,
 ) -> AnalysisResponse:
-    insertion_mistakes, _, _, mistakes_by_target = phonetic_errors(phone_pairings_by_word)
+    insertion_mistakes, _, _, mistakes_by_target = phonetic_errors(
+        phone_pairings_by_word
+    )
     combined_target_mistakes = _combine_target_mistakes(
         phone_pairings_by_word, mistakes_by_target
     )

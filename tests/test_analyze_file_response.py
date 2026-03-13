@@ -55,7 +55,9 @@ def test_build_analysis_response_formats_ready_to_use_feedback():
     assert any(caption.startswith("You under-enunciated") for caption in captions)
     assert any(caption.startswith("You're pronouncing") for caption in captions)
     assert any(caption.startswith("You tend to add") for caption in captions)
-    assert all("words" in item and len(item["words"]) > 0 for item in response["feedback"])
+    assert all(
+        "words" in item and len(item["words"]) > 0 for item in response["feedback"]
+    )
 
 
 def _build_test_wav_bytes(sample_rate: int = 16000) -> bytes:
@@ -71,7 +73,9 @@ def test_analyze_file_queues_audio_upload_with_metadata(client, monkeypatch):
     queued_uploads = []
 
     monkeypatch.setattr(server, "transcribe_timestamped", lambda audio, offset: [])
-    monkeypatch.setattr(server, "pair_by_words", lambda target_by_words, transcription: [])
+    monkeypatch.setattr(
+        server, "pair_by_words", lambda target_by_words, transcription: []
+    )
     monkeypatch.setattr(
         server,
         "build_analysis_response",
@@ -123,7 +127,10 @@ def test_analyze_file_rejects_non_object_metadata(client):
     )
 
     assert response.status_code == 400
-    assert "metadata must be a JSON object" in response.get_json()["Malformatted arguments"]
+    assert (
+        "metadata must be a JSON object"
+        in response.get_json()["Malformatted arguments"]
+    )
 
 
 def test_feedback_report_queues_payload_and_screenshot(client, monkeypatch):
