@@ -124,3 +124,56 @@ def test_analyze_file_rejects_non_object_metadata(client):
 
     assert response.status_code == 400
     assert "metadata must be a JSON object" in response.get_json()["Malformatted arguments"]
+
+
+def test_feedback_report_queues_payload_and_screenshot(client, monkeypatch):
+    import server
+
+    queued_reports = []
+    monkeypatch.setattr(
+        server,
+        "_queue_feedback_report_upload",
+        lambda **kwargs: queued_reports.append(kwargs),
+    )
+    monkeypatch.setattr(server, "_build_feedback_report_id", lambda: "report-123")
+
+    payload = {
+        "appVersion": "1.2.3",
+        "body": "Something went wrong on this screen.",
+        "platform": "ios 18.0",
+        "route": "/lesson/42",
+        "timestamp": "2026-03-13T12:00:00.000Z",
+    }
+    screenshot_bytes = b"fake-jpeg"
+
+    response = client.post(
+        "/feedback_report",
+        data={
+            "payload": json.dumps(payload),
+            "screenshot": (io.BytesIO(screenshot_bytes), "screen.jpg"),
+        },
+        content_type="multipart/form-data",
+    )
+
+    assert response.status_code == 202
+    assert response.get_json() == {"ok": True, "report_id": "report-123"}
+    assert queued_reports == [
+        {
+            "report_id": "report-123",
+            "payload": payload,
+            "screenshot_bytes": screenshot_bytes,
+            "screenshot_filename": "screen.jpg",
+            "screenshot_content_type": "image/jpeg",
+        }
+    ]
+
+
+def test_feedback_report_rejects_invalid_payload(client):
+    response = client.post(
+        "/feedback_report",
+        data={"payload": json.dumps(["not", "an", "object"])},
+        content_type="multipart/form-data",
+    )
+
+    assert response.status_code == 400
+    assert response.get_json() == {"error": "payload must be a JSON object"}
