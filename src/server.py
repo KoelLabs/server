@@ -26,7 +26,6 @@ from phoneme_utils import (
 )
 from scipy.io import wavfile
 
-
 _ENV_PATH = Path(__file__).resolve().parents[1] / ".env"
 _S3_REQUIRED_ENV_VARS = (
     "AWS_S3_REGION",
