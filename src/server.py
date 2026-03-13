@@ -120,18 +120,21 @@ def _get_s3_config() -> dict[str, str] | None:
     return values
 
 
-def _build_s3_object_key(filename: str | None) -> str:
+def _build_s3_object_key(
+    prefix: str, filename: str | None = None, default_extension: str = ".bin"
+) -> str:
     extension = Path(filename or "").suffix.lower()
     if not extension:
-        extension = ".bin"
+        extension = default_extension
 
     now = datetime.now(timezone.utc)
-    return f"user-audio/{now:%Y/%m/%d/%H%M%S}-" f"{uuid.uuid4().hex}{extension}"
+    return f"{prefix}/{now:%Y/%m/%d/%H%M%S}-{uuid.uuid4().hex}{extension}"
 
 
-def _upload_audio_to_s3(
+def _upload_bytes_to_s3(
     *,
-    audio_bytes: bytes,
+    object_key: str,
+    payload: bytes,
     filename: str | None,
     content_type: str | None,
     metadata: dict[str, Any],
@@ -149,8 +152,8 @@ def _upload_audio_to_s3(
     guessed_content_type = content_type or mimetypes.guess_type(filename or "")[0]
     extra_args: dict[str, Any] = {
         "Bucket": config["AWS_S3_BUCKET"],
-        "Key": _build_s3_object_key(filename),
-        "Body": audio_bytes,
+        "Key": object_key,
+        "Body": payload,
         "Metadata": _sanitize_s3_metadata(metadata),
     }
     if guessed_content_type:
@@ -165,7 +168,23 @@ def _upload_audio_to_s3(
         )
         client.put_object(**extra_args)
     except Exception:
-        app.logger.exception("Failed to upload analyzed audio to S3")
+        app.logger.exception("Failed to upload object to S3: %s", object_key)
+
+
+def _upload_audio_to_s3(
+    *,
+    audio_bytes: bytes,
+    filename: str | None,
+    content_type: str | None,
+    metadata: dict[str, Any],
+) -> None:
+    _upload_bytes_to_s3(
+        object_key=_build_s3_object_key("user-audio", filename=filename),
+        payload=audio_bytes,
+        filename=filename,
+        content_type=content_type,
+        metadata=metadata,
+    )
 
 
 def _queue_audio_upload(
@@ -185,6 +204,88 @@ def _queue_audio_upload(
         },
         daemon=True,
     ).start()
+
+
+def _build_feedback_report_id() -> str:
+    now = datetime.now(timezone.utc)
+    return f"{now:%Y%m%dT%H%M%S}-{uuid.uuid4().hex}"
+
+
+def _upload_feedback_report_to_s3(
+    *,
+    report_id: str,
+    payload: dict[str, Any],
+    screenshot_bytes: bytes | None,
+    screenshot_filename: str | None,
+    screenshot_content_type: str | None,
+) -> None:
+    now = datetime.now(timezone.utc)
+    report_prefix = f"feedback-reports/{now:%Y/%m/%d}/{report_id}"
+    screenshot_key = None
+
+    report_metadata = {
+        "report_id": report_id,
+        "route": payload.get("route"),
+        "platform": payload.get("platform"),
+        "app_version": payload.get("appVersion"),
+        "has_screenshot": screenshot_bytes is not None,
+    }
+
+    if screenshot_bytes is not None:
+        screenshot_extension = Path(screenshot_filename or "").suffix.lower() or ".jpg"
+        screenshot_key = f"{report_prefix}/screenshot{screenshot_extension}"
+        _upload_bytes_to_s3(
+            object_key=screenshot_key,
+            payload=screenshot_bytes,
+            filename=screenshot_filename,
+            content_type=screenshot_content_type,
+            metadata=report_metadata,
+        )
+
+    report_body = {
+        **payload,
+        "reportId": report_id,
+        "s3ScreenshotKey": screenshot_key,
+    }
+    _upload_bytes_to_s3(
+        object_key=f"{report_prefix}/report.json",
+        payload=json.dumps(report_body, ensure_ascii=False).encode("utf-8"),
+        filename="report.json",
+        content_type="application/json",
+        metadata=report_metadata,
+    )
+
+
+def _queue_feedback_report_upload(
+    *,
+    report_id: str,
+    payload: dict[str, Any],
+    screenshot_bytes: bytes | None,
+    screenshot_filename: str | None,
+    screenshot_content_type: str | None,
+) -> None:
+    threading.Thread(
+        target=_upload_feedback_report_to_s3,
+        kwargs={
+            "report_id": report_id,
+            "payload": payload,
+            "screenshot_bytes": screenshot_bytes,
+            "screenshot_filename": screenshot_filename,
+            "screenshot_content_type": screenshot_content_type,
+        },
+        daemon=True,
+    ).start()
+
+
+def _parse_feedback_report_payload(raw_payload: str | None) -> dict[str, Any]:
+    if raw_payload is None or raw_payload.strip() == "":
+        raise ValueError("payload is required")
+
+    parsed = json.loads(raw_payload)
+    if not isinstance(parsed, dict):
+        raise ValueError("payload must be a JSON object")
+
+    return parsed
 
 
 # server /
@@ -260,6 +361,29 @@ def analyze_file():
         metadata=metadata,
     )
     return response
+
+
+@app.route("/feedback_report", methods=["POST"])
+@cross_origin()
+def feedback_report():
+    try:
+        payload = _parse_feedback_report_payload(request.form.get("payload"))
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+    screenshot = request.files.get("screenshot")
+    screenshot_bytes = screenshot.read() if screenshot else None
+    report_id = _build_feedback_report_id()
+
+    _queue_feedback_report_upload(
+        report_id=report_id,
+        payload=payload,
+        screenshot_bytes=screenshot_bytes,
+        screenshot_filename=screenshot.filename if screenshot else None,
+        screenshot_content_type=screenshot.mimetype if screenshot else None,
+    )
+
+    return jsonify({"ok": True, "report_id": report_id}), 202
 
 
 if __name__ == "__main__":
