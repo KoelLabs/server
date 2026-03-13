@@ -1,6 +1,7 @@
 import sys
 import io
 import json
+from urllib.parse import quote
 
 sys.path.append("server/src")
 
@@ -94,8 +95,9 @@ def test_analyze_file_queues_audio_upload_with_metadata(client, monkeypatch):
 
     wav_bytes = _build_test_wav_bytes()
     metadata = {"native_language": "Spanish", "user_id": "user-123"}
+    target_by_words = json.dumps([["hello", []]])
     response = client.post(
-        "/analyze_file?target_words=%5B%22hello%22%5D",
+        f"/analyze_file?target_by_words={quote(target_by_words)}",
         data={
             "file": (io.BytesIO(wav_bytes), "practice.wav"),
             "metadata": json.dumps(metadata),
