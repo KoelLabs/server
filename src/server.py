@@ -24,6 +24,11 @@ from phoneme_utils import (
     TIMESTAMPED_PHONES_BY_WORD_T,
     english2ipa,
 )
+from request_integrity import (
+    build_analyze_file_request_hash,
+    build_feedback_report_request_hash,
+    protect_request,
+)
 from scipy.io import wavfile
 
 _ENV_PATH = Path(__file__).resolve().parents[1] / ".env"
@@ -331,6 +336,16 @@ def analyze_file():
 
     f = request.files["file"]
     file_bytes = f.read()
+    integrity_result = protect_request(
+        route_key="analyze_file",
+        expected_request_hash=build_analyze_file_request_hash(
+            target_words=target_words,
+            metadata_json=request.form.get("metadata"),
+            file_bytes=file_bytes,
+        ),
+    )
+    if integrity_result is not None:
+        return integrity_result
 
     # Decode WAV file
     sr, audio = wavfile.read(io.BytesIO(file_bytes))
@@ -366,12 +381,22 @@ def analyze_file():
 @cross_origin()
 def feedback_report():
     try:
-        payload = _parse_feedback_report_payload(request.form.get("payload"))
+        raw_payload = request.form.get("payload")
+        payload = _parse_feedback_report_payload(raw_payload)
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
     screenshot = request.files.get("screenshot")
     screenshot_bytes = screenshot.read() if screenshot else None
+    integrity_result = protect_request(
+        route_key="feedback_report",
+        expected_request_hash=build_feedback_report_request_hash(
+            payload_json=raw_payload or "",
+            screenshot_bytes=screenshot_bytes,
+        ),
+    )
+    if integrity_result is not None:
+        return integrity_result
     report_id = _build_feedback_report_id()
 
     _queue_feedback_report_upload(
