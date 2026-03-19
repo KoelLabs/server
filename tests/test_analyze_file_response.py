@@ -59,6 +59,17 @@ def test_build_analysis_response_formats_ready_to_use_feedback():
     assert all(
         "words" in item and len(item["words"]) > 0 for item in response["feedback"]
     )
+    mispronunciation_items = [
+        item for item in response["feedback"] if item["type"] == "mispronunciation"
+    ]
+    assert len(mispronunciation_items) > 0
+    mispronunciation = mispronunciation_items[0]
+    assert mispronunciation["target"] == "θ"
+    assert mispronunciation["speech"] == ["t"]
+    assert mispronunciation["target_description"]["phoneme"] == "θ"
+    assert mispronunciation["target_description"]["primary_cue"]
+    assert mispronunciation["target_description"]["drill_ladder"]["words"]
+    assert mispronunciation["speech_description"][0]["phoneme"] == "t"
 
 
 def _build_test_wav_bytes(sample_rate: int = 16000) -> bytes:

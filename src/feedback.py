@@ -38,7 +38,7 @@ class Mistake(TypedDict):
     total_severity: float
 
 
-class FeedbackCard(TypedDict):
+class FeedbackCard(TypedDict, total=False):
     type: str
     caption: str
     details: str
@@ -46,6 +46,10 @@ class FeedbackCard(TypedDict):
     video: str | None
     frequency: int
     total_severity: float
+    target: PHONE_T
+    speech: list[PHONE_T]
+    target_description: dict | None
+    speech_description: list[dict | None]
 
 
 class AnalyzedWord(TypedDict):
@@ -211,6 +215,10 @@ def _build_target_card(mistake: Mistake) -> FeedbackCard:
             video=_first_video(target_description),
             frequency=mistake["frequency"],
             total_severity=mistake["total_severity"],
+            target=mistake["target"],
+            speech=[],
+            target_description=target_description,
+            speech_description=[],
         )
 
     spoken_labels = [
@@ -228,6 +236,10 @@ def _build_target_card(mistake: Mistake) -> FeedbackCard:
         video=_first_video(target_description, *spoken_descriptions),
         frequency=mistake["frequency"],
         total_severity=mistake["total_severity"],
+        target=mistake["target"],
+        speech=spoken_phones,
+        target_description=target_description,
+        speech_description=spoken_descriptions,
     )
 
 
@@ -256,6 +268,10 @@ def _build_insertion_card(mistake: Mistake) -> FeedbackCard:
         video=_first_video(*inserted_descriptions),
         frequency=mistake["frequency"],
         total_severity=mistake["total_severity"],
+        target=mistake["target"],
+        speech=inserted_phones,
+        target_description=mistake["target_description"],
+        speech_description=inserted_descriptions,
     )
 
 
