@@ -55,12 +55,12 @@
     ],
     "minimal_pairs": [
       [
-        "bat",
-        "bot"
+        "bad",
+        "bed"
       ],
       [
-        "cap",
-        "cop"
+        "man",
+        "men"
       ]
     ],
     "drill_ladder": {
@@ -151,7 +151,16 @@
       "boy",
       "toy"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "boy",
+        "bow"
+      ],
+      [
+        "toy",
+        "tie"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "oy"
@@ -194,7 +203,16 @@
       "father",
       "hot"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "hot",
+        "hut"
+      ],
+      [
+        "stock",
+        "stuck"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "ah"
@@ -289,7 +307,16 @@
       "eye",
       "pie"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "pie",
+        "pay"
+      ],
+      [
+        "time",
+        "tame"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "ay"
@@ -332,7 +359,16 @@
       "how",
       "cow"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "loud",
+        "load"
+      ],
+      [
+        "cow",
+        "coy"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "ow"
@@ -477,7 +513,16 @@
     "anchor_words": [
       "bet"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "bait",
+        "bet"
+      ],
+      [
+        "late",
+        "let"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "eh"
@@ -515,7 +560,16 @@
       "say",
       "day"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "pay",
+        "pie"
+      ],
+      [
+        "late",
+        "light"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "ei"
@@ -558,7 +612,16 @@
       "go",
       "no"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "load",
+        "loud"
+      ],
+      [
+        "bow",
+        "boy"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "ow"
@@ -607,8 +670,8 @@
         "pull"
       ],
       [
-        "Luke",
-        "look"
+        "fool",
+        "full"
       ]
     ],
     "drill_ladder": {
@@ -697,12 +760,12 @@
     ],
     "minimal_pairs": [
       [
-        "look",
-        "luck"
+        "pull",
+        "pool"
       ],
       [
-        "could",
-        "cut"
+        "full",
+        "fool"
       ]
     ],
     "drill_ladder": {
@@ -749,12 +812,12 @@
     ],
     "minimal_pairs": [
       [
-        "luck",
-        "look"
+        "cup",
+        "cap"
       ],
       [
-        "cut",
-        "could"
+        "luck",
+        "look"
       ]
     ],
     "drill_ladder": {
@@ -840,7 +903,16 @@
       "her",
       "word"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "word",
+        "ward"
+      ],
+      [
+        "fir",
+        "far"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "er"
@@ -882,7 +954,16 @@
       "bed",
       "head"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "bed",
+        "bad"
+      ],
+      [
+        "pen",
+        "pin"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "eh"
@@ -1032,7 +1113,16 @@
       "dog",
       "bad"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "dime",
+        "time"
+      ],
+      [
+        "dock",
+        "talk"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "duh"
@@ -1078,7 +1168,16 @@
       "top",
       "cat"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "tie",
+        "die"
+      ],
+      [
+        "ten",
+        "den"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "tuh"
@@ -1124,7 +1223,16 @@
       "chop",
       "match"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "chip",
+        "ship"
+      ],
+      [
+        "cheer",
+        "jeer"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "ch"
@@ -1170,7 +1278,16 @@
       "she",
       "shoes"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "she",
+        "see"
+      ],
+      [
+        "shop",
+        "chop"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "shhh"
@@ -1262,7 +1379,16 @@
       "judge",
       "age"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "jeep",
+        "cheap"
+      ],
+      [
+        "gin",
+        "chin"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "j"
@@ -1308,7 +1434,16 @@
       "bat",
       "cab"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "bat",
+        "pat"
+      ],
+      [
+        "berry",
+        "very"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "buh"
@@ -1354,7 +1489,16 @@
       "fish",
       "leaf"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "fan",
+        "van"
+      ],
+      [
+        "fine",
+        "vine"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "fff"
@@ -1400,7 +1544,16 @@
       "hat",
       "hello"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "heat",
+        "eat"
+      ],
+      [
+        "hill",
+        "ill"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "h"
@@ -1446,7 +1599,16 @@
       "yes",
       "yellow"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "yet",
+        "jet"
+      ],
+      [
+        "yoke",
+        "joke"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "y"
@@ -1492,7 +1654,16 @@
       "cat",
       "back"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "cap",
+        "gap"
+      ],
+      [
+        "coat",
+        "goat"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "kuh"
@@ -1579,7 +1750,16 @@
       "lamp",
       "ball"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "light",
+        "right"
+      ],
+      [
+        "clue",
+        "crew"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "lll"
@@ -1672,7 +1852,16 @@
       "mother",
       "amber"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "mat",
+        "nat"
+      ],
+      [
+        "mouse",
+        "house"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "mmm"
@@ -1765,7 +1954,16 @@
       "no",
       "sun"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "net",
+        "met"
+      ],
+      [
+        "nip",
+        "lip"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "nnn"
@@ -1852,7 +2050,16 @@
       "pat",
       "cap"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "pat",
+        "bat"
+      ],
+      [
+        "pack",
+        "back"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "puh"
@@ -1898,7 +2105,16 @@
       "see",
       "bus"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "sip",
+        "ship"
+      ],
+      [
+        "seal",
+        "zeal"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "sss"
@@ -1944,7 +2160,16 @@
       "van",
       "love"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "van",
+        "fan"
+      ],
+      [
+        "vest",
+        "west"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "vvv"
@@ -1993,8 +2218,8 @@
     ],
     "minimal_pairs": [
       [
-        "west",
-        "vest"
+        "wet",
+        "vet"
       ],
       [
         "wine",
@@ -2048,7 +2273,16 @@
       "zoo",
       "buzz"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "zip",
+        "sip"
+      ],
+      [
+        "zeal",
+        "seal"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "zzz"
@@ -2094,7 +2328,16 @@
       "this",
       "that"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "then",
+        "den"
+      ],
+      [
+        "they",
+        "day"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "thh"
@@ -2143,7 +2386,16 @@
       "think",
       "bath"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "thin",
+        "fin"
+      ],
+      [
+        "thank",
+        "tank"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "th"
@@ -2192,7 +2444,16 @@
       "sing",
       "ring"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "sing",
+        "sin"
+      ],
+      [
+        "rang",
+        "ran"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "ng"
@@ -2238,7 +2499,16 @@
       "go",
       "bag"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "gap",
+        "cap"
+      ],
+      [
+        "goat",
+        "coat"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "guh"
@@ -2444,7 +2714,16 @@
     "anchor_words": [
       "bach"
     ],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "loch",
+        "lock"
+      ],
+      [
+        "bach",
+        "back"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "kh"
@@ -2680,7 +2959,16 @@
     "visual_cue": "Watch the tongue tip move to the ridge behind the top teeth.",
     "feel_check": "You should feel buzzing in your throat.",
     "anchor_words": [],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "pero",
+        "perro"
+      ],
+      [
+        "caro",
+        "carro"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "rrr"
@@ -2907,7 +3195,16 @@
     "visual_cue": "Watch the lips stay relaxed rather than rounded.",
     "feel_check": "Your lips should feel relaxed, not puckered.",
     "anchor_words": [],
-    "minimal_pairs": [],
+    "minimal_pairs": [
+      [
+        "coat",
+        "caught"
+      ],
+      [
+        "so",
+        "saw"
+      ]
+    ],
     "drill_ladder": {
       "sound": [
         "oh"
