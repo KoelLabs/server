@@ -86,7 +86,39 @@
     ],
     "phonetic_spelling": "AH!",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Near-open_front_unrounded_vowel.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Near-open_front_unrounded_vowel.ogg",
+    "minimal_pairs_by_confusion": {
+      "ɛ": [
+        [
+          "man",
+          "men"
+        ],
+        [
+          "bad",
+          "bed"
+        ]
+      ],
+      "ɑ": [
+        [
+          "bat",
+          "bot"
+        ],
+        [
+          "cap",
+          "cop"
+        ]
+      ],
+      "ʌ": [
+        [
+          "bat",
+          "but"
+        ],
+        [
+          "cap",
+          "cup"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ɔ",
@@ -132,7 +164,29 @@
     ],
     "phonetic_spelling": "AW",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/02/Open-mid_back_rounded_vowel.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/02/Open-mid_back_rounded_vowel.ogg",
+    "minimal_pairs_by_confusion": {
+      "ɑ": [
+        [
+          "caught",
+          "cot"
+        ],
+        [
+          "dawn",
+          "don"
+        ]
+      ],
+      "oʊ": [
+        [
+          "saw",
+          "sew"
+        ],
+        [
+          "law",
+          "low"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ɔɪ",
@@ -236,7 +290,39 @@
     ],
     "phonetic_spelling": "AH",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Open_back_unrounded_vowel.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Open_back_unrounded_vowel.ogg",
+    "minimal_pairs_by_confusion": {
+      "æ": [
+        [
+          "cot",
+          "cat"
+        ],
+        [
+          "sock",
+          "sack"
+        ]
+      ],
+      "ʌ": [
+        [
+          "cot",
+          "cut"
+        ],
+        [
+          "lock",
+          "luck"
+        ]
+      ],
+      "ɔ": [
+        [
+          "cot",
+          "caught"
+        ],
+        [
+          "don",
+          "dawn"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ɒ",
@@ -340,7 +426,29 @@
     ],
     "phonetic_spelling": "AY",
     "video": "/placeholder.mp4",
-    "audio": null
+    "audio": null,
+    "minimal_pairs_by_confusion": {
+      "ɪ": [
+        [
+          "bite",
+          "bit"
+        ],
+        [
+          "site",
+          "sit"
+        ]
+      ],
+      "eɪ": [
+        [
+          "pie",
+          "pay"
+        ],
+        [
+          "time",
+          "tame"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "aʊ",
@@ -392,7 +500,19 @@
     ],
     "phonetic_spelling": "OW",
     "video": "/placeholder.mp4",
-    "audio": null
+    "audio": null,
+    "minimal_pairs_by_confusion": {
+      "oʊ": [
+        [
+          "loud",
+          "load"
+        ],
+        [
+          "town",
+          "tone"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "i",
@@ -444,7 +564,19 @@
     ],
     "phonetic_spelling": "EE",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/9/91/Close_front_unrounded_vowel.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/9/91/Close_front_unrounded_vowel.ogg",
+    "minimal_pairs_by_confusion": {
+      "ɪ": [
+        [
+          "sheep",
+          "ship"
+        ],
+        [
+          "beat",
+          "bit"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ɪ",
@@ -496,7 +628,39 @@
     ],
     "phonetic_spelling": "IH",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Near-close_near-front_unrounded_vowel.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Near-close_near-front_unrounded_vowel.ogg",
+    "minimal_pairs_by_confusion": {
+      "i": [
+        [
+          "ship",
+          "sheep"
+        ],
+        [
+          "bit",
+          "beat"
+        ]
+      ],
+      "aɪ": [
+        [
+          "sit",
+          "site"
+        ],
+        [
+          "bit",
+          "bite"
+        ]
+      ],
+      "ɛ": [
+        [
+          "sit",
+          "set"
+        ],
+        [
+          "bit",
+          "bet"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "e",
@@ -593,7 +757,29 @@
     ],
     "phonetic_spelling": "EI",
     "video": "/placeholder.mp4",
-    "audio": null
+    "audio": null,
+    "minimal_pairs_by_confusion": {
+      "aɪ": [
+        [
+          "pay",
+          "pie"
+        ],
+        [
+          "late",
+          "light"
+        ]
+      ],
+      "ɛ": [
+        [
+          "late",
+          "let"
+        ],
+        [
+          "mate",
+          "met"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "oʊ",
@@ -645,7 +831,29 @@
     ],
     "phonetic_spelling": "OW",
     "video": "/placeholder.mp4",
-    "audio": null
+    "audio": null,
+    "minimal_pairs_by_confusion": {
+      "aʊ": [
+        [
+          "load",
+          "loud"
+        ],
+        [
+          "tone",
+          "town"
+        ]
+      ],
+      "u": [
+        [
+          "coat",
+          "coot"
+        ],
+        [
+          "boat",
+          "boot"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "u",
@@ -697,7 +905,29 @@
     ],
     "phonetic_spelling": "OO",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Close_back_rounded_vowel.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Close_back_rounded_vowel.ogg",
+    "minimal_pairs_by_confusion": {
+      "ʊ": [
+        [
+          "pool",
+          "pull"
+        ],
+        [
+          "fool",
+          "full"
+        ]
+      ],
+      "oʊ": [
+        [
+          "boot",
+          "boat"
+        ],
+        [
+          "coot",
+          "coat"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ə",
@@ -791,7 +1021,29 @@
     ],
     "phonetic_spelling": "UH",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Near-close_near-back_rounded_vowel.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Near-close_near-back_rounded_vowel.ogg",
+    "minimal_pairs_by_confusion": {
+      "u": [
+        [
+          "pull",
+          "pool"
+        ],
+        [
+          "full",
+          "fool"
+        ]
+      ],
+      "ʌ": [
+        [
+          "look",
+          "luck"
+        ],
+        [
+          "book",
+          "buck"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ʌ",
@@ -843,7 +1095,39 @@
     ],
     "phonetic_spelling": "UH",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/9/92/Open-mid_back_unrounded_vowel.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/9/92/Open-mid_back_unrounded_vowel.ogg",
+    "minimal_pairs_by_confusion": {
+      "ʊ": [
+        [
+          "luck",
+          "look"
+        ],
+        [
+          "buck",
+          "book"
+        ]
+      ],
+      "ɑ": [
+        [
+          "cut",
+          "cot"
+        ],
+        [
+          "luck",
+          "lock"
+        ]
+      ],
+      "æ": [
+        [
+          "but",
+          "bat"
+        ],
+        [
+          "cup",
+          "cap"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ə˞",
@@ -936,7 +1220,29 @@
     ],
     "phonetic_spelling": "ER",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e3/PR-r-coloured_open-mid_central_unrounded_vowel.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e3/PR-r-coloured_open-mid_central_unrounded_vowel.ogg",
+    "minimal_pairs_by_confusion": {
+      "ɔ": [
+        [
+          "word",
+          "ward"
+        ],
+        [
+          "fir",
+          "for"
+        ]
+      ],
+      "ɑ": [
+        [
+          "bird",
+          "bard"
+        ],
+        [
+          "fir",
+          "far"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ɛ",
@@ -987,7 +1293,39 @@
     ],
     "phonetic_spelling": "EH",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/7/71/Open-mid_front_unrounded_vowel.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/7/71/Open-mid_front_unrounded_vowel.ogg",
+    "minimal_pairs_by_confusion": {
+      "ɪ": [
+        [
+          "pen",
+          "pin"
+        ],
+        [
+          "bed",
+          "bid"
+        ]
+      ],
+      "æ": [
+        [
+          "men",
+          "man"
+        ],
+        [
+          "send",
+          "sand"
+        ]
+      ],
+      "eɪ": [
+        [
+          "let",
+          "late"
+        ],
+        [
+          "met",
+          "mate"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ɹ",
@@ -1049,7 +1387,29 @@
     ],
     "phonetic_spelling": "R",
     "video": "/R-Feedback.MP4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Alveolar_approximant.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Alveolar_approximant.ogg",
+    "minimal_pairs_by_confusion": {
+      "w": [
+        [
+          "red",
+          "wed"
+        ],
+        [
+          "right",
+          "white"
+        ]
+      ],
+      "l": [
+        [
+          "road",
+          "load"
+        ],
+        [
+          "rice",
+          "lice"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ɾ",
@@ -1115,12 +1475,12 @@
     ],
     "minimal_pairs": [
       [
-        "dime",
-        "time"
+        "do",
+        "two"
       ],
       [
-        "dock",
-        "talk"
+        "den",
+        "ten"
       ]
     ],
     "drill_ladder": {
@@ -1150,7 +1510,59 @@
     ],
     "phonetic_spelling": "D",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/01/Voiced_alveolar_plosive.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/01/Voiced_alveolar_plosive.ogg",
+    "minimal_pairs_by_confusion": {
+      "t": [
+        [
+          "do",
+          "two"
+        ],
+        [
+          "den",
+          "ten"
+        ]
+      ],
+      "ɹ": [
+        [
+          "day",
+          "ray"
+        ],
+        [
+          "dock",
+          "rock"
+        ]
+      ],
+      "r": [
+        [
+          "day",
+          "ray"
+        ],
+        [
+          "dock",
+          "rock"
+        ]
+      ],
+      "ð": [
+        [
+          "day",
+          "they"
+        ],
+        [
+          "doze",
+          "those"
+        ]
+      ],
+      "ɡ": [
+        [
+          "day",
+          "gay"
+        ],
+        [
+          "do",
+          "go"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "t",
@@ -1205,7 +1617,49 @@
     ],
     "phonetic_spelling": "T",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/02/Voiceless_alveolar_plosive.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/02/Voiceless_alveolar_plosive.ogg",
+    "minimal_pairs_by_confusion": {
+      "d": [
+        [
+          "tie",
+          "die"
+        ],
+        [
+          "ten",
+          "den"
+        ]
+      ],
+      "k": [
+        [
+          "top",
+          "cop"
+        ],
+        [
+          "tame",
+          "came"
+        ]
+      ],
+      "θ": [
+        [
+          "tin",
+          "thin"
+        ],
+        [
+          "tank",
+          "thank"
+        ]
+      ],
+      "tʃ": [
+        [
+          "tip",
+          "chip"
+        ],
+        [
+          "tin",
+          "chin"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "tʃ",
@@ -1260,7 +1714,39 @@
     ],
     "phonetic_spelling": "CH",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/9/97/Voiceless_palato-alveolar_affricate.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/9/97/Voiceless_palato-alveolar_affricate.ogg",
+    "minimal_pairs_by_confusion": {
+      "ʃ": [
+        [
+          "chip",
+          "ship"
+        ],
+        [
+          "chop",
+          "shop"
+        ]
+      ],
+      "dʒ": [
+        [
+          "cheap",
+          "jeep"
+        ],
+        [
+          "choke",
+          "joke"
+        ]
+      ],
+      "t": [
+        [
+          "chip",
+          "tip"
+        ],
+        [
+          "chin",
+          "tin"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ʃ",
@@ -1315,7 +1801,39 @@
     ],
     "phonetic_spelling": "SH",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Voiceless_palato-alveolar_sibilant.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Voiceless_palato-alveolar_sibilant.ogg",
+    "minimal_pairs_by_confusion": {
+      "s": [
+        [
+          "she",
+          "see"
+        ],
+        [
+          "mash",
+          "mass"
+        ]
+      ],
+      "tʃ": [
+        [
+          "ship",
+          "chip"
+        ],
+        [
+          "shop",
+          "chop"
+        ]
+      ],
+      "t": [
+        [
+          "ship",
+          "tip"
+        ],
+        [
+          "shoe",
+          "two"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ʒ",
@@ -1416,7 +1934,29 @@
     ],
     "phonetic_spelling": "DCH",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Voiced_palato-alveolar_affricate.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Voiced_palato-alveolar_affricate.ogg",
+    "minimal_pairs_by_confusion": {
+      "tʃ": [
+        [
+          "jeep",
+          "cheap"
+        ],
+        [
+          "joke",
+          "choke"
+        ]
+      ],
+      "j": [
+        [
+          "jet",
+          "yet"
+        ],
+        [
+          "joke",
+          "yolk"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "b",
@@ -1440,8 +1980,8 @@
         "pat"
       ],
       [
-        "berry",
-        "very"
+        "best",
+        "vest"
       ]
     ],
     "drill_ladder": {
@@ -1471,7 +2011,29 @@
     ],
     "phonetic_spelling": "B",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Voiced_bilabial_plosive.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Voiced_bilabial_plosive.ogg",
+    "minimal_pairs_by_confusion": {
+      "p": [
+        [
+          "bat",
+          "pat"
+        ],
+        [
+          "big",
+          "pig"
+        ]
+      ],
+      "v": [
+        [
+          "best",
+          "vest"
+        ],
+        [
+          "berry",
+          "very"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "f",
@@ -1526,7 +2088,39 @@
     ],
     "phonetic_spelling": "F",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/3/33/Voiceless_labiodental_fricative.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/3/33/Voiceless_labiodental_fricative.ogg",
+    "minimal_pairs_by_confusion": {
+      "v": [
+        [
+          "fan",
+          "van"
+        ],
+        [
+          "fine",
+          "vine"
+        ]
+      ],
+      "θ": [
+        [
+          "fin",
+          "thin"
+        ],
+        [
+          "free",
+          "three"
+        ]
+      ],
+      "p": [
+        [
+          "fan",
+          "pan"
+        ],
+        [
+          "fin",
+          "pin"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "h",
@@ -1636,7 +2230,19 @@
     ],
     "phonetic_spelling": "YE",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Palatal_approximant.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Palatal_approximant.ogg",
+    "minimal_pairs_by_confusion": {
+      "dʒ": [
+        [
+          "yet",
+          "jet"
+        ],
+        [
+          "yoke",
+          "joke"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "k",
@@ -1691,7 +2297,29 @@
     ],
     "phonetic_spelling": "K",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Voiceless_velar_plosive.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Voiceless_velar_plosive.ogg",
+    "minimal_pairs_by_confusion": {
+      "t": [
+        [
+          "cop",
+          "top"
+        ],
+        [
+          "cap",
+          "tap"
+        ]
+      ],
+      "ɡ": [
+        [
+          "coat",
+          "goat"
+        ],
+        [
+          "cap",
+          "gap"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "kʰ",
@@ -1756,8 +2384,8 @@
         "right"
       ],
       [
-        "clue",
-        "crew"
+        "led",
+        "red"
       ]
     ],
     "drill_ladder": {
@@ -1787,7 +2415,39 @@
     ],
     "phonetic_spelling": "L",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Alveolar_lateral_approximant.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Alveolar_lateral_approximant.ogg",
+    "minimal_pairs_by_confusion": {
+      "ɹ": [
+        [
+          "light",
+          "right"
+        ],
+        [
+          "led",
+          "red"
+        ]
+      ],
+      "r": [
+        [
+          "light",
+          "right"
+        ],
+        [
+          "led",
+          "red"
+        ]
+      ],
+      "w": [
+        [
+          "led",
+          "wed"
+        ],
+        [
+          "light",
+          "white"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "l̩",
@@ -1858,8 +2518,8 @@
         "nat"
       ],
       [
-        "mouse",
-        "house"
+        "mime",
+        "mine"
       ]
     ],
     "drill_ladder": {
@@ -1889,7 +2549,29 @@
     ],
     "phonetic_spelling": "M",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Bilabial_nasal.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Bilabial_nasal.ogg",
+    "minimal_pairs_by_confusion": {
+      "n": [
+        [
+          "sum",
+          "sun"
+        ],
+        [
+          "ram",
+          "ran"
+        ]
+      ],
+      "ŋ": [
+        [
+          "sum",
+          "sung"
+        ],
+        [
+          "ram",
+          "rang"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "m̩",
@@ -1991,7 +2673,29 @@
     ],
     "phonetic_spelling": "N",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/2/29/Alveolar_nasal.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/2/29/Alveolar_nasal.ogg",
+    "minimal_pairs_by_confusion": {
+      "m": [
+        [
+          "sun",
+          "sum"
+        ],
+        [
+          "ran",
+          "ram"
+        ]
+      ],
+      "ŋ": [
+        [
+          "sin",
+          "sing"
+        ],
+        [
+          "ran",
+          "rang"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "n̩",
@@ -2087,7 +2791,29 @@
     ],
     "phonetic_spelling": "P",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/5/51/Voiceless_bilabial_plosive.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/5/51/Voiceless_bilabial_plosive.ogg",
+    "minimal_pairs_by_confusion": {
+      "b": [
+        [
+          "pat",
+          "bat"
+        ],
+        [
+          "pack",
+          "back"
+        ]
+      ],
+      "f": [
+        [
+          "pin",
+          "fin"
+        ],
+        [
+          "pig",
+          "fig"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "s",
@@ -2142,7 +2868,49 @@
     ],
     "phonetic_spelling": "S",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Voiceless_alveolar_sibilant.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Voiceless_alveolar_sibilant.ogg",
+    "minimal_pairs_by_confusion": {
+      "z": [
+        [
+          "sip",
+          "zip"
+        ],
+        [
+          "seal",
+          "zeal"
+        ]
+      ],
+      "ʃ": [
+        [
+          "see",
+          "she"
+        ],
+        [
+          "sip",
+          "ship"
+        ]
+      ],
+      "θ": [
+        [
+          "sink",
+          "think"
+        ],
+        [
+          "sank",
+          "thank"
+        ]
+      ],
+      "t": [
+        [
+          "see",
+          "tea"
+        ],
+        [
+          "sip",
+          "tip"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "v",
@@ -2197,7 +2965,39 @@
     ],
     "phonetic_spelling": "V",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/8/85/Voiced_labiodental_fricative.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/8/85/Voiced_labiodental_fricative.ogg",
+    "minimal_pairs_by_confusion": {
+      "f": [
+        [
+          "van",
+          "fan"
+        ],
+        [
+          "vine",
+          "fine"
+        ]
+      ],
+      "w": [
+        [
+          "vest",
+          "west"
+        ],
+        [
+          "vine",
+          "wine"
+        ]
+      ],
+      "b": [
+        [
+          "vat",
+          "bat"
+        ],
+        [
+          "vote",
+          "boat"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "w",
@@ -2255,7 +3055,49 @@
     ],
     "phonetic_spelling": "W",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Voiced_labio-velar_approximant.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Voiced_labio-velar_approximant.ogg",
+    "minimal_pairs_by_confusion": {
+      "ɹ": [
+        [
+          "wake",
+          "rake"
+        ],
+        [
+          "wing",
+          "ring"
+        ]
+      ],
+      "r": [
+        [
+          "wake",
+          "rake"
+        ],
+        [
+          "wing",
+          "ring"
+        ]
+      ],
+      "v": [
+        [
+          "west",
+          "vest"
+        ],
+        [
+          "wine",
+          "vine"
+        ]
+      ],
+      "l": [
+        [
+          "wake",
+          "lake"
+        ],
+        [
+          "weed",
+          "lead"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "z",
@@ -2310,7 +3152,19 @@
     ],
     "phonetic_spelling": "Z",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Voiced_alveolar_sibilant.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Voiced_alveolar_sibilant.ogg",
+    "minimal_pairs_by_confusion": {
+      "s": [
+        [
+          "zip",
+          "sip"
+        ],
+        [
+          "zeal",
+          "seal"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ð",
@@ -2368,7 +3222,39 @@
     ],
     "phonetic_spelling": "buzzed TH",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Voiced_dental_fricative.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Voiced_dental_fricative.ogg",
+    "minimal_pairs_by_confusion": {
+      "d": [
+        [
+          "they",
+          "day"
+        ],
+        [
+          "those",
+          "doze"
+        ]
+      ],
+      "z": [
+        [
+          "then",
+          "zen"
+        ],
+        [
+          "breathe",
+          "breeze"
+        ]
+      ],
+      "θ": [
+        [
+          "bathe",
+          "bath"
+        ],
+        [
+          "breathe",
+          "breath"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "θ",
@@ -2426,7 +3312,49 @@
     ],
     "phonetic_spelling": "silent TH",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/8/80/Voiceless_dental_fricative.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/8/80/Voiceless_dental_fricative.ogg",
+    "minimal_pairs_by_confusion": {
+      "s": [
+        [
+          "think",
+          "sink"
+        ],
+        [
+          "thank",
+          "sank"
+        ]
+      ],
+      "t": [
+        [
+          "thin",
+          "tin"
+        ],
+        [
+          "thank",
+          "tank"
+        ]
+      ],
+      "f": [
+        [
+          "thin",
+          "fin"
+        ],
+        [
+          "three",
+          "free"
+        ]
+      ],
+      "ð": [
+        [
+          "bath",
+          "bathe"
+        ],
+        [
+          "breath",
+          "breathe"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ŋ",
@@ -2481,7 +3409,29 @@
     ],
     "phonetic_spelling": "NG",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/3/39/Velar_nasal.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/3/39/Velar_nasal.ogg",
+    "minimal_pairs_by_confusion": {
+      "n": [
+        [
+          "sing",
+          "sin"
+        ],
+        [
+          "rang",
+          "ran"
+        ]
+      ],
+      "m": [
+        [
+          "sung",
+          "sum"
+        ],
+        [
+          "rang",
+          "ram"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ɡ",
@@ -2536,7 +3486,29 @@
     ],
     "phonetic_spelling": "G",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Voiced_velar_plosive.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Voiced_velar_plosive.ogg",
+    "minimal_pairs_by_confusion": {
+      "k": [
+        [
+          "goat",
+          "coat"
+        ],
+        [
+          "gap",
+          "cap"
+        ]
+      ],
+      "d": [
+        [
+          "gay",
+          "day"
+        ],
+        [
+          "goal",
+          "dole"
+        ]
+      ]
+    }
   },
   {
     "phoneme": "ŋ̩",
