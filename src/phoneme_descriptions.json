@@ -1,14 +1,13 @@
 [
   {
     "phoneme": "a",
-    "ipa": "a",
+    "primary": false,
     "label": "Aah sound",
     "plain_english": "like the sound in 'laa'",
     "description": [
       "front open unrounded vowel"
     ],
     "explanation": "Open your jaw and keep your tongue low and forward. Think of the open 'a' sound in many pronunciations of 'la'.",
-    "confused_phone": "ɑ",
     "primary_cue": "Open your jaw and keep your tongue low and forward.",
     "visual_cue": "Watch the lips stay relaxed rather than rounded.",
     "feel_check": "Your lips should feel relaxed, not puckered.",
@@ -16,6 +15,7 @@
       "laa"
     ],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "aah"
@@ -34,18 +34,18 @@
     ],
     "phonetic_spelling": "AAH",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/6/65/Open_front_unrounded_vowel.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/6/65/Open_front_unrounded_vowel.ogg",
+    "confused_phone": "ɑ"
   },
   {
     "phoneme": "æ",
-    "ipa": "æ",
+    "primary": true,
     "label": "Ah! sound",
     "plain_english": "like the sound in 'apple'",
     "description": [
       "front near-open unrounded vowel"
     ],
     "explanation": "Open your mouth wide with a slight smile and keep your tongue low and forward. This is the short vowel in 'apple' and 'cat'.",
-    "confused_phone": "ɑ",
     "primary_cue": "Open your mouth wide with a slight smile and keep your tongue low and forward.",
     "visual_cue": "Watch the lips stay relaxed rather than rounded.",
     "feel_check": "Your lips should feel relaxed, not puckered.",
@@ -63,30 +63,6 @@
         "men"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "ah!"
-      ],
-      "syllables": [],
-      "words": [
-        "apple",
-        "last"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*a*pple",
-        "phonetic_spelling": "AH-P-L"
-      },
-      {
-        "word": "l*a*st",
-        "phonetic_spelling": "L-AH-ST"
-      }
-    ],
-    "phonetic_spelling": "AH!",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Near-open_front_unrounded_vowel.ogg",
     "minimal_pairs_by_confusion": {
       "ɛ": [
         [
@@ -118,18 +94,46 @@
           "cup"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "ah!"
+      ],
+      "syllables": [],
+      "words": [
+        "apple",
+        "last"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "back",
+        "phonetic_spelling": "B-AH-K"
+      },
+      {
+        "word": "camp",
+        "phonetic_spelling": "K-AH-MP"
+      },
+      {
+        "word": "hand",
+        "phonetic_spelling": "H-AH-ND"
+      }
+    ],
+    "phonetic_spelling": "AH!",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Near-open_front_unrounded_vowel.ogg",
+    "confused_phone": "ɑ"
   },
   {
     "phoneme": "ɔ",
-    "ipa": "ɔ",
+    "primary": true,
     "label": "Aw sound",
     "plain_english": "like the sound in 'thought'",
     "description": [
       "back open-mid rounded vowel"
     ],
     "explanation": "Round your lips a little and keep the back of your tongue low. This is the rounded vowel in 'thought' for many speakers.",
-    "confused_phone": "ɒ",
     "primary_cue": "Round your lips a little and keep the back of your tongue low.",
     "visual_cue": "Watch the lips round into a smaller, more focused shape.",
     "feel_check": "Your lips should feel rounded and slightly firm.",
@@ -146,25 +150,6 @@
         "don"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "aw"
-      ],
-      "syllables": [],
-      "words": [
-        "thought"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "th*ou*ght",
-        "phonetic_spelling": "TH-AW-T"
-      }
-    ],
-    "phonetic_spelling": "AW",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/02/Open-mid_back_rounded_vowel.ogg",
     "minimal_pairs_by_confusion": {
       "ɑ": [
         [
@@ -186,11 +171,40 @@
           "low"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "aw"
+      ],
+      "syllables": [],
+      "words": [
+        "thought"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "often",
+        "phonetic_spelling": "AW-F-T-UHN"
+      },
+      {
+        "word": "orbit",
+        "phonetic_spelling": "AW-R-B-IH-T"
+      },
+      {
+        "word": "autumn",
+        "phonetic_spelling": "AW-D-UHM"
+      }
+    ],
+    "phonetic_spelling": "AW",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/02/Open-mid_back_rounded_vowel.ogg",
+    "confused_phone": "ɒ",
+    "sort_key": "AW1"
   },
   {
     "phoneme": "ɔɪ",
-    "ipa": "ɔɪ",
+    "primary": true,
     "label": "Oy sound",
     "plain_english": "like the sound in 'boy'",
     "description": [
@@ -215,6 +229,7 @@
         "tie"
       ]
     ],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "oy"
@@ -228,28 +243,31 @@
     },
     "examples": [
       {
-        "word": "b*oy*",
-        "phonetic_spelling": "B-OY"
+        "word": "boil",
+        "phonetic_spelling": "B-OY-L"
       },
       {
-        "word": "t*oy*",
-        "phonetic_spelling": "T-OY"
+        "word": "coin",
+        "phonetic_spelling": "K-OY-N"
+      },
+      {
+        "word": "void",
+        "phonetic_spelling": "V-OY-D"
       }
     ],
     "phonetic_spelling": "OY",
     "video": "/placeholder.mp4",
-    "audio": null
+    "sort_key": "AW2"
   },
   {
     "phoneme": "ɑ",
-    "ipa": "ɑ",
+    "primary": true,
     "label": "Ah sound",
     "plain_english": "like the sound in 'father'",
     "description": [
       "back open unrounded vowel"
     ],
     "explanation": "Drop your jaw and keep your lips relaxed. Keep your tongue low and back for the 'ah' sound in 'father' and many versions of 'hot'.",
-    "confused_phone": "ɒ",
     "primary_cue": "Drop your jaw and keep your lips relaxed.",
     "visual_cue": "Watch the lips stay relaxed rather than rounded.",
     "feel_check": "Your lips should feel relaxed, not puckered.",
@@ -267,30 +285,6 @@
         "stuck"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "ah"
-      ],
-      "syllables": [],
-      "words": [
-        "father",
-        "hot"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "f*a*ther",
-        "phonetic_spelling": "F-AH-TH-ER"
-      },
-      {
-        "word": "h*o*t",
-        "phonetic_spelling": "H-AH-T"
-      }
-    ],
-    "phonetic_spelling": "AH",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Open_back_unrounded_vowel.ogg",
     "minimal_pairs_by_confusion": {
       "æ": [
         [
@@ -322,18 +316,46 @@
           "dawn"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "ah"
+      ],
+      "syllables": [],
+      "words": [
+        "father",
+        "hot"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "arch",
+        "phonetic_spelling": "AA-R-CH"
+      },
+      {
+        "word": "odds",
+        "phonetic_spelling": "AA-D-Z"
+      },
+      {
+        "word": "honor",
+        "phonetic_spelling": "AA-N-ER"
+      }
+    ],
+    "phonetic_spelling": "AA",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Open_back_unrounded_vowel.ogg",
+    "confused_phone": "ɒ"
   },
   {
     "phoneme": "ɒ",
-    "ipa": "ɒ",
+    "primary": false,
     "label": "Aw sound",
     "plain_english": "like the sound in 'lot'",
     "description": [
       "back open rounded vowel"
     ],
     "explanation": "Open your mouth and round your lips slightly more than /ɑ/. This is the short rounded vowel in British 'lot'.",
-    "confused_phone": "ɔ",
     "primary_cue": "Open your mouth and round your lips slightly more than /ɑ/.",
     "visual_cue": "Watch the lips round into a smaller, more focused shape.",
     "feel_check": "Your lips should feel rounded and slightly firm.",
@@ -351,6 +373,7 @@
         "dawn"
       ]
     ],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "aw"
@@ -374,11 +397,12 @@
     ],
     "phonetic_spelling": "AW",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Open_back_rounded_vowel.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Open_back_rounded_vowel.ogg",
+    "confused_phone": "ɔ"
   },
   {
     "phoneme": "aɪ",
-    "ipa": "aɪ",
+    "primary": true,
     "label": "Ay sound",
     "plain_english": "like the sound in 'eye'",
     "description": [
@@ -403,30 +427,6 @@
         "tame"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "ay"
-      ],
-      "syllables": [],
-      "words": [
-        "eye",
-        "pie"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*ey*e",
-        "phonetic_spelling": "AY"
-      },
-      {
-        "word": "p*i*e",
-        "phonetic_spelling": "P-AY"
-      }
-    ],
-    "phonetic_spelling": "AY",
-    "video": "/placeholder.mp4",
-    "audio": null,
     "minimal_pairs_by_confusion": {
       "ɪ": [
         [
@@ -448,11 +448,39 @@
           "tame"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "ay"
+      ],
+      "syllables": [],
+      "words": [
+        "eye",
+        "pie"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "bike",
+        "phonetic_spelling": "B-AY-K"
+      },
+      {
+        "word": "find",
+        "phonetic_spelling": "F-AY-ND"
+      },
+      {
+        "word": "high",
+        "phonetic_spelling": "H-AY"
+      }
+    ],
+    "phonetic_spelling": "AY",
+    "video": "/placeholder.mp4",
+    "sort_key": "AY1"
   },
   {
     "phoneme": "aʊ",
-    "ipa": "aʊ",
+    "primary": true,
     "label": "Ow sound",
     "plain_english": "like the sound in 'how'",
     "description": [
@@ -477,6 +505,18 @@
         "coy"
       ]
     ],
+    "minimal_pairs_by_confusion": {
+      "oʊ": [
+        [
+          "loud",
+          "load"
+        ],
+        [
+          "town",
+          "tone"
+        ]
+      ]
+    },
     "drill_ladder": {
       "sound": [
         "ow"
@@ -490,40 +530,31 @@
     },
     "examples": [
       {
-        "word": "h*ow*",
-        "phonetic_spelling": "H-OW"
+        "word": "hour",
+        "phonetic_spelling": "OW-ER"
       },
       {
-        "word": "c*ow*",
-        "phonetic_spelling": "K-OW"
+        "word": "down",
+        "phonetic_spelling": "D-OW-N"
+      },
+      {
+        "word": "loud",
+        "phonetic_spelling": "L-OW-D"
       }
     ],
     "phonetic_spelling": "OW",
     "video": "/placeholder.mp4",
-    "audio": null,
-    "minimal_pairs_by_confusion": {
-      "oʊ": [
-        [
-          "loud",
-          "load"
-        ],
-        [
-          "town",
-          "tone"
-        ]
-      ]
-    }
+    "sort_key": "AY2"
   },
   {
     "phoneme": "i",
-    "ipa": "i",
+    "primary": true,
     "label": "Ee sound",
     "plain_english": "like the sound in 'see'",
     "description": [
       "close front unrounded vowel"
     ],
     "explanation": "Spread your lips slightly and raise the front of your tongue high. This is the long 'ee' sound in 'see'.",
-    "confused_phone": "ɪ",
     "primary_cue": "Spread your lips slightly and raise the front of your tongue high.",
     "visual_cue": "Watch the lips stay relaxed rather than rounded.",
     "feel_check": "Your lips should feel relaxed, not puckered.",
@@ -541,6 +572,18 @@
         "bit"
       ]
     ],
+    "minimal_pairs_by_confusion": {
+      "ɪ": [
+        [
+          "sheep",
+          "ship"
+        ],
+        [
+          "beat",
+          "bit"
+        ]
+      ]
+    },
     "drill_ladder": {
       "sound": [
         "ee"
@@ -554,40 +597,33 @@
     },
     "examples": [
       {
-        "word": "s*ee*",
-        "phonetic_spelling": "S-EE"
+        "word": "ease",
+        "phonetic_spelling": "EE-Z"
       },
       {
-        "word": "b*ee*",
-        "phonetic_spelling": "B-EE"
+        "word": "free",
+        "phonetic_spelling": "F-R-EE"
+      },
+      {
+        "word": "bean",
+        "phonetic_spelling": "B-EE-N"
       }
     ],
     "phonetic_spelling": "EE",
     "video": "/placeholder.mp4",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/9/91/Close_front_unrounded_vowel.ogg",
-    "minimal_pairs_by_confusion": {
-      "ɪ": [
-        [
-          "sheep",
-          "ship"
-        ],
-        [
-          "beat",
-          "bit"
-        ]
-      ]
-    }
+    "confused_phone": "ɪ",
+    "sort_key": "EE1"
   },
   {
     "phoneme": "ɪ",
-    "ipa": "ɪ",
+    "primary": true,
     "label": "Ih sound",
     "plain_english": "like the sound in 'sit'",
     "description": [
       "near-close near-front unrounded vowel"
     ],
     "explanation": "Keep your lips relaxed and raise the front of your tongue, but not as high or tense as /i/. This is the short vowel in 'sit' and 'bit'.",
-    "confused_phone": "i",
     "primary_cue": "Keep your lips relaxed and raise the front of your tongue, but not as high or tense as /i/.",
     "visual_cue": "Watch the lips stay relaxed rather than rounded.",
     "feel_check": "Your lips should feel relaxed, not puckered.",
@@ -605,30 +641,6 @@
         "beat"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "ih"
-      ],
-      "syllables": [],
-      "words": [
-        "sit",
-        "bit"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "s*i*t",
-        "phonetic_spelling": "S-IH-T"
-      },
-      {
-        "word": "b*i*t",
-        "phonetic_spelling": "B-IH-T"
-      }
-    ],
-    "phonetic_spelling": "IH",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Near-close_near-front_unrounded_vowel.ogg",
     "minimal_pairs_by_confusion": {
       "i": [
         [
@@ -660,11 +672,41 @@
           "bet"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "ih"
+      ],
+      "syllables": [],
+      "words": [
+        "sit",
+        "bit"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "inch",
+        "phonetic_spelling": "IH-N-CH"
+      },
+      {
+        "word": "bill",
+        "phonetic_spelling": "B-IH-L"
+      },
+      {
+        "word": "chip",
+        "phonetic_spelling": "CH-IH-P"
+      }
+    ],
+    "phonetic_spelling": "IH",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Near-close_near-front_unrounded_vowel.ogg",
+    "confused_phone": "i",
+    "sort_key": "EE2"
   },
   {
     "phoneme": "e",
-    "ipa": "e",
+    "primary": false,
     "label": "Eh sound",
     "plain_english": "like the sound in 'bet'",
     "description": [
@@ -687,6 +729,7 @@
         "let"
       ]
     ],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "eh"
@@ -709,7 +752,7 @@
   },
   {
     "phoneme": "eɪ",
-    "ipa": "eɪ",
+    "primary": true,
     "label": "Ei sound",
     "plain_english": "like the sound in 'say'",
     "description": [
@@ -734,30 +777,6 @@
         "light"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "ei"
-      ],
-      "syllables": [],
-      "words": [
-        "say",
-        "day"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "s*ay*",
-        "phonetic_spelling": "S-AY"
-      },
-      {
-        "word": "d*ay*",
-        "phonetic_spelling": "D-AY"
-      }
-    ],
-    "phonetic_spelling": "EI",
-    "video": "/placeholder.mp4",
-    "audio": null,
     "minimal_pairs_by_confusion": {
       "aɪ": [
         [
@@ -779,11 +798,38 @@
           "met"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "ei"
+      ],
+      "syllables": [],
+      "words": [
+        "say",
+        "day"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "ache",
+        "phonetic_spelling": "EI-K"
+      },
+      {
+        "word": "bake",
+        "phonetic_spelling": "B-EI-K"
+      },
+      {
+        "word": "bail",
+        "phonetic_spelling": "B-EI-L"
+      }
+    ],
+    "phonetic_spelling": "EI",
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "oʊ",
-    "ipa": "oʊ",
+    "primary": true,
     "label": "Ow sound",
     "plain_english": "like the sound in 'go'",
     "description": [
@@ -808,30 +854,6 @@
         "boy"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "ow"
-      ],
-      "syllables": [],
-      "words": [
-        "go",
-        "no"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "g*o*",
-        "phonetic_spelling": "G-OW"
-      },
-      {
-        "word": "n*o*",
-        "phonetic_spelling": "N-OW"
-      }
-    ],
-    "phonetic_spelling": "OW",
-    "video": "/placeholder.mp4",
-    "audio": null,
     "minimal_pairs_by_confusion": {
       "aʊ": [
         [
@@ -853,18 +875,44 @@
           "boot"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "ow"
+      ],
+      "syllables": [],
+      "words": [
+        "go",
+        "no"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "open",
+        "phonetic_spelling": "OH-P-UHN"
+      },
+      {
+        "word": "bone",
+        "phonetic_spelling": "B-OH-N"
+      },
+      {
+        "word": "bowl",
+        "phonetic_spelling": "B-OH-L"
+      }
+    ],
+    "phonetic_spelling": "OH",
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "u",
-    "ipa": "u",
+    "primary": true,
     "label": "Oo sound",
     "plain_english": "like the sound in 'boot'",
     "description": [
       "back close rounded vowel"
     ],
     "explanation": "Round your lips and raise the back of your tongue high. This is the long 'oo' sound in 'food' and 'boot'.",
-    "confused_phone": "ʊ",
     "primary_cue": "Round your lips and raise the back of your tongue high.",
     "visual_cue": "Watch the lips round into a smaller, more focused shape.",
     "feel_check": "Your lips should feel rounded and slightly firm.",
@@ -882,30 +930,6 @@
         "full"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "oo"
-      ],
-      "syllables": [],
-      "words": [
-        "boot",
-        "food"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "b*oo*t",
-        "phonetic_spelling": "B-OO-T"
-      },
-      {
-        "word": "f*oo*d",
-        "phonetic_spelling": "F-OO-D"
-      }
-    ],
-    "phonetic_spelling": "OO",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Close_back_rounded_vowel.ogg",
     "minimal_pairs_by_confusion": {
       "ʊ": [
         [
@@ -927,11 +951,42 @@
           "coat"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "oo"
+      ],
+      "syllables": [],
+      "words": [
+        "boot",
+        "food"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "boot",
+        "phonetic_spelling": "B-OO-T"
+      },
+      {
+        "word": "blue",
+        "phonetic_spelling": "B-L-OO"
+      },
+      {
+        "word": "flew",
+        "phonetic_spelling": "F-L-OO"
+      }
+    ],
+    "phonetic_spelling": "OO",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Close_back_rounded_vowel.ogg",
+    "confused_phone": "ʊ",
+    "sort_key": "OO1",
+    "voicing_tag": "boot"
   },
   {
     "phoneme": "ə",
-    "ipa": "ə",
+    "primary": false,
     "label": "Schwa sound",
     "plain_english": "like the sound in 'about'",
     "description": [
@@ -946,6 +1001,7 @@
       "sofa"
     ],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "uh"
@@ -973,14 +1029,13 @@
   },
   {
     "phoneme": "ʊ",
-    "ipa": "ʊ",
+    "primary": false,
     "label": "Uh sound",
     "plain_english": "like the sound in 'foot'",
     "description": [
       "near-back near-close rounded vowel"
     ],
     "explanation": "Round your lips a little and keep the back of your tongue high but relaxed. This is the short 'oo' sound in 'foot' and 'good'.",
-    "confused_phone": "ʌ",
     "primary_cue": "Round your lips a little and keep the back of your tongue high but relaxed.",
     "visual_cue": "Watch the lips round into a smaller, more focused shape.",
     "feel_check": "Your lips should feel rounded and slightly firm.",
@@ -998,6 +1053,28 @@
         "fool"
       ]
     ],
+    "minimal_pairs_by_confusion": {
+      "u": [
+        [
+          "pull",
+          "pool"
+        ],
+        [
+          "full",
+          "fool"
+        ]
+      ],
+      "ʌ": [
+        [
+          "look",
+          "luck"
+        ],
+        [
+          "book",
+          "buck"
+        ]
+      ]
+    },
     "drill_ladder": {
       "sound": [
         "uh"
@@ -1022,39 +1099,17 @@
     "phonetic_spelling": "UH",
     "video": "/placeholder.mp4",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Near-close_near-back_rounded_vowel.ogg",
-    "minimal_pairs_by_confusion": {
-      "u": [
-        [
-          "pull",
-          "pool"
-        ],
-        [
-          "full",
-          "fool"
-        ]
-      ],
-      "ʌ": [
-        [
-          "look",
-          "luck"
-        ],
-        [
-          "book",
-          "buck"
-        ]
-      ]
-    }
+    "confused_phone": "ʌ"
   },
   {
     "phoneme": "ʌ",
-    "ipa": "ʌ",
+    "primary": true,
     "label": "Uh sound",
     "plain_english": "like the sound in 'cup'",
     "description": [
       "back open-mid unrounded vowel"
     ],
     "explanation": "Keep your lips relaxed and your jaw slightly open. This is the stressed 'uh' sound in 'cup' and 'luck'.",
-    "confused_phone": "ʊ",
     "primary_cue": "Keep your lips relaxed and your jaw slightly open.",
     "visual_cue": "Watch the lips stay relaxed rather than rounded.",
     "feel_check": "Your lips should feel relaxed, not puckered.",
@@ -1072,30 +1127,6 @@
         "look"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "uh"
-      ],
-      "syllables": [],
-      "words": [
-        "cup",
-        "luck"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "c*up*",
-        "phonetic_spelling": "K-UH-P"
-      },
-      {
-        "word": "l*u*ck",
-        "phonetic_spelling": "L-UH-K"
-      }
-    ],
-    "phonetic_spelling": "UH",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/9/92/Open-mid_back_unrounded_vowel.ogg",
     "minimal_pairs_by_confusion": {
       "ʊ": [
         [
@@ -1127,18 +1158,49 @@
           "cap"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "uh"
+      ],
+      "syllables": [],
+      "words": [
+        "cup",
+        "luck"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "ugly",
+        "phonetic_spelling": "UH-G-L-EE"
+      },
+      {
+        "word": "come",
+        "phonetic_spelling": "K-UH-M"
+      },
+      {
+        "word": "buck",
+        "phonetic_spelling": "B-UH-K"
+      }
+    ],
+    "phonetic_spelling": "UH",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/9/92/Open-mid_back_unrounded_vowel.ogg",
+    "confused_phone": "ʊ",
+    "sort_key": "UH1",
+    "voicing_tag": "stressed"
   },
   {
     "phoneme": "ə˞",
-    "ipa": "ə˞",
+    "primary": true,
     "label": "R-colored schwa",
     "plain_english": "like the sound in 'butter'",
     "description": [
       "central mid rhotacized unrounded vowel"
     ],
-    "explanation": "Start with a relaxed 'uh' and add light r-coloring by pulling the tongue back without touching the roof. This is the American 'er' in 'butter' and 'sister'.",
-    "primary_cue": "Start with a relaxed 'uh' and add light r-coloring by pulling the tongue back without touching the roof.",
+    "explanation": "Start with a relaxed 'uh' and add a light 'r' sound by pulling the tongue back without touching the roof. This is the American 'er' in 'butter' and 'sister'.",
+    "primary_cue": "Start with a relaxed 'uh' and add a light 'r' sound by pulling the tongue back without touching the roof.",
     "visual_cue": "Watch the lips stay relaxed rather than rounded.",
     "feel_check": "Your lips should feel relaxed, not puckered.",
     "anchor_words": [
@@ -1146,6 +1208,7 @@
       "sister"
     ],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "ur"
@@ -1159,28 +1222,33 @@
     },
     "examples": [
       {
-        "word": "butt*er*",
-        "phonetic_spelling": "B-UH-D-UR"
+        "word": "ever",
+        "phonetic_spelling": "EH-V-UR"
       },
       {
-        "word": "sist*er*",
-        "phonetic_spelling": "S-IH-S-T-UR"
+        "word": "actor",
+        "phonetic_spelling": "AH-K-T-UR"
+      },
+      {
+        "word": "altar",
+        "phonetic_spelling": "AW-L-T-UR"
       }
     ],
     "phonetic_spelling": "UR",
     "video": "/placeholder.mp4",
-    "audio": null
+    "sort_key": "ER2",
+    "voicing_tag": "unstressed"
   },
   {
     "phoneme": "ɜ˞",
-    "ipa": "ɜ˞",
+    "primary": true,
     "label": "ER sound",
     "plain_english": "like the sound in 'her'",
     "description": [
       "central open-mid rhotacized unrounded vowel"
     ],
-    "explanation": "Keep the tongue centered, then pull it slightly back for r-coloring. This is the strong 'er' sound in American 'her' and 'word'.",
-    "primary_cue": "Keep the tongue centered, then pull it slightly back for r-coloring.",
+    "explanation": "Keep the tongue centered, then pull it slightly back so the sound picks up an 'r' quality. This is the strong 'er' sound in American 'her' and 'word'.",
+    "primary_cue": "Keep the tongue centered, then pull it slightly back so the sound picks up an 'r' quality.",
     "visual_cue": "Watch the lips stay relaxed rather than rounded.",
     "feel_check": "Your lips should feel relaxed, not puckered.",
     "anchor_words": [
@@ -1197,30 +1265,6 @@
         "far"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "er"
-      ],
-      "syllables": [],
-      "words": [
-        "her",
-        "word"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "h*er*",
-        "phonetic_spelling": "H-ER"
-      },
-      {
-        "word": "w*or*d",
-        "phonetic_spelling": "W-ER-D"
-      }
-    ],
-    "phonetic_spelling": "ER",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e3/PR-r-coloured_open-mid_central_unrounded_vowel.ogg",
     "minimal_pairs_by_confusion": {
       "ɔ": [
         [
@@ -1242,11 +1286,41 @@
           "far"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "er"
+      ],
+      "syllables": [],
+      "words": [
+        "her",
+        "word"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "earl",
+        "phonetic_spelling": "ER-L"
+      },
+      {
+        "word": "herb",
+        "phonetic_spelling": "H-ER-B"
+      },
+      {
+        "word": "bird",
+        "phonetic_spelling": "B-ER-D"
+      }
+    ],
+    "phonetic_spelling": "ER",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e3/PR-r-coloured_open-mid_central_unrounded_vowel.ogg",
+    "sort_key": "ER1",
+    "voicing_tag": "stressed"
   },
   {
     "phoneme": "ɛ",
-    "ipa": "ɛ",
+    "primary": true,
     "label": "Eh sound",
     "plain_english": "like the sound in 'bed'",
     "description": [
@@ -1270,30 +1344,6 @@
         "pin"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "eh"
-      ],
-      "syllables": [],
-      "words": [
-        "bed",
-        "head"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "b*e*d",
-        "phonetic_spelling": "B-EH-D"
-      },
-      {
-        "word": "h*ea*d",
-        "phonetic_spelling": "H-EH-D"
-      }
-    ],
-    "phonetic_spelling": "EH",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/7/71/Open-mid_front_unrounded_vowel.ogg",
     "minimal_pairs_by_confusion": {
       "ɪ": [
         [
@@ -1325,18 +1375,46 @@
           "mate"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "eh"
+      ],
+      "syllables": [],
+      "words": [
+        "bed",
+        "head"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "echo",
+        "phonetic_spelling": "EH-K-OH"
+      },
+      {
+        "word": "bell",
+        "phonetic_spelling": "B-EH-L"
+      },
+      {
+        "word": "dead",
+        "phonetic_spelling": "D-EH-D"
+      }
+    ],
+    "phonetic_spelling": "EH",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/7/71/Open-mid_front_unrounded_vowel.ogg",
+    "sort_key": "ES"
   },
   {
     "phoneme": "ɹ",
-    "ipa": "ɹ",
+    "primary": true,
     "label": "R sound",
     "plain_english": "like the R in 'red'",
     "description": [
       "alveolar approximant consonant voiced"
     ],
     "explanation": "Pull your tongue back and keep the front from touching the roof of your mouth. The middle or back of the tongue should feel tight for the English R in 'red'.",
-    "confused_phone": "w",
     "primary_cue": "Pull your tongue back and keep it off the roof of your mouth.",
     "visual_cue": "The tongue stays back and tight, not forward.",
     "feel_check": "You may feel side tension in your tongue.",
@@ -1355,6 +1433,28 @@
         "white"
       ]
     ],
+    "minimal_pairs_by_confusion": {
+      "w": [
+        [
+          "red",
+          "wed"
+        ],
+        [
+          "right",
+          "white"
+        ]
+      ],
+      "l": [
+        [
+          "road",
+          "load"
+        ],
+        [
+          "rice",
+          "lice"
+        ]
+      ]
+    },
     "drill_ladder": {
       "sound": [
         "rrr"
@@ -1377,43 +1477,26 @@
     },
     "examples": [
       {
-        "word": "*r*ed",
-        "phonetic_spelling": "R-EH-D"
+        "word": "race",
+        "phonetic_spelling": "R-EI-S"
       },
       {
-        "word": "c*a*r",
-        "phonetic_spelling": "K-AH-R"
+        "word": "rain",
+        "phonetic_spelling": "R-EI-N"
+      },
+      {
+        "word": "park",
+        "phonetic_spelling": "P-AA-R-K"
       }
     ],
     "phonetic_spelling": "R",
     "video": "/R-Feedback.MP4",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Alveolar_approximant.ogg",
-    "minimal_pairs_by_confusion": {
-      "w": [
-        [
-          "red",
-          "wed"
-        ],
-        [
-          "right",
-          "white"
-        ]
-      ],
-      "l": [
-        [
-          "road",
-          "load"
-        ],
-        [
-          "rice",
-          "lice"
-        ]
-      ]
-    }
+    "confused_phone": "w"
   },
   {
     "phoneme": "ɾ",
-    "ipa": "ɾ",
+    "primary": false,
     "label": "Flap sound",
     "plain_english": "like the sound in 'butter'",
     "description": [
@@ -1428,6 +1511,7 @@
       "ladder"
     ],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "duh"
@@ -1459,7 +1543,7 @@
   },
   {
     "phoneme": "d",
-    "ipa": "d",
+    "primary": true,
     "label": "D sound",
     "plain_english": "like the sound in 'dog'",
     "description": [
@@ -1483,34 +1567,6 @@
         "ten"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "duh"
-      ],
-      "syllables": [
-        "da",
-        "dee",
-        "doh"
-      ],
-      "words": [
-        "dog",
-        "bad"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*d*og",
-        "phonetic_spelling": "D-AW-G"
-      },
-      {
-        "word": "ba*d*",
-        "phonetic_spelling": "B-AH-D"
-      }
-    ],
-    "phonetic_spelling": "D",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/01/Voiced_alveolar_plosive.ogg",
     "minimal_pairs_by_confusion": {
       "t": [
         [
@@ -1562,11 +1618,44 @@
           "go"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "duh"
+      ],
+      "syllables": [
+        "da",
+        "dee",
+        "doh"
+      ],
+      "words": [
+        "dog",
+        "bad"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "damp",
+        "phonetic_spelling": "D-AH-MP"
+      },
+      {
+        "word": "dark",
+        "phonetic_spelling": "D-AA-R-K"
+      },
+      {
+        "word": "band",
+        "phonetic_spelling": "B-AH-ND"
+      }
+    ],
+    "phonetic_spelling": "D",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/01/Voiced_alveolar_plosive.ogg",
+    "sort_key": "AB2"
   },
   {
     "phoneme": "t",
-    "ipa": "t",
+    "primary": true,
     "label": "T sound",
     "plain_english": "like the sound in 'top'",
     "description": [
@@ -1590,34 +1679,6 @@
         "den"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "tuh"
-      ],
-      "syllables": [
-        "ta",
-        "tee",
-        "toh"
-      ],
-      "words": [
-        "top",
-        "cat"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*t*op",
-        "phonetic_spelling": "T-AW-P"
-      },
-      {
-        "word": "ca*t*",
-        "phonetic_spelling": "K-AH-T"
-      }
-    ],
-    "phonetic_spelling": "T",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/02/Voiceless_alveolar_plosive.ogg",
     "minimal_pairs_by_confusion": {
       "d": [
         [
@@ -1659,11 +1720,44 @@
           "chin"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "tuh"
+      ],
+      "syllables": [
+        "ta",
+        "tee",
+        "toh"
+      ],
+      "words": [
+        "top",
+        "cat"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "talk",
+        "phonetic_spelling": "T-AW-K"
+      },
+      {
+        "word": "tape",
+        "phonetic_spelling": "T-EI-P"
+      },
+      {
+        "word": "beat",
+        "phonetic_spelling": "B-EE-T"
+      }
+    ],
+    "phonetic_spelling": "T",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/0/02/Voiceless_alveolar_plosive.ogg",
+    "sort_key": "AB1"
   },
   {
     "phoneme": "tʃ",
-    "ipa": "tʃ",
+    "primary": true,
     "label": "CH sound",
     "plain_english": "like the sound in 'chop'",
     "description": [
@@ -1687,34 +1781,6 @@
         "jeer"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "ch"
-      ],
-      "syllables": [
-        "cha",
-        "chee",
-        "choh"
-      ],
-      "words": [
-        "chop",
-        "match"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*ch*op",
-        "phonetic_spelling": "CH-AW-P"
-      },
-      {
-        "word": "ma*tch*",
-        "phonetic_spelling": "M-AH-CH"
-      }
-    ],
-    "phonetic_spelling": "CH",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/9/97/Voiceless_palato-alveolar_affricate.ogg",
     "minimal_pairs_by_confusion": {
       "ʃ": [
         [
@@ -1746,11 +1812,44 @@
           "tin"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "ch"
+      ],
+      "syllables": [
+        "cha",
+        "chee",
+        "choh"
+      ],
+      "words": [
+        "chop",
+        "match"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "chip",
+        "phonetic_spelling": "CH-IH-P"
+      },
+      {
+        "word": "chap",
+        "phonetic_spelling": "CH-AH-P"
+      },
+      {
+        "word": "much",
+        "phonetic_spelling": "M-UH-CH"
+      }
+    ],
+    "phonetic_spelling": "CH",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/9/97/Voiceless_palato-alveolar_affricate.ogg",
+    "sort_key": "AD1"
   },
   {
     "phoneme": "ʃ",
-    "ipa": "ʃ",
+    "primary": true,
     "label": "SH sound",
     "plain_english": "like the sound in 'she'",
     "description": [
@@ -1774,34 +1873,6 @@
         "chop"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "shhh"
-      ],
-      "syllables": [
-        "sha",
-        "shee",
-        "shoh"
-      ],
-      "words": [
-        "she",
-        "shoes"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*sh*e",
-        "phonetic_spelling": "SH-EE"
-      },
-      {
-        "word": "*sh*oes",
-        "phonetic_spelling": "SH-OO-Z"
-      }
-    ],
-    "phonetic_spelling": "SH",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Voiceless_palato-alveolar_sibilant.ogg",
     "minimal_pairs_by_confusion": {
       "s": [
         [
@@ -1833,11 +1904,44 @@
           "two"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "shhh"
+      ],
+      "syllables": [
+        "sha",
+        "shee",
+        "shoh"
+      ],
+      "words": [
+        "she",
+        "shoes"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "ship",
+        "phonetic_spelling": "SH-IH-P"
+      },
+      {
+        "word": "chef",
+        "phonetic_spelling": "SH-EH-F"
+      },
+      {
+        "word": "cash",
+        "phonetic_spelling": "K-AH-SH"
+      }
+    ],
+    "phonetic_spelling": "SH",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Voiceless_palato-alveolar_sibilant.ogg",
+    "sort_key": "SH1"
   },
   {
     "phoneme": "ʒ",
-    "ipa": "ʒ",
+    "primary": true,
     "label": "ZH sound",
     "plain_english": "like the sound in 'measure'",
     "description": [
@@ -1852,6 +1956,7 @@
       "genre"
     ],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "zhhh"
@@ -1869,21 +1974,26 @@
     },
     "examples": [
       {
-        "word": "mea*s*ure",
-        "phonetic_spelling": "M-EH-ZSH-ER"
+        "word": "genre",
+        "phonetic_spelling": "ZSH-AWN-RUH"
       },
       {
-        "word": "*g*enre",
-        "phonetic_spelling": "ZSH-AWN-RUH"
+        "word": "vision",
+        "phonetic_spelling": "V-IH-ZSH-UHN"
+      },
+      {
+        "word": "beige",
+        "phonetic_spelling": "B-EI-ZSH"
       }
     ],
     "phonetic_spelling": "ZSH",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/3/30/Voiced_palato-alveolar_sibilant.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/3/30/Voiced_palato-alveolar_sibilant.ogg",
+    "sort_key": "SH2"
   },
   {
     "phoneme": "dʒ",
-    "ipa": "dʒ",
+    "primary": true,
     "label": "J sound",
     "plain_english": "like the sound in 'judge'",
     "description": [
@@ -1907,34 +2017,6 @@
         "chin"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "j"
-      ],
-      "syllables": [
-        "ja",
-        "jee",
-        "joh"
-      ],
-      "words": [
-        "judge",
-        "age"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*j*u*dge*",
-        "phonetic_spelling": "DCH-UH-DCH"
-      },
-      {
-        "word": "*a*ge",
-        "phonetic_spelling": "AY-DCH"
-      }
-    ],
-    "phonetic_spelling": "DCH",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Voiced_palato-alveolar_affricate.ogg",
     "minimal_pairs_by_confusion": {
       "tʃ": [
         [
@@ -1956,11 +2038,44 @@
           "yolk"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "j"
+      ],
+      "syllables": [
+        "ja",
+        "jee",
+        "joh"
+      ],
+      "words": [
+        "judge",
+        "age"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "jack",
+        "phonetic_spelling": "J-AH-K"
+      },
+      {
+        "word": "gene",
+        "phonetic_spelling": "J-EE-N"
+      },
+      {
+        "word": "edge",
+        "phonetic_spelling": "EH-J"
+      }
+    ],
+    "phonetic_spelling": "J",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Voiced_palato-alveolar_affricate.ogg",
+    "sort_key": "AD2"
   },
   {
     "phoneme": "b",
-    "ipa": "b",
+    "primary": true,
     "label": "B sound",
     "plain_english": "like the sound in 'bat'",
     "description": [
@@ -1984,34 +2099,6 @@
         "vest"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "buh"
-      ],
-      "syllables": [
-        "ba",
-        "bee",
-        "boh"
-      ],
-      "words": [
-        "bat",
-        "cab"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*b*at",
-        "phonetic_spelling": "B-AH-T"
-      },
-      {
-        "word": "ca*b*",
-        "phonetic_spelling": "K-AH-B"
-      }
-    ],
-    "phonetic_spelling": "B",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Voiced_bilabial_plosive.ogg",
     "minimal_pairs_by_confusion": {
       "p": [
         [
@@ -2033,11 +2120,44 @@
           "very"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "buh"
+      ],
+      "syllables": [
+        "ba",
+        "bee",
+        "boh"
+      ],
+      "words": [
+        "bat",
+        "cab"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "back",
+        "phonetic_spelling": "B-AH-K"
+      },
+      {
+        "word": "baby",
+        "phonetic_spelling": "B-EI-B-EE"
+      },
+      {
+        "word": "bulb",
+        "phonetic_spelling": "B-UH-L-B"
+      }
+    ],
+    "phonetic_spelling": "B",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Voiced_bilabial_plosive.ogg",
+    "sort_key": "AA2"
   },
   {
     "phoneme": "f",
-    "ipa": "f",
+    "primary": true,
     "label": "F sound",
     "plain_english": "like the sound in 'fish'",
     "description": [
@@ -2061,34 +2181,6 @@
         "vine"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "fff"
-      ],
-      "syllables": [
-        "fa",
-        "fee",
-        "foh"
-      ],
-      "words": [
-        "fish",
-        "leaf"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*f*ish",
-        "phonetic_spelling": "F-ISH"
-      },
-      {
-        "word": "lea*f*",
-        "phonetic_spelling": "L-EE-F"
-      }
-    ],
-    "phonetic_spelling": "F",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/3/33/Voiceless_labiodental_fricative.ogg",
     "minimal_pairs_by_confusion": {
       "v": [
         [
@@ -2120,11 +2212,44 @@
           "pin"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "fff"
+      ],
+      "syllables": [
+        "fa",
+        "fee",
+        "foh"
+      ],
+      "words": [
+        "fish",
+        "leaf"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "face",
+        "phonetic_spelling": "F-EI-S"
+      },
+      {
+        "word": "fall",
+        "phonetic_spelling": "F-AW-L"
+      },
+      {
+        "word": "calf",
+        "phonetic_spelling": "K-AH-F"
+      }
+    ],
+    "phonetic_spelling": "F",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/3/33/Voiceless_labiodental_fricative.ogg",
+    "sort_key": "FA1"
   },
   {
     "phoneme": "h",
-    "ipa": "h",
+    "primary": true,
     "label": "H sound",
     "plain_english": "like the sound in 'hat'",
     "description": [
@@ -2148,6 +2273,7 @@
         "ill"
       ]
     ],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "h"
@@ -2165,12 +2291,16 @@
     },
     "examples": [
       {
-        "word": "*h*at",
-        "phonetic_spelling": "H-AH-T"
+        "word": "hack",
+        "phonetic_spelling": "H-AH-K"
       },
       {
-        "word": "*h*ello",
-        "phonetic_spelling": "H-EH-LO"
+        "word": "hand",
+        "phonetic_spelling": "H-AH-ND"
+      },
+      {
+        "word": "hard",
+        "phonetic_spelling": "H-AA-R-D"
       }
     ],
     "phonetic_spelling": "H",
@@ -2179,7 +2309,7 @@
   },
   {
     "phoneme": "j",
-    "ipa": "j",
+    "primary": true,
     "label": "Ye sound",
     "plain_english": "like the sound in 'yes'",
     "description": [
@@ -2203,6 +2333,18 @@
         "joke"
       ]
     ],
+    "minimal_pairs_by_confusion": {
+      "dʒ": [
+        [
+          "yet",
+          "jet"
+        ],
+        [
+          "yoke",
+          "joke"
+        ]
+      ]
+    },
     "drill_ladder": {
       "sound": [
         "y"
@@ -2220,33 +2362,25 @@
     },
     "examples": [
       {
-        "word": "*y*es",
-        "phonetic_spelling": "Y-EH-S"
+        "word": "yard",
+        "phonetic_spelling": "Y-AA-R-D"
       },
       {
-        "word": "*y*ellow",
-        "phonetic_spelling": "Y-EH-LOW"
+        "word": "yawn",
+        "phonetic_spelling": "Y-AW-N"
+      },
+      {
+        "word": "unit",
+        "phonetic_spelling": "Y-OO-N-IH-T"
       }
     ],
-    "phonetic_spelling": "YE",
+    "phonetic_spelling": "Y",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Palatal_approximant.ogg",
-    "minimal_pairs_by_confusion": {
-      "dʒ": [
-        [
-          "yet",
-          "jet"
-        ],
-        [
-          "yoke",
-          "joke"
-        ]
-      ]
-    }
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Palatal_approximant.ogg"
   },
   {
     "phoneme": "k",
-    "ipa": "k",
+    "primary": true,
     "label": "K sound",
     "plain_english": "like the sound in 'cat'",
     "description": [
@@ -2270,34 +2404,6 @@
         "goat"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "kuh"
-      ],
-      "syllables": [
-        "ka",
-        "kee",
-        "koh"
-      ],
-      "words": [
-        "cat",
-        "back"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*c*at",
-        "phonetic_spelling": "K-AH-T"
-      },
-      {
-        "word": "ba*ck*",
-        "phonetic_spelling": "B-AH-K"
-      }
-    ],
-    "phonetic_spelling": "K",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Voiceless_velar_plosive.ogg",
     "minimal_pairs_by_confusion": {
       "t": [
         [
@@ -2319,11 +2425,44 @@
           "gap"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "kuh"
+      ],
+      "syllables": [
+        "ka",
+        "kee",
+        "koh"
+      ],
+      "words": [
+        "cat",
+        "back"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "cake",
+        "phonetic_spelling": "K-EI-K"
+      },
+      {
+        "word": "back",
+        "phonetic_spelling": "B-AH-K"
+      },
+      {
+        "word": "bank",
+        "phonetic_spelling": "B-AH-NK"
+      }
+    ],
+    "phonetic_spelling": "K",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Voiceless_velar_plosive.ogg",
+    "sort_key": "AC1"
   },
   {
     "phoneme": "kʰ",
-    "ipa": "kʰ",
+    "primary": false,
     "label": "Kh sound",
     "plain_english": "like the sound in 'call'",
     "description": [
@@ -2338,6 +2477,7 @@
       "call"
     ],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "kuh"
@@ -2359,12 +2499,11 @@
       }
     ],
     "phonetic_spelling": "KH",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "l",
-    "ipa": "l",
+    "primary": true,
     "label": "L sound",
     "plain_english": "like the sound in 'lamp'",
     "description": [
@@ -2388,34 +2527,6 @@
         "red"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "lll"
-      ],
-      "syllables": [
-        "la",
-        "lee",
-        "loh"
-      ],
-      "words": [
-        "lamp",
-        "ball"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*l*amp",
-        "phonetic_spelling": "L-AH-MP"
-      },
-      {
-        "word": "ba*ll*",
-        "phonetic_spelling": "B-AH-L"
-      }
-    ],
-    "phonetic_spelling": "L",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Alveolar_lateral_approximant.ogg",
     "minimal_pairs_by_confusion": {
       "ɹ": [
         [
@@ -2447,11 +2558,43 @@
           "white"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "lll"
+      ],
+      "syllables": [
+        "la",
+        "lee",
+        "loh"
+      ],
+      "words": [
+        "lamp",
+        "ball"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "lake",
+        "phonetic_spelling": "L-EI-K"
+      },
+      {
+        "word": "lamp",
+        "phonetic_spelling": "L-AH-MP"
+      },
+      {
+        "word": "ball",
+        "phonetic_spelling": "B-AW-L"
+      }
+    ],
+    "phonetic_spelling": "L",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Alveolar_lateral_approximant.ogg"
   },
   {
     "phoneme": "l̩",
-    "ipa": "l̩",
+    "primary": false,
     "label": "Syllabic L sound",
     "plain_english": "like the sound in 'bottle'",
     "description": [
@@ -2467,6 +2610,7 @@
       "little"
     ],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "lll"
@@ -2493,12 +2637,11 @@
       }
     ],
     "phonetic_spelling": "iL",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "m",
-    "ipa": "m",
+    "primary": true,
     "label": "M sound",
     "plain_english": "like the sound in 'mother'",
     "description": [
@@ -2522,34 +2665,6 @@
         "mine"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "mmm"
-      ],
-      "syllables": [
-        "ma",
-        "mee",
-        "moh"
-      ],
-      "words": [
-        "mother",
-        "amber"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*m*other",
-        "phonetic_spelling": "M-UH-TH-ER"
-      },
-      {
-        "word": "*a*mber",
-        "phonetic_spelling": "AHM-B-ER"
-      }
-    ],
-    "phonetic_spelling": "M",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Bilabial_nasal.ogg",
     "minimal_pairs_by_confusion": {
       "n": [
         [
@@ -2571,11 +2686,44 @@
           "rang"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "mmm"
+      ],
+      "syllables": [
+        "ma",
+        "mee",
+        "moh"
+      ],
+      "words": [
+        "mother",
+        "amber"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "make",
+        "phonetic_spelling": "M-EI-K"
+      },
+      {
+        "word": "mail",
+        "phonetic_spelling": "M-EI-L"
+      },
+      {
+        "word": "calm",
+        "phonetic_spelling": "K-AA-M"
+      }
+    ],
+    "phonetic_spelling": "M",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Bilabial_nasal.ogg",
+    "sort_key": "AA3"
   },
   {
     "phoneme": "m̩",
-    "ipa": "m̩",
+    "primary": false,
     "label": "Syllabic M sound",
     "plain_english": "like the sound in 'rhythm'",
     "description": [
@@ -2591,6 +2739,7 @@
       "system"
     ],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "mmm"
@@ -2617,12 +2766,11 @@
       }
     ],
     "phonetic_spelling": "iM",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "n",
-    "ipa": "n",
+    "primary": true,
     "label": "N sound",
     "plain_english": "like the sound in 'no'",
     "description": [
@@ -2646,34 +2794,6 @@
         "lip"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "nnn"
-      ],
-      "syllables": [
-        "na",
-        "nee",
-        "noh"
-      ],
-      "words": [
-        "no",
-        "sun"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*n*o",
-        "phonetic_spelling": "N-OH"
-      },
-      {
-        "word": "s*un*",
-        "phonetic_spelling": "S-UH-N"
-      }
-    ],
-    "phonetic_spelling": "N",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/2/29/Alveolar_nasal.ogg",
     "minimal_pairs_by_confusion": {
       "m": [
         [
@@ -2695,11 +2815,43 @@
           "rang"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "nnn"
+      ],
+      "syllables": [
+        "na",
+        "nee",
+        "noh"
+      ],
+      "words": [
+        "no",
+        "sun"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "name",
+        "phonetic_spelling": "N-EI-M"
+      },
+      {
+        "word": "knee",
+        "phonetic_spelling": "N-EE"
+      },
+      {
+        "word": "band",
+        "phonetic_spelling": "B-AH-ND"
+      }
+    ],
+    "phonetic_spelling": "N",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/2/29/Alveolar_nasal.ogg"
   },
   {
     "phoneme": "n̩",
-    "ipa": "n̩",
+    "primary": false,
     "label": "Syllabic N sound",
     "plain_english": "like the sound in 'sudden'",
     "description": [
@@ -2714,6 +2866,7 @@
       "sudden"
     ],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "nnn"
@@ -2735,12 +2888,11 @@
       }
     ],
     "phonetic_spelling": "iN",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "p",
-    "ipa": "p",
+    "primary": true,
     "label": "P sound",
     "plain_english": "like the sound in 'pat'",
     "description": [
@@ -2764,34 +2916,6 @@
         "back"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "puh"
-      ],
-      "syllables": [
-        "pa",
-        "pee",
-        "poh"
-      ],
-      "words": [
-        "pat",
-        "cap"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*p*at",
-        "phonetic_spelling": "P-AH-T"
-      },
-      {
-        "word": "ca*p*",
-        "phonetic_spelling": "K-AH-P"
-      }
-    ],
-    "phonetic_spelling": "P",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/5/51/Voiceless_bilabial_plosive.ogg",
     "minimal_pairs_by_confusion": {
       "b": [
         [
@@ -2813,11 +2937,44 @@
           "fig"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "puh"
+      ],
+      "syllables": [
+        "pa",
+        "pee",
+        "poh"
+      ],
+      "words": [
+        "pat",
+        "cap"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "pack",
+        "phonetic_spelling": "P-AH-K"
+      },
+      {
+        "word": "palm",
+        "phonetic_spelling": "P-AA-M"
+      },
+      {
+        "word": "bump",
+        "phonetic_spelling": "B-UH-MP"
+      }
+    ],
+    "phonetic_spelling": "P",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/5/51/Voiceless_bilabial_plosive.ogg",
+    "sort_key": "AA1"
   },
   {
     "phoneme": "s",
-    "ipa": "s",
+    "primary": true,
     "label": "S sound",
     "plain_english": "like the sound in 'see'",
     "description": [
@@ -2841,34 +2998,6 @@
         "zeal"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "sss"
-      ],
-      "syllables": [
-        "sa",
-        "see",
-        "soh"
-      ],
-      "words": [
-        "see",
-        "bus"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*s*ee",
-        "phonetic_spelling": "S-EE"
-      },
-      {
-        "word": "bu*s*",
-        "phonetic_spelling": "B-UH-S"
-      }
-    ],
-    "phonetic_spelling": "S",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Voiceless_alveolar_sibilant.ogg",
     "minimal_pairs_by_confusion": {
       "z": [
         [
@@ -2910,11 +3039,44 @@
           "tip"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "sss"
+      ],
+      "syllables": [
+        "sa",
+        "see",
+        "soh"
+      ],
+      "words": [
+        "see",
+        "bus"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "safe",
+        "phonetic_spelling": "S-EI-F"
+      },
+      {
+        "word": "cell",
+        "phonetic_spelling": "S-EH-L"
+      },
+      {
+        "word": "base",
+        "phonetic_spelling": "B-EI-S"
+      }
+    ],
+    "phonetic_spelling": "S",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Voiceless_alveolar_sibilant.ogg",
+    "sort_key": "SA1"
   },
   {
     "phoneme": "v",
-    "ipa": "v",
+    "primary": true,
     "label": "V sound",
     "plain_english": "like the sound in 'van'",
     "description": [
@@ -2938,34 +3100,6 @@
         "west"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "vvv"
-      ],
-      "syllables": [
-        "va",
-        "vee",
-        "voh"
-      ],
-      "words": [
-        "van",
-        "love"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*v*an",
-        "phonetic_spelling": "V-AH-N"
-      },
-      {
-        "word": "lo*v*e",
-        "phonetic_spelling": "L-UH-V"
-      }
-    ],
-    "phonetic_spelling": "V",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/8/85/Voiced_labiodental_fricative.ogg",
     "minimal_pairs_by_confusion": {
       "f": [
         [
@@ -2997,18 +3131,50 @@
           "boat"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "vvv"
+      ],
+      "syllables": [
+        "va",
+        "vee",
+        "voh"
+      ],
+      "words": [
+        "van",
+        "love"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "vain",
+        "phonetic_spelling": "V-EI-N"
+      },
+      {
+        "word": "vast",
+        "phonetic_spelling": "V-AH-ST"
+      },
+      {
+        "word": "five",
+        "phonetic_spelling": "F-AY-V"
+      }
+    ],
+    "phonetic_spelling": "V",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/8/85/Voiced_labiodental_fricative.ogg",
+    "sort_key": "FA2"
   },
   {
     "phoneme": "w",
-    "ipa": "w",
+    "primary": true,
     "label": "W sound",
     "plain_english": "like the W in 'wet'",
     "description": [
       "approximant consonant labio-velar voiced"
     ],
     "explanation": "Round your lips and lift the back of your tongue slightly, but keep your top teeth off your bottom lip. If the teeth touch the lip, it can sound like /v/.",
-    "confused_phone": "v",
     "primary_cue": "Round your lips and lift the back of your tongue slightly.",
     "visual_cue": "Your lips should round without your top teeth touching your bottom lip.",
     "feel_check": "The sound should feel smooth and voiced, not buzzy against the lip like /v/.",
@@ -3026,36 +3192,6 @@
         "vine"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "wuh"
-      ],
-      "syllables": [
-        "wa",
-        "wee",
-        "woe"
-      ],
-      "words": [
-        "wet",
-        "window"
-      ],
-      "phrases": [
-        "wet window"
-      ]
-    },
-    "examples": [
-      {
-        "word": "*w*et",
-        "phonetic_spelling": "W-EH-T"
-      },
-      {
-        "word": "*w*indow",
-        "phonetic_spelling": "W-IH-N-D-OW"
-      }
-    ],
-    "phonetic_spelling": "W",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Voiced_labio-velar_approximant.ogg",
     "minimal_pairs_by_confusion": {
       "ɹ": [
         [
@@ -3097,11 +3233,46 @@
           "lead"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "wuh"
+      ],
+      "syllables": [
+        "wa",
+        "wee",
+        "woe"
+      ],
+      "words": [
+        "wet",
+        "window"
+      ],
+      "phrases": [
+        "wet window"
+      ]
+    },
+    "examples": [
+      {
+        "word": "wake",
+        "phonetic_spelling": "W-EI-K"
+      },
+      {
+        "word": "wall",
+        "phonetic_spelling": "W-AW-L"
+      },
+      {
+        "word": "walk",
+        "phonetic_spelling": "W-AW-K"
+      }
+    ],
+    "phonetic_spelling": "W",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Voiced_labio-velar_approximant.ogg",
+    "confused_phone": "v"
   },
   {
     "phoneme": "z",
-    "ipa": "z",
+    "primary": true,
     "label": "Z sound",
     "plain_english": "like the sound in 'zoo'",
     "description": [
@@ -3125,6 +3296,18 @@
         "seal"
       ]
     ],
+    "minimal_pairs_by_confusion": {
+      "s": [
+        [
+          "zip",
+          "sip"
+        ],
+        [
+          "zeal",
+          "seal"
+        ]
+      ]
+    },
     "drill_ladder": {
       "sound": [
         "zzz"
@@ -3142,33 +3325,26 @@
     },
     "examples": [
       {
-        "word": "*z*oo",
-        "phonetic_spelling": "Z-OO"
+        "word": "zero",
+        "phonetic_spelling": "Z-EE-R-OH"
       },
       {
-        "word": "*b*uzz",
-        "phonetic_spelling": "B-UH-Z"
+        "word": "jazz",
+        "phonetic_spelling": "J-AH-Z"
+      },
+      {
+        "word": "fuse",
+        "phonetic_spelling": "F-Y-OO-Z"
       }
     ],
     "phonetic_spelling": "Z",
     "video": "/placeholder.mp4",
     "audio": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Voiced_alveolar_sibilant.ogg",
-    "minimal_pairs_by_confusion": {
-      "s": [
-        [
-          "zip",
-          "sip"
-        ],
-        [
-          "zeal",
-          "seal"
-        ]
-      ]
-    }
+    "sort_key": "SA2"
   },
   {
     "phoneme": "ð",
-    "ipa": "ð",
+    "primary": true,
     "label": "Buzzed TH sound",
     "plain_english": "like the sound in 'this'",
     "description": [
@@ -3192,37 +3368,6 @@
         "day"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "thh"
-      ],
-      "syllables": [
-        "tha",
-        "thee",
-        "tho"
-      ],
-      "words": [
-        "this",
-        "that"
-      ],
-      "phrases": [
-        "this thing",
-        "that one"
-      ]
-    },
-    "examples": [
-      {
-        "word": "*th*is",
-        "phonetic_spelling": "buzzed TH-IH-S"
-      },
-      {
-        "word": "*th*at",
-        "phonetic_spelling": "buzzed TH-AH-T"
-      }
-    ],
-    "phonetic_spelling": "buzzed TH",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Voiced_dental_fricative.ogg",
     "minimal_pairs_by_confusion": {
       "d": [
         [
@@ -3254,12 +3399,49 @@
           "breath"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "thh"
+      ],
+      "syllables": [
+        "tha",
+        "thee",
+        "tho"
+      ],
+      "words": [
+        "this",
+        "that"
+      ],
+      "phrases": [
+        "this thing",
+        "that one"
+      ]
+    },
+    "examples": [
+      {
+        "word": "these",
+        "phonetic_spelling": "TH-EE-Z"
+      },
+      {
+        "word": "other",
+        "phonetic_spelling": "UH-TH-ER"
+      },
+      {
+        "word": "bathe",
+        "phonetic_spelling": "B-EI-TH"
+      }
+    ],
+    "phonetic_spelling": "TH",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Voiced_dental_fricative.ogg",
+    "sort_key": "TH_b",
+    "voicing_tag": "voiced"
   },
   {
     "phoneme": "θ",
-    "ipa": "θ",
-    "label": "Unvoiced TH sound",
+    "primary": true,
+    "label": "Voiceless TH sound",
     "plain_english": "like the sound in 'think'",
     "description": [
       "consonant dental non-sibilant-fricative voiceless"
@@ -3282,37 +3464,6 @@
         "tank"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "th"
-      ],
-      "syllables": [
-        "tha",
-        "thee",
-        "tho"
-      ],
-      "words": [
-        "think",
-        "bath"
-      ],
-      "phrases": [
-        "think fast",
-        "take a bath"
-      ]
-    },
-    "examples": [
-      {
-        "word": "*th*ink",
-        "phonetic_spelling": "TH-IH-NK"
-      },
-      {
-        "word": "ba*th*",
-        "phonetic_spelling": "B-AH-TH"
-      }
-    ],
-    "phonetic_spelling": "silent TH",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/8/80/Voiceless_dental_fricative.ogg",
     "minimal_pairs_by_confusion": {
       "s": [
         [
@@ -3354,11 +3505,48 @@
           "breathe"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "th"
+      ],
+      "syllables": [
+        "tha",
+        "thee",
+        "tho"
+      ],
+      "words": [
+        "think",
+        "bath"
+      ],
+      "phrases": [
+        "think fast",
+        "take a bath"
+      ]
+    },
+    "examples": [
+      {
+        "word": "thin",
+        "phonetic_spelling": "TH-IH-N"
+      },
+      {
+        "word": "thank",
+        "phonetic_spelling": "TH-AH-NK"
+      },
+      {
+        "word": "bath",
+        "phonetic_spelling": "B-AH-TH"
+      }
+    ],
+    "phonetic_spelling": "TH",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/8/80/Voiceless_dental_fricative.ogg",
+    "sort_key": "TH_a",
+    "voicing_tag": "voiceless"
   },
   {
     "phoneme": "ŋ",
-    "ipa": "ŋ",
+    "primary": true,
     "label": "NG sound",
     "plain_english": "like the sound in 'sing'",
     "description": [
@@ -3382,34 +3570,6 @@
         "ran"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "ng"
-      ],
-      "syllables": [
-        "nga",
-        "ngee",
-        "ngoh"
-      ],
-      "words": [
-        "sing",
-        "ring"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "si*ng*",
-        "phonetic_spelling": "S-IH-NG"
-      },
-      {
-        "word": "ri*ng*",
-        "phonetic_spelling": "R-IH-NG"
-      }
-    ],
-    "phonetic_spelling": "NG",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/3/39/Velar_nasal.ogg",
     "minimal_pairs_by_confusion": {
       "n": [
         [
@@ -3431,11 +3591,43 @@
           "ram"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "ng"
+      ],
+      "syllables": [
+        "nga",
+        "ngee",
+        "ngoh"
+      ],
+      "words": [
+        "sing",
+        "ring"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "bang",
+        "phonetic_spelling": "B-AH-NG"
+      },
+      {
+        "word": "king",
+        "phonetic_spelling": "K-IH-NG"
+      },
+      {
+        "word": "long",
+        "phonetic_spelling": "L-AW-NG"
+      }
+    ],
+    "phonetic_spelling": "NG",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/3/39/Velar_nasal.ogg"
   },
   {
     "phoneme": "ɡ",
-    "ipa": "ɡ",
+    "primary": true,
     "label": "G sound",
     "plain_english": "like the sound in 'go'",
     "description": [
@@ -3459,34 +3651,6 @@
         "coat"
       ]
     ],
-    "drill_ladder": {
-      "sound": [
-        "guh"
-      ],
-      "syllables": [
-        "ga",
-        "gee",
-        "goh"
-      ],
-      "words": [
-        "go",
-        "bag"
-      ],
-      "phrases": []
-    },
-    "examples": [
-      {
-        "word": "*g*o",
-        "phonetic_spelling": "G-OH"
-      },
-      {
-        "word": "ba*g*",
-        "phonetic_spelling": "B-AH-G"
-      }
-    ],
-    "phonetic_spelling": "G",
-    "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Voiced_velar_plosive.ogg",
     "minimal_pairs_by_confusion": {
       "k": [
         [
@@ -3508,11 +3672,44 @@
           "dole"
         ]
       ]
-    }
+    },
+    "drill_ladder": {
+      "sound": [
+        "guh"
+      ],
+      "syllables": [
+        "ga",
+        "gee",
+        "goh"
+      ],
+      "words": [
+        "go",
+        "bag"
+      ],
+      "phrases": []
+    },
+    "examples": [
+      {
+        "word": "game",
+        "phonetic_spelling": "G-EI-M"
+      },
+      {
+        "word": "gain",
+        "phonetic_spelling": "G-EI-N"
+      },
+      {
+        "word": "drag",
+        "phonetic_spelling": "D-R-AH-G"
+      }
+    ],
+    "phonetic_spelling": "G",
+    "video": "/placeholder.mp4",
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Voiced_velar_plosive.ogg",
+    "sort_key": "AC2"
   },
   {
     "phoneme": "ŋ̩",
-    "ipa": "ŋ̩",
+    "primary": false,
     "label": "Syllabic NG sound",
     "plain_english": "the syllabic ng sound",
     "description": [
@@ -3525,6 +3722,7 @@
     "feel_check": "You should feel some vibration or airflow at the nose.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "ng"
@@ -3539,12 +3737,11 @@
     },
     "examples": [],
     "phonetic_spelling": "IN",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "ɣ",
-    "ipa": "ɣ",
+    "primary": false,
     "label": "Gghh sound",
     "plain_english": "the gghh sound",
     "description": [
@@ -3556,6 +3753,7 @@
     "feel_check": "You should feel buzzing in your throat.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "gh"
@@ -3575,7 +3773,7 @@
   },
   {
     "phoneme": "ɦ",
-    "ipa": "ɦ",
+    "primary": false,
     "label": "Uhh sound",
     "plain_english": "the uhh sound",
     "description": [
@@ -3587,6 +3785,7 @@
     "feel_check": "You should feel buzzing in your throat.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "h"
@@ -3606,7 +3805,7 @@
   },
   {
     "phoneme": "ʔ",
-    "ipa": "ʔ",
+    "primary": false,
     "label": "Glottal stop",
     "plain_english": "like the sound in 'uh-oh'",
     "description": [
@@ -3620,6 +3819,7 @@
       "uh-oh"
     ],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "uh"
@@ -3642,7 +3842,7 @@
   },
   {
     "phoneme": "β",
-    "ipa": "β",
+    "primary": false,
     "label": "Bvuh sound",
     "plain_english": "the bvuh sound",
     "description": [
@@ -3654,6 +3854,7 @@
     "feel_check": "You should feel buzzing in your throat.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "bv"
@@ -3673,7 +3874,7 @@
   },
   {
     "phoneme": "x",
-    "ipa": "x",
+    "primary": false,
     "label": "Hhg sound",
     "plain_english": "like the sound in 'bach'",
     "description": [
@@ -3696,6 +3897,7 @@
         "back"
       ]
     ],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "kh"
@@ -3722,7 +3924,7 @@
   },
   {
     "phoneme": "θʰ",
-    "ipa": "θʰ",
+    "primary": false,
     "label": "Thh sound",
     "plain_english": "the thh sound",
     "description": [
@@ -3735,6 +3937,7 @@
     "feel_check": "Your throat should stay quiet while the air moves.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "thh"
@@ -3745,12 +3948,11 @@
     },
     "examples": [],
     "phonetic_spelling": "THH",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "pʰ",
-    "ipa": "pʰ",
+    "primary": false,
     "label": "Puh sound",
     "plain_english": "the puh sound",
     "description": [
@@ -3763,6 +3965,7 @@
     "feel_check": "Your throat should stay quiet while the air moves.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "puh"
@@ -3773,12 +3976,11 @@
     },
     "examples": [],
     "phonetic_spelling": "PUH",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "ɪ̰",
-    "ipa": "ɪ̰",
+    "primary": false,
     "label": "Ih sound",
     "plain_english": "the ih sound",
     "description": [
@@ -3786,12 +3988,12 @@
       "creaky-voiced"
     ],
     "explanation": "Start with /ɪ/ as in 'sit', but add a creaky or vocal-fry quality from the throat. The tongue stays similar to /ɪ/; the change is mostly in the voice.",
-    "confused_phone": "i",
     "primary_cue": "Start with /ɪ/ as in 'sit', but add a creaky or vocal-fry quality from the throat.",
     "visual_cue": "Watch the lips stay relaxed rather than rounded.",
     "feel_check": "The voice should feel rough or creaky in your throat.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "ih"
@@ -3803,11 +4005,11 @@
     "examples": [],
     "phonetic_spelling": "IH",
     "video": "/placeholder.mp4",
-    "audio": null
+    "confused_phone": "i"
   },
   {
     "phoneme": "ɑ̃",
-    "ipa": "ɑ̃",
+    "primary": false,
     "label": "Uhn sound",
     "plain_english": "the uhn sound",
     "description": [
@@ -3820,6 +4022,7 @@
     "feel_check": "You should feel some vibration or airflow at the nose.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "uhn"
@@ -3835,7 +4038,7 @@
   },
   {
     "phoneme": "aɪ̃",
-    "ipa": "aɪ̃",
+    "primary": false,
     "label": "Ayn sound",
     "plain_english": "the ayn sound",
     "description": [
@@ -3849,6 +4052,7 @@
     "feel_check": "You should feel some vibration or airflow at the nose.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "ayn"
@@ -3859,12 +4063,11 @@
     },
     "examples": [],
     "phonetic_spelling": "AYN",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "æ̃",
-    "ipa": "æ̃",
+    "primary": false,
     "label": "Ehn sound",
     "plain_english": "the ehn sound",
     "description": [
@@ -3877,6 +4080,7 @@
     "feel_check": "You should feel some vibration or airflow at the nose.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "ehn"
@@ -3887,12 +4091,11 @@
     },
     "examples": [],
     "phonetic_spelling": "EHN",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "ɾ̃",
-    "ipa": "ɾ̃",
+    "primary": false,
     "label": "Rhn sound",
     "plain_english": "the rhn sound",
     "description": [
@@ -3905,6 +4108,7 @@
     "feel_check": "You should feel some vibration or airflow at the nose.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "rhn"
@@ -3915,12 +4119,11 @@
     },
     "examples": [],
     "phonetic_spelling": "RHN",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "r",
-    "ipa": "r",
+    "primary": false,
     "label": "Rolled R sound",
     "plain_english": "the rolled r sound",
     "description": [
@@ -3941,6 +4144,7 @@
         "carro"
       ]
     ],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "rrr"
@@ -3960,7 +4164,7 @@
   },
   {
     "phoneme": "sʰ",
-    "ipa": "sʰ",
+    "primary": false,
     "label": "Suh sound",
     "plain_english": "the suh sound",
     "description": [
@@ -3973,6 +4177,7 @@
     "feel_check": "Your throat should stay quiet while the air moves.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "sss"
@@ -3987,12 +4192,11 @@
     },
     "examples": [],
     "phonetic_spelling": "SUH",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "ɛ̃",
-    "ipa": "ɛ̃",
+    "primary": false,
     "label": "Ahn sound",
     "plain_english": "the ahn sound",
     "description": [
@@ -4005,6 +4209,7 @@
     "feel_check": "You should feel some vibration or airflow at the nose.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "ahn"
@@ -4020,7 +4225,7 @@
   },
   {
     "phoneme": "ɜ",
-    "ipa": "ɜ",
+    "primary": false,
     "label": "Ur sound",
     "plain_english": "like the sound in 'nurse'",
     "description": [
@@ -4035,6 +4240,7 @@
       "girl"
     ],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "ur"
@@ -4062,7 +4268,7 @@
   },
   {
     "phoneme": "ĩ",
-    "ipa": "ĩ",
+    "primary": false,
     "label": "Een sound",
     "plain_english": "like the sound in 'mean'",
     "description": [
@@ -4070,7 +4276,6 @@
       "nasalized"
     ],
     "explanation": "Start with /i/ as in 'see', then let some air flow through your nose while holding the vowel. You should feel a light nasal buzz.",
-    "confused_phone": "i",
     "primary_cue": "Start with /i/ as in 'see', then let some air flow through your nose while holding the vowel.",
     "visual_cue": "Watch the lips stay relaxed rather than rounded.",
     "feel_check": "You should feel some vibration or airflow at the nose.",
@@ -4078,6 +4283,7 @@
       "mean"
     ],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "een"
@@ -4096,23 +4302,23 @@
     ],
     "phonetic_spelling": "EEN",
     "video": "/placeholder.mp4",
-    "audio": null
+    "confused_phone": "i"
   },
   {
     "phoneme": "ɨ",
-    "ipa": "ɨ",
+    "primary": false,
     "label": "Eeh sound",
     "plain_english": "the eeh sound",
     "description": [
       "central close unrounded vowel"
     ],
     "explanation": "Say something between 'ee' and 'uh'. Keep your tongue high but more central than /i/, and keep your lips relaxed.",
-    "confused_phone": "i",
     "primary_cue": "Say something between 'ee' and 'uh'.",
     "visual_cue": "Watch the lips stay relaxed rather than rounded.",
     "feel_check": "Your lips should feel relaxed, not puckered.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "eeh"
@@ -4124,11 +4330,12 @@
     "examples": [],
     "phonetic_spelling": "EEH",
     "video": "/placeholder.mp4",
-    "audio": "https://upload.wikimedia.org/wikipedia/commons/5/53/Close_central_unrounded_vowel.ogg"
+    "audio": "https://upload.wikimedia.org/wikipedia/commons/5/53/Close_central_unrounded_vowel.ogg",
+    "confused_phone": "i"
   },
   {
     "phoneme": "o",
-    "ipa": "o",
+    "primary": false,
     "label": "Oh sound",
     "plain_english": "the oh sound",
     "description": [
@@ -4140,6 +4347,7 @@
     "feel_check": "Your lips should feel rounded and slightly firm.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "oh"
@@ -4155,7 +4363,7 @@
   },
   {
     "phoneme": "əʊ",
-    "ipa": "əʊ",
+    "primary": false,
     "label": "Oh sound",
     "plain_english": "the oh sound",
     "description": [
@@ -4177,6 +4385,7 @@
         "saw"
       ]
     ],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "oh"
@@ -4187,12 +4396,11 @@
     },
     "examples": [],
     "phonetic_spelling": "OH",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "ə̃",
-    "ipa": "ə̃",
+    "primary": false,
     "label": "Uhn sound",
     "plain_english": "the uhn sound",
     "description": [
@@ -4205,6 +4413,7 @@
     "feel_check": "You should feel some vibration or airflow at the nose.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "uhn"
@@ -4215,12 +4424,11 @@
     },
     "examples": [],
     "phonetic_spelling": "UHN",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "ʊ̃",
-    "ipa": "ʊ̃",
+    "primary": false,
     "label": "Oon sound",
     "plain_english": "the oon sound",
     "description": [
@@ -4233,6 +4441,7 @@
     "feel_check": "You should feel some vibration or airflow at the nose.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "oon"
@@ -4243,12 +4452,11 @@
     },
     "examples": [],
     "phonetic_spelling": "OON",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "oʊ̃",
-    "ipa": "oʊ̃",
+    "primary": false,
     "label": "Own sound",
     "plain_english": "the own sound",
     "description": [
@@ -4262,6 +4470,7 @@
     "feel_check": "You should feel some vibration or airflow at the nose.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "own"
@@ -4272,12 +4481,11 @@
     },
     "examples": [],
     "phonetic_spelling": "OWN",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "ə̥",
-    "ipa": "ə̥",
+    "primary": false,
     "label": "Uh sound",
     "plain_english": "the uh sound",
     "description": [
@@ -4290,6 +4498,7 @@
     "feel_check": "Your throat should stay quiet while the air moves.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "uh"
@@ -4300,12 +4509,11 @@
     },
     "examples": [],
     "phonetic_spelling": "UH",
-    "video": "/placeholder.mp4",
-    "audio": null
+    "video": "/placeholder.mp4"
   },
   {
     "phoneme": "ʉ",
-    "ipa": "ʉ",
+    "primary": false,
     "label": "Uh sound",
     "plain_english": "the uh sound",
     "description": [
@@ -4317,6 +4525,7 @@
     "feel_check": "Your lips should feel rounded and slightly firm.",
     "anchor_words": [],
     "minimal_pairs": [],
+    "minimal_pairs_by_confusion": {},
     "drill_ladder": {
       "sound": [
         "uh-"

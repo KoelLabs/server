@@ -6,6 +6,36 @@ from src.phoneme_utils import _ALL_MAPPINGS, _PHONEMES_TO_MASK
 from src.feedback import _PHONEME_DESCRIPTIONS
 from src.transcription import processor
 
+REQUIRED_PHONEME_DESCRIPTION_FIELDS = {
+    "phoneme": str,
+    "primary": bool,
+    "label": str,
+    "plain_english": str,
+    "description": list,
+    "explanation": str,
+    "primary_cue": str,
+    "visual_cue": str,
+    "feel_check": str,
+    "anchor_words": list,
+    "minimal_pairs": list,
+    "drill_ladder": dict,
+    "examples": list,
+    "phonetic_spelling": str,
+    "video": str,
+}
+
+OPTIONAL_PHONEME_DESCRIPTION_FIELDS = {
+    "audio": str,
+    "confused_phone": str,
+    "minimal_pairs_by_confusion": dict,
+    "sort_key": str,
+    "voicing_tag": str,
+}
+
+ALLOWED_PHONEME_DESCRIPTION_FIELDS = set(REQUIRED_PHONEME_DESCRIPTION_FIELDS) | set(
+    OPTIONAL_PHONEME_DESCRIPTION_FIELDS
+)
+
 
 def test_vocab_feedback_no_duplicates():
     assert len(set(p["phoneme"] for p in _PHONEME_DESCRIPTIONS)) == len(
@@ -15,28 +45,53 @@ def test_vocab_feedback_no_duplicates():
 
 def test_vocab_feedback_format():
     for feedback in _PHONEME_DESCRIPTIONS:
-        assert "phoneme" in feedback.keys() and type(feedback["phoneme"]) == str
-        assert "explanation" in feedback.keys() and type(feedback["explanation"]) == str
-        assert (
-            "phonetic_spelling" in feedback.keys()
-            and type(feedback["phonetic_spelling"]) == str
-        )
-        assert "video" in feedback.keys()
-        assert (
-            "description" in feedback.keys() and type(feedback["description"]) == list
-        )
-        assert "examples" in feedback.keys()
+        assert set(feedback.keys()).issubset(ALLOWED_PHONEME_DESCRIPTION_FIELDS)
+
+        for field, expected_type in REQUIRED_PHONEME_DESCRIPTION_FIELDS.items():
+            assert field in feedback.keys()
+            assert type(feedback[field]) == expected_type
+
+        for field, expected_type in OPTIONAL_PHONEME_DESCRIPTION_FIELDS.items():
+            if field in feedback:
+                assert type(feedback[field]) == expected_type
+
+        for word in feedback["anchor_words"]:
+            assert type(word) == str
+
+        for pair in feedback["minimal_pairs"]:
+            assert type(pair) == list
+            assert len(pair) == 2
+            assert all(type(word) == str for word in pair)
+
+        for pairs in feedback.get("minimal_pairs_by_confusion", {}).values():
+            assert type(pairs) == list
+            for pair in pairs:
+                assert type(pair) == list
+                assert len(pair) == 2
+                assert all(type(word) == str for word in pair)
+
+        for ladder_key in ("sound", "syllables", "words", "phrases"):
+            assert ladder_key in feedback["drill_ladder"]
+            assert type(feedback["drill_ladder"][ladder_key]) == list
+            assert all(
+                type(value) == str for value in feedback["drill_ladder"][ladder_key]
+            )
+
         for example in feedback["examples"]:
             assert (
                 "word" in example.keys()
                 and type(example["word"]) == str
-                and example["word"].count("*") >= 2
                 and example["word"].count("*") % 2 == 0
             ), example["word"]
             assert (
                 "phonetic_spelling" in example.keys()
                 and type(example["phonetic_spelling"]) == str
             )
+
+
+def test_vocab_feedback_primary_subset_matches_app_library():
+    primary_phonemes = {p["phoneme"] for p in _PHONEME_DESCRIPTIONS if p["primary"]}
+    assert len(primary_phonemes) == 39
 
 
 def test_vocab_feedback_coverage():

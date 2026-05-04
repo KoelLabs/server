@@ -197,7 +197,7 @@ def _build_target_card(mistake: Mistake) -> FeedbackCard:
     target_description = mistake["target_description"]
     target_label = _phone_label(mistake["target"], target_description)
     spoken_phones = sorted(phone for phone in mistake["speech"] if phone != "-")
-    spoken_descriptions = [
+    spoken_descriptions: list[dict | None] = [
         description
         for description in mistake["speech_description"]
         if description and description.get("phoneme") in spoken_phones
@@ -341,7 +341,9 @@ def build_analysis_response(
     ]
     feedback_cards = sorted(
         feedback_cards,
-        key=lambda card: (-card["frequency"] - card["total_severity"]),
+        key=lambda card: (
+            -(card.get("frequency") or 0) - (card.get("total_severity") or 0)
+        ),
     )[:topk]
 
     words = [
